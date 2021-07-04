@@ -3,6 +3,7 @@ import { gql, useMutation } from "@apollo/client";
 const GET_EMAIL = gql`query GetAccounts {
     accounts {
         email
+        userName
         blockedUsers {
           email
         }
@@ -12,7 +13,7 @@ const GET_EMAIL = gql`query GetAccounts {
 
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
-  mutation AddBlockedUser($type: Account!) {
+  mutation AddBlockedUser($type: ObjectId!) {
     addBlockedUser(type: $type) {
       id
       type

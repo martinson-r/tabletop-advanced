@@ -14,6 +14,7 @@ const resolvers = require('./graphql/resolvers');
 const typeDefs = require('./graphql/typedefs');
 
 const Account = require('./models/account');
+const Message = require('./models/message');
 
 // Construct a schema, using GraphQL schema language
 

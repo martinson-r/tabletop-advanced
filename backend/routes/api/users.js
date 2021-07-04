@@ -22,7 +22,7 @@ router.post('/create', asyncHandler(async(req, res, next) => {
     const {email, username, password, confirmPassword} = req.body;
 
     if (email &&
-        username &&
+        userName &&
         password &&
         confirmPassword) {
 
@@ -30,7 +30,7 @@ router.post('/create', asyncHandler(async(req, res, next) => {
 
         var userData = {
           email,
-          username,
+          userName,
           hashedPassword,
         }
         //use schema.create to insert data into the db

@@ -8,7 +8,7 @@ const typeDefs = gql`
   }
   type Account {
     email: String,
-    username: String,
+    userName: String,
     hashedPassword: String,
     blockedUsers: [Account]
   }
