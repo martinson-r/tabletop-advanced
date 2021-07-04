@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+const { port, db } = require('../config');
+const { uri } = db;
+const app = require('../app');
+const mongoose = require('mongoose');
+const io = require('../routes/sockets');
+
+//Connect to database
+try {
+    mongoose.connect(`${uri}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
+} catch(e) {
+    console.log(e)
+}
+
+let database = mongoose.connection;
+
+//check database connection
+database.once('open', function() {
+    console.log('Connected to MongoDB!');
+ });
+
+//check for database errors
+database.on('error', function(err) {
+    console.log(err);
+});
+
+// Start listening for connections
+    const server = app.listen(port, () => console.log(`Listening on port ${port}...`));
+
+// Attach socket.io websockets
+    io.attach(server);
