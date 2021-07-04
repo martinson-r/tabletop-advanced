@@ -17,25 +17,23 @@ function Home() {
     const { loading, error, data } = useQuery(GET_EMAIL);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :( {error}</p>;
+  if (error) return <p>Error :(</p>;
 
     if (!data.accounts) {
-        console.log('DATA', data)
-
         return (
         <p>No accounts found.</p>
         )
     }
 
     if (data.accounts) {
-        console.log('DATA2', data);
         return (
             <div>
-            {data.accounts.map(account => <><p>{account.email}</p>
-            <p>Blocked Users are: {account.blockedUsers.map(blockedUser => blockedUser.email)}</p></>
+            {data.accounts.map(account => <><p><b>{account.email}</b></p>
+            {account.blockedUsers.length > 0 && (
+            <p>Blocked Users for {account.email} are: {account.blockedUsers.map(blockedUser => blockedUser.email)}</p>)}
+            </>
             )}
             </div>
-
         )
     }
 }

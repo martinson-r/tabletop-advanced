@@ -10,6 +10,8 @@ const routes = require('./routes');
 const session = require("express-session");
 const MongoStore = require('connect-mongo');
 const { graphqlExpress, ApolloServer, gql } = require('apollo-server-express');
+const resolvers = require('./graphql/resolvers');
+const typeDefs = require('./graphql/typedefs');
 
 const Account = require('./models/account');
 
@@ -17,29 +19,6 @@ const Account = require('./models/account');
 
 //Query for accounts: returns an array because it contains many things, so it must be placed
 //inside of an array
-
-//type Account defines what you expect to get back from Query accounts:
-
-const typeDefs = gql`
-  type Query {
-    accounts: [Account]
-  }
-  type Account {
-    email: String,
-    username: String,
-    hashedPassword: String,
-    blockedUsers: [Account]
-  }
-`;
-// Provide resolver functions for your schema fields
-const resolvers = {
-    Query: {
-        accounts: (obj, args, context, info) => {
-            //This is where you actually query the database.
-            return Account.find({});
-          },
-    },
-  };
 
 //asynchandler for errors
 const asynchandler = require('express-async-handler');
@@ -89,21 +68,6 @@ app.get('/', asynchandler(async(req, res) => {
     //Send back json of all accounts.
     res.json({accounts});
 }));
-
-// app.post('/', asynchandler(async(req, res) => {
-//     //Pull data out of body using destructuring.
-//     const { email, password } = req.body;
-
-//     //Hash and salt password before storing in database.
-//     const hashedPassword = bcrypt.hashSync(password, 10);
-
-//     //Create and save new entry. Can't use insertOne.
-//     const account = await Account.create({ email, hashedPassword });
-//     await account.save();
-
-//     //Send back json of new account.
-//     res.json( { account } );
-// }));
 
 // Catch unhandled requests and forward to error handler.
 app.use((_req, _res, next) => {
