@@ -16,19 +16,27 @@ const typeDefs = require('./graphql/typedefs');
 const Account = require('./models/account');
 const Message = require('./models/message');
 
-// Construct a schema, using GraphQL schema language
-
-//Query for accounts: returns an array because it contains many things, so it must be placed
-//inside of an array
-
 //asynchandler for errors
 const asynchandler = require('express-async-handler');
 
 //init App
 const app = express();
 
-const server = new ApolloServer({ typeDefs, resolvers });
-server.applyMiddleware({ app });
+// Security Middleware
+    //test if we are in Production
+    const isProduction = environment === 'production';
+    //if not production, CORS okay.
+if (!isProduction) {
+    console.log('DEVELOPMENT');
+    // enable cors only in development
+    app.use(cors({
+        origin: 'http://localhost:3000',
+        methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
+        credentials: true,
+        preflightContinue: true,
+        cookie: { secure: true }
+    }));
+}
 
 //Use cookie parser so we can parse cookies.
 app.use(cookieParser());
@@ -37,18 +45,9 @@ app.use(cookieParser());
 app.use(express.json());
 
 //Just to be a little safer.
-app.use(helmet({
-    contentSecurityPolicy: false
-  }));
-
-// Security Middleware
-    //test if we are in Production
-    const isProduction = environment === 'production';
-    //if not production, CORS okay.
-if (!isProduction) {
-    // enable cors only in development
-    app.use(cors());
-  }
+// app.use(helmet({
+//     contentSecurityPolicy: false
+//   }));
 
   //use sessions for tracking logins
 app.use(session({
@@ -59,6 +58,9 @@ app.use(session({
     //Avoid race conditions & obey cookie related laws
     saveUninitialized: false
   }));
+
+const server = new ApolloServer({ typeDefs, resolvers });
+server.applyMiddleware({ app });
 
 app.use(routes); // Connect all the routes
 

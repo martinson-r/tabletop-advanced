@@ -1,6 +1,7 @@
 let mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { ObjectId } = Schema.Types;
+const Message = require('./message')
 const { compareSync, hashSync } = require('bcryptjs');
 
 let AccountSchema = mongoose.Schema({
@@ -22,21 +23,21 @@ let AccountSchema = mongoose.Schema({
         required: true
     },
     blockedUsers: {
-        type: Array, userId: { type: ObjectId, ref: 'User', index: true },
+        type: Array, userId: { type: ObjectId, ref: 'Account', index: true },
     },
     emailVerified: {
         type: Boolean,
         required: true,
         default: false
     },
-    // conversations: {
-    //     type: Array, messageId: { type: ObjectId, ref: 'Message', index: true },
-    // },
+    conversations: {
+        type: Array, messageId: { type: ObjectId, ref: 'Message', index: true },
+    },
     mutedPlayers: {
-        type: Array, userId: { type: ObjectId, ref: 'User', index: true },
+        type: Array, userId: { type: ObjectId, ref: 'Account', index: true },
     },
     playedWith: {
-        type: Array, userId: { type: ObjectId, ref: 'User', index: true },
+        type: Array, userId: { type: ObjectId, ref: 'Account', index: true },
     },
     hideStrangers: {
         type: Boolean,
@@ -93,19 +94,20 @@ let AccountSchema = mongoose.Schema({
 
     //Game Preferences
     books: {
+        //tbd enum
         type: Array
     },
     rulesets: {
+        //tbd enum also embed books for each one
         type: Array
     },
     gameTimes: {
+        //tbd enum
         type: Array
     },
-    gameDays: {
-        type: Array
-    },
-    gameTypes: { type: [{type: String, enum: ['Live Chat', 'Play by Post'] }], default: ['Live Chat']},
-    gameFrequency: { type: [{type: String, enum: ['Live Chat', 'Daily Posts', '3-4 Posts/week', '1-2 Posts/week'] }], default: ['Live Chat']},
+    gameDays: { type: [{type: [String], enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday','Sunday'] }], default: ['Monday']},
+    gameTypes: { type: [{type: [String], enum: ['Live Chat', 'Play by Post'] }], default: ['Live Chat']},
+    gameFrequency: { type: [{type: [String], enum: ['Live Chat', 'Daily Posts', '3-4 Posts/week', '1-2 Posts/week'] }], default: ['Live Chat']},
     homebrew: {
         type: Boolean
     },

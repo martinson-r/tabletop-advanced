@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import configureStore from './store';
 import reportWebVitals from './reportWebVitals';
 import {
   ApolloClient,
@@ -11,6 +12,15 @@ import {
   gql
 } from "@apollo/client";
 
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';;
+
+
+// import { restoreCSRF, fetch } from './store/csrf';
+// import * as sessionActions from './store/session';
+
+const store = configureStore();
+
 const client = new ApolloClient({
   //uri of graphql backend
   uri: 'http://localhost:5000/graphql',
@@ -19,22 +29,14 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-client
-  .query({
-    query: gql`
-        query GetAccounts {
-          accounts {
-          email
-        }
-      }
-    `
-  })
-  .then(result => console.log(result));
-
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <App />
+      <Provider store={store}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </Provider>
     </ApolloProvider>
   </React.StrictMode>,
   document.getElementById('root')

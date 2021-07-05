@@ -1,16 +1,12 @@
 const router = require('express').Router();
-// const sessionRouter = require('./session.js');
+const sessionRouter = require('./session.js');
 const usersRouter = require('./users.js');
 // const gamesRouter = require('./games.js');
 // const messagesRouter = require('./messages.js');
 
 //TODO: Auth
 
-router.post('/test', function (req, res) {
-  res.json({ requestBody: req.body });
-});
-
-// router.use('/session', sessionRouter);
+router.use('/session', sessionRouter);
 
 router.use('/users', usersRouter);
 
