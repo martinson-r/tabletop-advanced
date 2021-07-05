@@ -14,7 +14,7 @@ const removeUser = () => ({
 
 export const login = ({ email, password }) => async (dispatch) => {
 console.log('Hit login')
-  const res = await fetch('http://localhost:5000/api/session/', {
+  const res = await fetch('/api/session/', {
     method: 'POST',
     // headers: {
     //     'Content-Type': 'application/json'
@@ -34,7 +34,7 @@ export const restoreUser = () => async (dispatch) => {
 
 export const signup = (user) => async (dispatch) => {
   const { email, password } = user;
-  const response = await fetch('http://localhost:5000/api/users/', {
+  const response = await fetch('/api/users/', {
     method: 'POST',
     body: JSON.stringify({
       email,
@@ -47,7 +47,7 @@ export const signup = (user) => async (dispatch) => {
 };
 
 export const logout = () => async (dispatch) => {
-  const response = await fetch('http://localhost:5000/api/session/', {
+  const response = await fetch('/api/session/', {
     method: 'DELETE'
   });
   dispatch(removeUser());
