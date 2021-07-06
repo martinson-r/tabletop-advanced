@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Game from "./components/Game";
+import Conversations from "./components/Conversations";
 import Navigation from "./components/Navigation";
 import * as sessionActions from "./store/session";
 
@@ -32,6 +33,7 @@ function App() {
       {isLoaded &&(<Switch>
         <Route path="/login" component={Login}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
+        <Route path="/conversations" component={Conversations} exact={true}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

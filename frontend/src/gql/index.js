@@ -53,6 +53,18 @@ const GET_GAME_CONVOS = gql`
     }
 `;
 
+const GET_NON_GAME_NON_SPEC_CONVOS = gql`
+query GetNonGameNonSpecConvos($userId: ID) {
+    getNonGameMessages(userId: $userId){
+       messages {
+           messageText
+       }
+    }
+}
+`;
+
+
+
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
   mutation AddBlockedUser($email: String) {
@@ -77,10 +89,26 @@ const SEND_MESSAGE_TO_GAME = gql`
   }
 `;
 
+const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
+mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
+    sendNonGameMessage(userId: $userId, messageText: $messageText, _id: $messageId){
+        messages {
+           messageText
+           userId {
+               email
+           }
+        }
+    }
+}
+`;
+
 export { GET_ACCOUNTS,
         GET_CURRENT_ACCOUNT,
         ADD_BLOCKED_USER,
         GET_GAMES,
         GET_GAME,
         GET_GAME_CONVOS,
-        SEND_MESSAGE_TO_GAME };
+        SEND_MESSAGE_TO_GAME,
+        GET_NON_GAME_NON_SPEC_CONVOS,
+        SEND_NON_GAME_NON_SPEC_CONVOS
+     };

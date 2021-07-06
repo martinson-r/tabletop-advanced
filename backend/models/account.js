@@ -30,9 +30,11 @@ let AccountSchema = mongoose.Schema({
         required: true,
         default: false
     },
-    // conversations: {
-    //     type: Array, messageId: { type: ObjectId, ref: 'Message', index: true },
-    // },
+
+    //Will query and filter conversations (including games) from here.
+    conversations: {
+        type: Array, messageId: { type: ObjectId, ref: 'Message', index: true },
+    },
     mutedPlayers: {
         type: Array, userId: { type: ObjectId, ref: 'Account', index: true },
     },

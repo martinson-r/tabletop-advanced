@@ -14,7 +14,6 @@ function Game() {
     const sessionUser = useSelector((state) => state.session.user);
 
     const { gameId } = useParams();
-    console.log('GAMEID', gameId)
 
     //grab current game
     const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } } );

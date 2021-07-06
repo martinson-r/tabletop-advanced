@@ -10,10 +10,7 @@ import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME } from "../../gql"
 function Messages({gameData, gameConvosData}) {
 
     const dispatch = useDispatch();
-    console.log('gameData', gameData)
-    console.log('gameConvosData', gameConvosData)
     const gameId = gameData.game[0]._id;
-    console.log('GAMEID', gameId)
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState("");
     const [messageText, setMessage] = useState("");
@@ -31,7 +28,6 @@ function Messages({gameData, gameConvosData}) {
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      console.log(messageText);
       updateMessages(gameId, userId, messageText)
     };
 

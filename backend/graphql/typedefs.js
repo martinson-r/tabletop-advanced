@@ -10,6 +10,8 @@ const typeDefs = gql`
     game(_id: ID!): [Game]
     messages: [Messages]
     convos(gameId: ID): [Messages]
+    getNonGameMessages(userId: ID): [Messages]
+    getSingleNonGameConversation(_id: ID): [Messages]
   }
   type Account {
     _id: ID,
@@ -53,16 +55,24 @@ const typeDefs = gql`
     title: String,
     description: String,
     premium: Boolean,
-    remote: Boolean
+    remote: Boolean,
+    host: [Account],
+    players: [Account],
+    spectators: [Account]
+  }
+  type Conversation {
+    _id: ID,
+    recipients: [Account]
   }
   type Message {
     userId: Account,
-    recipient: [Account],
     messageText: String
   }
   type Messages {
      _id: ID,
      gameId: ID,
+     recipients: [ID]
+     conversationId: ID,
      isMuted: Boolean,
      isGame: Boolean,
      messages: [Message]
@@ -70,6 +80,7 @@ const typeDefs = gql`
   type Mutation {
     blockAccount(emailToBlock: String, blockerEmail: String): Account
     sendMessageToGame(gameId: ID, userId: ID, messageText: String): Messages
+    sendNonGameMessage(userId: ID, messageText: String): Messages
   }
 `;
 

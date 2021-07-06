@@ -18,7 +18,7 @@ function Navigation({ isLoaded }){
       <NavLink to="/">Find a Game</NavLink>
       <NavLink to="/tables/create">Host a Game</NavLink>
       <div className="search-messages">
-        <div><NavLink to={`/messages`}><i className="far fa-envelope"></i></NavLink></div>
+        <div><NavLink to={`/conversations`}><i className="far fa-envelope"></i></NavLink></div>
         {/* <ProfileButton user={sessionUser} />
         <SearchModal /> */}
         </div>
