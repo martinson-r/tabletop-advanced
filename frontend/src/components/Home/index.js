@@ -1,26 +1,24 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import {
     useQuery,
   } from "@apollo/client";
 import { GET_CURRENT_ACCOUNT } from "../../gql"
-import { GET_ACCOUNTS } from "../../gql"
+import { GET_GAMES } from "../../gql"
 
 function Home() {
 
-    // return (
-    //     <p>derp</p>
-    // )
-
-    const dispatch = useDispatch();
 
     //Grab our session user
-    const sessionUser = useSelector((state) => state.session.user);
-    const userId = sessionUser._id
+    const sessionUser = useSelector(state => state.session.user);
+    const [userId, setUserId] = useState("");
 
     //grab our account
-    const { loading, error, data } = useQuery(GET_CURRENT_ACCOUNT, { variables: { userId } }, );
-    // const { loading, error, data } = useQuery(GET_ACCOUNTS);
+    // const { loading, error, data } = useQuery(GET_CURRENT_ACCOUNT, { variables: { userId } }, );
+
+    //grab all games
+    const { loading, error, data } = useQuery(GET_GAMES);
 
     const [accounts, setAccount] = useState([]);
     const [loadingData, setLoading] = useState([]);
@@ -28,6 +26,8 @@ function Home() {
 
 
     useEffect(() => {
+        //Make sure we have ALL of our data
+
         if (loading) {
             setLoading(loading);
         }
@@ -36,7 +36,9 @@ function Home() {
         }
         if (data) {
             setAccount(data);
-            console.log('DATA:', data)
+        }
+        if (sessionUser) {
+            setUserId(sessionUser._id);
         }
     }, []);
 
@@ -45,18 +47,19 @@ function Home() {
 
     if (!data) {
         return (
-        <p>No accounts found.</p>
+        <p>No games found. :(</p>
         )
     }
 
     if (data) {
-        console.log(data)
-        const accountData = data.account[0];
-        console.log(accountData)
+
+        //Just turning data.games into something easier to work with
+        const gameData = data.games;
+
         return (
             <div>
-                <p>derp</p>
-                <p>Your email: {accountData.email}</p>
+                <p>Games:</p>
+                {gameData.map(game => <p key={game._id}><Link to={`/game/${game._id}`}>{game.title}</Link> - {game.description}</p>)}
             </div>
         )
     }

@@ -14,6 +14,7 @@ const resolvers = require('./graphql/resolvers');
 const typeDefs = require('./graphql/typedefs');
 
 const Account = require('./models/account');
+const Game = require('./models/game');
 const Message = require('./models/message');
 
 //asynchandler for errors
@@ -65,10 +66,31 @@ app.use(routes); // Connect all the routes
 
 app.get('/', asynchandler(async(req, res) => {
     //Get all accounts. Must be awaited.
-    const accounts = await Account.find({});
+    const messages = await Message.find({});
 
     //Send back json of all accounts.
-    res.json({accounts});
+    res.json({messages});
+}));
+
+app.post('/game/create', asynchandler(async(req, res) => {
+    const { title, description } = req.body;
+    const game = await Game.create({
+        title,
+        description
+    });
+    res.json({game});
+}));
+
+app.post('/message/create', asynchandler(async(req, res) => {
+    const { messageText, userId, isGame, gameId } = req.body;
+    console.log("game ID", gameId);
+    const message = await Message.create({
+        isGame,
+        gameId,
+        messages:
+        [{messageText, userId}]
+    });
+    res.json({message});
 }));
 
 // Catch unhandled requests and forward to error handler.

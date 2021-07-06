@@ -5,6 +5,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import Game from "./components/Game";
+import Navigation from "./components/Navigation";
 import * as sessionActions from "./store/session";
 
 function App() {
@@ -16,13 +18,22 @@ function App() {
     dispatch(sessionActions.restoreUser()).then(() => setIsLoaded(true));
   }, [dispatch]);
 
+  const logout = (e) => {
+    e.preventDefault();
+    dispatch(sessionActions.logout());
+  };
+
   return (
     <div className="App">
-    {!sessionUser&&<div><NavLink to="/signup">Sign Up</NavLink></div>}
-        {isLoaded &&(<Switch>
-          <Route path="/login" component={Login}></Route>
-          <Route path="/" component={Home}></Route>
-        </Switch>)}
+      {sessionUser&&(<div className="logout" onClick={logout}>Log Out</div>)}
+      {!sessionUser&&<div><NavLink to="/signup">Sign Up</NavLink></div>}
+      {!sessionUser&&<div><NavLink to="/login">Log In</NavLink></div>}
+      <Navigation isLoaded={isLoaded} />
+      {isLoaded &&(<Switch>
+        <Route path="/login" component={Login}></Route>
+        <Route path="/game/:gameId" component={Game} exact={true}></Route>
+        <Route path="/" component={Home}></Route>
+      </Switch>)}
     </div>
   );
 }

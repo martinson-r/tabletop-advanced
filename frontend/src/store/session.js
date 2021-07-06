@@ -57,7 +57,6 @@ function reducer(state = initialState, action) {
   let newState;
   switch (action.type) {
     case SET_USER:
-      console.log(action.payload)
       newState = Object.assign({}, state, { user: action.payload });
       return newState;
     case REMOVE_USER:
