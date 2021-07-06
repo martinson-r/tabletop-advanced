@@ -18,10 +18,11 @@ function App() {
 
   return (
     <div className="App">
-        <Switch>
+    {!sessionUser&&<div><NavLink to="/signup">Sign Up</NavLink></div>}
+        {isLoaded &&(<Switch>
           <Route path="/login" component={Login}></Route>
           <Route path="/" component={Home}></Route>
-        </Switch>
+        </Switch>)}
     </div>
   );
 }

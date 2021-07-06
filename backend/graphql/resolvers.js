@@ -10,12 +10,16 @@ const resolvers = {
             return Account.find({})
             .populate('blockedUsers');
           },
+        account: (obj, args, context, info) => {
+            console.log('ID', args._id)
+            return Account.find({_id: args._id})
+            .populate('blockedUsers');
+        },
     },
     Mutation: {
         //Block accounts
         blockAccount: async(root, args) => {
             const accountToBlock = await Account.findOne({email: args.emailToBlock});
-            console.log('email', accountToBlock.email);
 
             //push id of user to be blocked into blockedUsers
             const blockAccount = { $push:

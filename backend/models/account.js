@@ -134,7 +134,6 @@ let AccountSchema = mongoose.Schema({
 });
 
 AccountSchema.methods.comparePasswords = function(password) {
-    console.log('PASSWORD', password);
     return compareSync(password, this.hashedPassword);
 }
 

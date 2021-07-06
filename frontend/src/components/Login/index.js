@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch } from "react-redux";
+import { useHistory } from 'react-router-dom';
+
 
 function Login() {
+    const history = useHistory();
     const dispatch = useDispatch();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -10,11 +13,11 @@ function Login() {
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      console.log('click', email, password)
       setErrors([]);
-      return dispatch(sessionActions.login({ email, password })).catch(
+      return dispatch(sessionActions.login({ email, password })).then((res) => {
+        history.push("/");
+      }).catch(
         (res) => {
-            console.log('oops', res)
           if (res.data && res.data.errors) setErrors(res.data.errors);
         }
       );

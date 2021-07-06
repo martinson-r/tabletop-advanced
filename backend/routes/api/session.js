@@ -12,10 +12,8 @@ var AccountSchema = require('mongoose').model('Account').schema
 const router = express.Router();
 
 router.post('/', asyncHandler(async(req, res, next) => {
-    console.log('hit session login router')
     try {
         const { email, password } = req.body;
-        console.log('EMAIL', email)
         if (email && password) {
             const foundUser = await Account.findOne({ email });
 
@@ -45,13 +43,13 @@ router.delete('/', (req, res, next) => {
 router.get(
     '/',
     restoreUser,
-    (req, res) => {
-      const { user } = req;
+    (req, res, next) => {
+      const { user } = res.locals;
       if (user) {
         return res.json({
           user
         });
-      } else return res.json({});
+      } else return res.json({message: 'no user found'});
     }
   );
 

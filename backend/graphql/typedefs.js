@@ -5,8 +5,10 @@ const Account = require('../models/account');
 const typeDefs = gql`
   type Query {
     accounts: [Account]
+    account(_id: ID!): [Account]
   }
   type Account {
+    _id: ID,
     email: String,
     userName: String,
     hashedPassword: String,

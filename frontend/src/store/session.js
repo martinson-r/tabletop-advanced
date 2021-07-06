@@ -1,4 +1,5 @@
 import { fetch } from './csrf.js';
+// import { connect } from 'react-redux';
 
 const SET_USER = 'session/setUser';
 const REMOVE_USER = 'session/removeUser';
@@ -16,12 +17,8 @@ export const login = ({ email, password }) => async (dispatch) => {
 console.log('Hit login')
   const res = await fetch('/api/session/', {
     method: 'POST',
-    // headers: {
-    //     'Content-Type': 'application/json'
-    //   },
     body: JSON.stringify({ email, password })
   });
-  console.log('RES', res);
   dispatch(setUser(res.data.user));
   return res;
 };
@@ -60,6 +57,7 @@ function reducer(state = initialState, action) {
   let newState;
   switch (action.type) {
     case SET_USER:
+      console.log(action.payload)
       newState = Object.assign({}, state, { user: action.payload });
       return newState;
     case REMOVE_USER:

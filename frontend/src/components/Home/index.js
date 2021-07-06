@@ -1,38 +1,62 @@
 import { useEffect, useState } from "react";
-import { GET_EMAIL } from "../../gql";
+import { useDispatch, useSelector } from "react-redux";
 import {
     useQuery,
   } from "@apollo/client";
+import { GET_CURRENT_ACCOUNT } from "../../gql"
+import { GET_ACCOUNTS } from "../../gql"
 
 function Home() {
 
-    const [accounts, setAccounts] = useState([]);
+    // return (
+    //     <p>derp</p>
+    // )
 
-    const getallAccounts = async() => {
-        const getAccounts = await fetch("http://localhost:5000/api/users");
-        const newAccounts = await getAccounts.json();
-        setAccounts(newAccounts.accounts);
-    }
+    const dispatch = useDispatch();
 
-    const { loading, error, data } = useQuery(GET_EMAIL);
+    //Grab our session user
+    const sessionUser = useSelector((state) => state.session.user);
+    const userId = sessionUser._id
+
+    //grab our account
+    const { loading, error, data } = useQuery(GET_CURRENT_ACCOUNT, { variables: { userId } }, );
+    // const { loading, error, data } = useQuery(GET_ACCOUNTS);
+
+    const [accounts, setAccount] = useState([]);
+    const [loadingData, setLoading] = useState([]);
+    const [errorData, setError] = useState([]);
+
+
+    useEffect(() => {
+        if (loading) {
+            setLoading(loading);
+        }
+        if (error) {
+            setError(error);
+        }
+        if (data) {
+            setAccount(data);
+            console.log('DATA:', data)
+        }
+    }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
+  if (error) return <p>Error :( </p>;
 
-    if (!data.accounts) {
+    if (!data) {
         return (
         <p>No accounts found.</p>
         )
     }
 
-    if (data.accounts) {
+    if (data) {
+        console.log(data)
+        const accountData = data.account[0];
+        console.log(accountData)
         return (
             <div>
-            {data.accounts.map(account => <><p><b>{account.email}</b></p>
-            {account.blockedUsers.length > 0 && (
-            <p>Blocked Users for {account.email} are: {account.blockedUsers.map(blockedUser => blockedUser.email)}</p>)}
-            </>
-            )}
+                <p>derp</p>
+                <p>Your email: {accountData.email}</p>
             </div>
         )
     }

@@ -27,15 +27,14 @@ const app = express();
     const isProduction = environment === 'production';
     //if not production, CORS okay.
 if (!isProduction) {
-    console.log('DEVELOPMENT');
     // enable cors only in development
-    app.use(cors({
-        origin: 'http://localhost:3000',
-        methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
-        credentials: true,
-        preflightContinue: true,
-        cookie: { secure: true }
-    }));
+    app.use(cors(
+    //     {
+    //     origin: 'http://localhost:3000',
+    //     methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
+    //     credentials: true,
+    // }
+    ));
 }
 
 //Use cookie parser so we can parse cookies.

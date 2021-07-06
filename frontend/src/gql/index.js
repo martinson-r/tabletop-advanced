@@ -1,7 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 
-const GET_EMAIL = gql`query GetAccounts {
+const GET_ACCOUNTS = gql`query GetAccounts {
     accounts {
+        _id
         email
         userName
         blockedUsers {
@@ -9,6 +10,15 @@ const GET_EMAIL = gql`query GetAccounts {
         }
       }
 }`;
+
+const GET_CURRENT_ACCOUNT = gql`
+    query GetCurrentAccount($userId: ID!) {
+        account(_id: $userId){
+            _id
+            email
+            userName
+        }
+    }`;
 
 
 //MUTATIONS
@@ -21,4 +31,4 @@ const ADD_BLOCKED_USER = gql`
   }
 `;
 
-export { GET_EMAIL, ADD_BLOCKED_USER };
+export { GET_ACCOUNTS, GET_CURRENT_ACCOUNT, ADD_BLOCKED_USER };
