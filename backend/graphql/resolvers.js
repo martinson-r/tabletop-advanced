@@ -176,17 +176,18 @@ const resolvers = {
     Subscription: {
         messageAdded: {
             subscribe:
-            // withFilter(
-            //     () => pubsub.asyncIterator('messageAdded'),
-            //     (payload, variables) => {
-            //         console.log('PAYLOAD', payload)
-            //         console.log('VARIABLES', variables)
-            //       // Only push an update if the message is on
-            //       // the correct Game for this operation
-            //       return (payload.updatedMessages.gameId === variables.gameId);
-            //     },
-            //   ),
-             () => pubsub.asyncIterator('NEW_MESSAGE')
+             withFilter(
+                () => pubsub.asyncIterator('NEW_MESSAGE'),
+                (payload, variables) => {
+                    console.log('PAYLOAD', payload)
+                    console.log('VARIABLES', variables)
+                  // Only push an update if the message is on
+                  // the correct Game for this operation
+                  // variables come through as string, so cast either to string or to int either way
+                  return (payload.messageAdded.gameId.toString() === variables.gameId);
+                },
+              ),
+            //  () => pubsub.asyncIterator('NEW_MESSAGE')
             }
     },
   };

@@ -21,24 +21,6 @@ function Messages({...props}) {
     const [messageText, setMessage] = useState("");
 
     const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText } } );
-    // const [updateNonGameMessages] = useMutation(SEND_NON_GAME_NON_SPEC_CONVOS, { variables: { userId, messageText, _id } } );
-
-    // const [accounts, setAccount] = useState([]);
-    // const [loadingData, setLoading] = useState([]);
-    // const [errorData, setErrors] = useState([]);
-
-    //TODO: research subscribeToMore for pagination
-    // function LatestGameMessage({ gameId }) {
-    //     const { data: { messageAdded }, loading } = useSubscription(
-    //       GAME_MESSAGES_SUBSCRIPTION,
-    //       { variables: { gameId } }
-    //     );
-    //     return <h4>New comment: {!loading && messageAdded.content}</h4>;
-    // }
-
-    // pubsub.publish('commentAdded', payload);
-
-
 
     const [errors, setErrors] = useState([]);
 
