@@ -15,6 +15,7 @@ let MessageSchema = mongoose.Schema({
     gameId: {
         type: ObjectId, ref: 'Game', index: true
     },
+    //recipients must be filled with objectIds NOT set to a key in order for this to work.
     recipients: [{
             type: ObjectId, ref: 'Account', index: true
             }],

@@ -4,6 +4,10 @@ const Game = require('../models/game');
 let mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { ObjectId } = Schema.Types;
+const { PubSub, withFilter } = require('graphql-subscriptions');
+
+const pubsub = new PubSub();
+
 // Provide resolver functions for your schema fields
 const resolvers = {
     Query: {
@@ -37,10 +41,8 @@ const resolvers = {
             .exec();
         },
         getNonGameMessages: async(obj, args, context, info) => {
-            console.log('ARGS', args)
             const { userId } = args;
-            console.log('USERID NON GAME MSGS', userId)
-            return Message.find({}).populate('recipients').exec();
+            return Message.find({recipients: [userId]}).populate('recipients').exec();
         },
         //TODO: GetSingleNonGameConversation
         getSingleNonGameConversation: (obj, args, context, info) => {
@@ -69,11 +71,8 @@ const resolvers = {
         sendMessageToGame: async(root, args) => {
 
             const { gameId, messageText, userId } = args;
-            console.log('ARGS', args)
-            console.log('GAMEID', args.gameId)
 
             const findExistingMessages = await Message.find({gameId});
-            console.log(findExistingMessages)
 
             if (findExistingMessages) {
                 const updateMessages = {
@@ -85,17 +84,26 @@ const resolvers = {
                 const options = { upsert: true };
 
                 const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
-                .populate('messages');
+                updatedMessages.populate('messages');
+
+                console.log(updatedMessages);
+
+                pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
+
                 return updatedMessages;
             }
 
-            //If Message does not exist, create it.
-                const newMessage = await Message.create({gameId, messages: [{ messageText, userId }] })
-                .populate('messages');
-                return newMessage;
+            //If no Game chat exists, create it.
+                const updatedMessages = await Message.create({gameId, messages: [{ messageText, userId }] })
+                updatedMessages.populate('messages');
+
+                pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
+
         },
 
         sendNonGameMessage: async(root, args) => {
+
+            // - send a message to an existing conversation
             const { userId, messageText, _id } = args;
 
             //look for existing message with messageId
@@ -120,20 +128,67 @@ const resolvers = {
             }
 
             //if Message did not exist, create it
-                const newMessage = await Message.create({recipients: [userId], messages: [{ messageText, userId: userId }] });
-                newMessage.populate('recipients.email');
-                console.log(
-                'NEW MESSAGE', newMessage
-                )
+                const newMessage = await Message.create({recipients: [userId, recipientId], messages: [{ messageText, userId: userId }] });
+                //newMessage can only be populated after it has been created.
+                newMessage.populate('recipients');
                 return newMessage;
         },
 
+        // - add a new recipient to an existing Message
+        // - TODO: typedefs and front end
+        // addNewRecipientToChat: async(root, args) => {
+        //     const { userId, messageText, recipientId, _id } = args;
 
+        //     //look for existing message with messageId
+        //     const findExistingMessage = await Message.find({_id});
+
+        //     //if existing message is found, push new recipient into it
+        //     if (findExistingMessage.length) {
+        //         const updateRecipients = {
+        //             $push:
+        //             { recipients: [{ recipientId }] },
+        //         }
+
+        //         //upsert: true means column will be created if it doesn't exist
+        //         const options = { upsert: true };
+
+        //         const messageWithUpdatedRecipients = await Message.findOneAndUpdate({_id, updateRecipients, options})
+        //         .populate('messages.userId')
+        //         .populate('recipients')
+        //         .execPopulate();
+        //         return messageWithUpdatedRecipients;
+        //     }
+        // },
+
+        // createNewNonGameChat: async (root, args) => {
+        //     // - create a new Message, if the user indicates they want one, and add a new recipient to that Message
+        //     // - TODO: typedefs and front end
+        //     // - TODO: Message another user from their profile page
+        //     // - TODO: Add a user to a message directly by typing in their name
+        //     const { userId, recipientId } = args;
+        //     const newMessage = await Message.create({recipients: [userId, recipientId], messages: [{ messageText, userId: userId }] });
+        //         //newMessage can only be populated after it has been created.
+        //         newMessage.populate('recipients');
+        //         return newMessage;
+        // },
 
     },
-
-
-
+    Subscription: {
+        messageAdded: {
+            subscribe:
+            // withFilter(
+            //     () => pubsub.asyncIterator('messageAdded'),
+            //     (payload, variables) => {
+            //         console.log('PAYLOAD', payload)
+            //         console.log('VARIABLES', variables)
+            //       // Only push an update if the message is on
+            //       // the correct Game for this operation
+            //       return (payload.updatedMessages.gameId === variables.gameId);
+            //     },
+            //   ),
+             () => pubsub.asyncIterator('NEW_MESSAGE')
+            }
+    },
   };
 
   module.exports = resolvers;

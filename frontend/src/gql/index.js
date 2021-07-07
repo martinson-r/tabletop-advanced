@@ -66,8 +66,6 @@ query GetNonGameNonSpecConvos($userId: ID) {
 }
 `;
 
-
-
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
   mutation AddBlockedUser($email: String) {
@@ -104,6 +102,16 @@ mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId:
 }
 `;
 
+const GAME_MESSAGES_SUBSCRIPTION = gql`
+  subscription OnMessageAdded($gameId: ID!) {
+    messageAdded(gameId: $gameId) {
+        messages {
+         messageText
+        }
+    }
+  }
+`;
+
 export { GET_ACCOUNTS,
         GET_CURRENT_ACCOUNT,
         ADD_BLOCKED_USER,
@@ -112,5 +120,6 @@ export { GET_ACCOUNTS,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,
         GET_NON_GAME_NON_SPEC_CONVOS,
-        SEND_NON_GAME_NON_SPEC_CONVOS
+        SEND_NON_GAME_NON_SPEC_CONVOS,
+        GAME_MESSAGES_SUBSCRIPTION
      };

@@ -2,17 +2,19 @@ import React, { useState, useEffect } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-    useQuery, useMutation
-  } from "@apollo/client";
-import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME } from "../../gql"
 
-function Messages({gameData, gameConvosData, nonGameConvosData}) {
+import {
+    useQuery, useMutation, useSubscription
+  } from "@apollo/client";
+import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION  } from "../../gql";
+
+function Messages({...props}) {
 
     const dispatch = useDispatch();
-    console.log('NON GAME CONVOS:', nonGameConvosData)
-    console.log('GAME CONVOS:', gameConvosData)
-    console.log('gameData', gameData)
+    const nonGameConvosData = props.nonGameConvosData;
+    const gameConvosData = props.convos;
+    const gameData = props.game;
+    const subscribeToNewMessages = props.subscribeToNewMessages;
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState("");
     const [gameId, setGameId] = useState("");
@@ -25,7 +27,18 @@ function Messages({gameData, gameConvosData, nonGameConvosData}) {
     // const [loadingData, setLoading] = useState([]);
     // const [errorData, setErrors] = useState([]);
 
-    //TODO: subscribe to new message creation for this game
+    //TODO: research subscribeToMore for pagination
+    // function LatestGameMessage({ gameId }) {
+    //     const { data: { messageAdded }, loading } = useSubscription(
+    //       GAME_MESSAGES_SUBSCRIPTION,
+    //       { variables: { gameId } }
+    //     );
+    //     return <h4>New comment: {!loading && messageAdded.content}</h4>;
+    // }
+
+    // pubsub.publish('commentAdded', payload);
+
+
 
     const [errors, setErrors] = useState([]);
 
@@ -48,38 +61,69 @@ function Messages({gameData, gameConvosData, nonGameConvosData}) {
         //     setAccount(data);
         //}
         if (gameData) {
-            setGameId(gameData.game._id);
+            setGameId(gameData._id);
         }
         if (sessionUser) {
             setUserId(sessionUser._id);
         }
     }, []);
 
+
+
     return (
-        <>
-        <p>Derp.</p>
-            {gameConvosData && (<p>Message: {gameConvosData.convos.map(convo => convo.messages.map(message => <>{message.userId.email}: {message.messageText} </>))}</p>)}
-            {nonGameConvosData && (<p>Conversations: {nonGameConvosData.getNonGameMessages.map(convo => convo.recipients.map(recipient => <>{recipient.email} </>))}</p>)}
-            {gameConvosData && ( <div>
-        <form onSubmit={handleSubmit}>
-          <ul>
-            {errors.map((error, idx) => (
-              <li key={idx}>{error}</li>
-            ))}
-          </ul>
-          <label>
-            Send Message
-            <input
-              type="text"
-              value={messageText}
-              onChange={(e) => setMessage(e.target.value)}
-              required
-            />
-          </label>
-          <button type="submit">Send</button>
-        </form>
-        </div>)}
-      </>
+      <div><p>Derp.</p>
+      {gameConvosData && (<div>
+        {gameConvosData.map(convo => <div>{convo.messages.map(message => <p>{message.userId.email}: {message.messageText}</p>)}</div>)}
+      </div>)}
+      <form onSubmit={handleSubmit}>
+         <ul>
+           {errors.map((error, idx) => (
+             <li key={idx}>{error}</li>
+           ))}
+         </ul>
+         <label>
+           Send Message
+           <input
+             type="text"
+             value={messageText}
+             onChange={(e) => setMessage(e.target.value)}
+             required
+           />
+         </label>
+         <button type="submit">Send</button>
+       </form>
+      </div>
+
+
+      //   <>
+      //   <p>Derp.</p>
+      //       {gameConvosData && (
+      //         <div>
+      //           <p>Message:</p>
+      //         {/* <p>{gameConvosData.map(convo => {convo.messages.map(message => console.log(message.userId.email))})})} */}
+      //         {nonGameConvosData && (<p>Conversations: {nonGameConvosData.getNonGameMessages.map(convo => convo.recipients.map(recipient => <>{recipient.email} </>))})}</p>
+      //         </div>
+
+      //      {gameConvosData && (
+      //  <form onSubmit={handleSubmit}>
+      //    <ul>
+      //      {errors.map((error, idx) => (
+      //     //       <li key={idx}>{error}</li>
+      //     //     ))}
+      //     //   </ul>
+      //     //   <label>
+      //     //     Send Message
+      //     //     <input
+      //     //       type="text"
+      //     //       value={messageText}
+      //     //       onChange={(e) => setMessage(e.target.value)}
+      //     //       required
+      //     //     />
+      //     //   </label>
+      //     //   <button type="submit">Send</button>
+      //     // </form>)
+      //       //}
+      //  </>
     )
 }
 

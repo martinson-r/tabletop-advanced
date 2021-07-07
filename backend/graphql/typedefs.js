@@ -1,7 +1,4 @@
 const { gql } = require('apollo-server-express');
-const Account = require('../models/account');
-
-//type Account defines what you expect to get back from Query accounts:
 const typeDefs = gql`
   type Query {
     accounts: [Account]
@@ -77,6 +74,14 @@ const typeDefs = gql`
     blockAccount(emailToBlock: String, blockerEmail: String): Account
     sendMessageToGame(gameId: ID, userId: ID, messageText: String): Messages
     sendNonGameMessage(userId: ID, messageText: String, _id: ID): Messages
+  }
+  type Subscription {
+    messageAdded(gameId: ID): Messages
+  }
+  schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
   }
 `;
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { db, environment } = require('./config');
+const { db, environment, port } = require('./config');
 const { uri }  = db;
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
@@ -9,13 +9,16 @@ const helmet = require('helmet');
 const routes = require('./routes');
 const session = require("express-session");
 const MongoStore = require('connect-mongo');
-const { graphqlExpress, ApolloServer, gql } = require('apollo-server-express');
+const { graphqlExpress, ApolloServer, makeExecutableSchema, gql } = require('apollo-server-express');
 const resolvers = require('./graphql/resolvers');
 const typeDefs = require('./graphql/typedefs');
 
 const Account = require('./models/account');
 const Game = require('./models/game');
 const Message = require('./models/message');
+
+const { execute, subscribe } = require('graphql') ;
+const { SubscriptionServer } = require('subscriptions-transport-ws');
 
 //asynchandler for errors
 const asynchandler = require('express-async-handler');
@@ -59,7 +62,17 @@ app.use(session({
     saveUninitialized: false
   }));
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    schema: makeExecutableSchema({
+        typeDefs,
+        resolvers
+     }),
+    subscriptions: {
+        path: '/subscriptions'
+      },
+});
 server.applyMiddleware({ app });
 
 app.use(routes); // Connect all the routes
@@ -72,35 +85,35 @@ app.get('/', asynchandler(async(req, res) => {
     res.json({messages});
 }));
 
-app.post('/game/create', asynchandler(async(req, res) => {
-    const { title, description } = req.body;
-    const game = await Game.create({
-        title,
-        description
-    });
-    res.json({game});
-}));
+// app.post('/game/create', asynchandler(async(req, res) => {
+//     const { title, description } = req.body;
+//     const game = await Game.create({
+//         title,
+//         description
+//     });
+//     res.json({game});
+// }));
 
-app.post('/message/create', asynchandler(async(req, res) => {
-    const { messageText, userId, isGame, gameId } = req.body;
-    console.log("game ID", gameId);
-    const message = await Message.create({
-        isGame,
-        gameId,
-        messages:
-        [{messageText, userId}]
-    });
-    res.json({message});
-}));
+// app.post('/message/create', asynchandler(async(req, res) => {
+//     const { messageText, userId, isGame, gameId } = req.body;
+//     console.log("game ID", gameId);
+//     const message = await Message.create({
+//         isGame,
+//         gameId,
+//         messages:
+//         [{messageText, userId}]
+//     });
+//     res.json({message});
+// }));
 
-// Catch unhandled requests and forward to error handler.
-app.use((_req, _res, next) => {
-    const err = new Error("The requested resource couldn't be found.");
-    err.title = 'Resource Not Found';
-    err.errors = ["The requested resource couldn't be found."];
-    err.status = 404;
-    next(err);
-  });
+// // Catch unhandled requests and forward to error handler.
+// app.use((_req, _res, next) => {
+//     const err = new Error("The requested resource couldn't be found.");
+//     err.title = 'Resource Not Found';
+//     err.errors = ["The requested resource couldn't be found."];
+//     err.status = 404;
+//     next(err);
+//   });
 
 // Error formatter
 app.use((err, _req, res, _next) => {

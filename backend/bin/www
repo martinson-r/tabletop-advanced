@@ -4,7 +4,19 @@ const { port, db } = require('../config');
 const { uri } = db;
 const app = require('../app');
 const mongoose = require('mongoose');
-const io = require('../routes/sockets');
+const { createServer } = require('http');
+const { SubscriptionServer } = require('subscriptions-transport-ws');
+const { execute, subscribe } = require('graphql');
+const { makeExecutableSchema } = require('graphql-tools')
+const typeDefs = require('../graphql/typedefs');
+const resolvers = require('../graphql/resolvers');
+const schema = makeExecutableSchema({
+   typeDefs,
+   resolvers
+});
+
+//old socket.io implementation
+//const io = require('../routes/sockets');
 
 //Connect to database
 try {
@@ -25,8 +37,12 @@ database.on('error', function(err) {
     console.log(err);
 });
 
-// Start listening for connections
-    const server = app.listen(port, () => console.log(`Listening on port ${port}...`));
-
-// Attach socket.io websockets
-    io.attach(server);
+const ws = createServer(app);
+ws.listen(port, () => {
+  console.log(`Apollo Server is now running on http://localhost:${port}`);
+  // Set up the WebSocket for handling GraphQL subscriptions
+  new SubscriptionServer({execute, subscribe, schema}, {
+    server: ws,
+    path: '/subscriptions',
+  });
+});

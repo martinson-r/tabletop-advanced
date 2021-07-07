@@ -6,7 +6,7 @@ import Messages from "../Messages";
 import {
     useQuery,
   } from "@apollo/client";
-import { GET_NON_GAME_NON_SPEC_CONVOS } from "../../gql"
+import { GET_NON_GAME_NON_SPEC_CONVOS, MESSAGES_SUBSCRIPTION } from "../../gql"
 
 function Conversation() {
     const sessionUser = useSelector((state) => state.session.user);
@@ -47,21 +47,29 @@ function Conversation() {
         )
     }
 
-    if (nonGameConvosData) {
+    // function MessagesPageWithData({ params }) {
+    //     const result = useQuery(
+    //       MESSAGES_QUERY,
+    //       { variables: { gameId } }
+    //     );
+    //     return <Messages nonGameConvosData={nonGameConvosData} />;
+    //   }
 
-        console.log('Non Game Convos Data', nonGameConvosData)
+    // if (nonGameConvosData) {
 
-        return (
-            <div>
-                <p>TBD: Non Game Conversations</p>
-                <Messages nonGameConvosData={nonGameConvosData}></Messages>
-            </div>
-        )
-    } else {
-        return (
-            <p>derp.</p>
-        )
-    }
+    //     console.log('Non Game Convos Data', nonGameConvosData)
+
+    //     return (
+    //         <div>
+    //             <p>TBD: Non Game Conversations</p>
+    //             <Messages nonGameConvosData={nonGameConvosData}></Messages>
+    //         </div>
+    //     )
+    // } else {
+    //     return (
+    //         <p>derp.</p>
+    //     )
+    // }
 };
 
 export default Conversation;

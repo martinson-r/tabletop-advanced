@@ -9,8 +9,13 @@ import {
   InMemoryCache,
   ApolloProvider,
   useQuery,
-  gql
+  gql,
+  split,
+  HttpLink
 } from "@apollo/client";
+import { WebSocketLink } from "@apollo/client/link/ws";
+import { getMainDefinition } from '@apollo/client/utilities';
+
 
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';;
@@ -18,15 +23,65 @@ import { BrowserRouter } from 'react-router-dom';;
 
 // import { restoreCSRF, fetch } from './store/csrf';
 // import * as sessionActions from './store/session';
+//split communication by operation so we don't use ws for everything
+const httpLink = new HttpLink({
+  uri: '/graphql'
+});
+
+
+const wsLink = new WebSocketLink({
+  uri: "ws://localhost:5000/subscriptions",
+  options: {
+    options: {
+      reconnect: true,
+
+      //tweak for session auth
+      // connectionParams: {
+      //   authToken: user.authToken,
+      // },
+    },
+  }
+});
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,
+  httpLink,
+);
 
 const store = configureStore();
 
 const client = new ApolloClient({
   //uri of graphql backend
-  uri: 'http://localhost:5000/graphql',
+  link: splitLink,
 
   //cache query results after fetching
-  cache: new InMemoryCache()
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        Part: {
+          parts: {
+            fields: {
+              convos: { merge(existing, incoming) {
+                return incoming;
+              },
+            },
+            messageAdded: { merge(existing, incoming) {
+              return incoming;
+            },
+          },
+            }
+          }
+        }
+      }
+    }
+  })
 });
 
 ReactDOM.render(
