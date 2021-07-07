@@ -7,15 +7,19 @@ import {
   } from "@apollo/client";
 import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME } from "../../gql"
 
-function Messages({gameData, gameConvosData}) {
+function Messages({gameData, gameConvosData, nonGameConvosData}) {
 
     const dispatch = useDispatch();
-    const gameId = gameData.game[0]._id;
+    console.log('NON GAME CONVOS:', nonGameConvosData)
+    console.log('GAME CONVOS:', gameConvosData)
+    console.log('gameData', gameData)
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState("");
+    const [gameId, setGameId] = useState("");
     const [messageText, setMessage] = useState("");
 
     const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText } } );
+    // const [updateNonGameMessages] = useMutation(SEND_NON_GAME_NON_SPEC_CONVOS, { variables: { userId, messageText, _id } } );
 
     // const [accounts, setAccount] = useState([]);
     // const [loadingData, setLoading] = useState([]);
@@ -28,7 +32,7 @@ function Messages({gameData, gameConvosData}) {
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      updateMessages(gameId, userId, messageText)
+        updateMessages(gameId, userId, messageText)
     };
 
     useEffect(() => {
@@ -43,17 +47,20 @@ function Messages({gameData, gameConvosData}) {
         // if (data) {
         //     setAccount(data);
         //}
+        if (gameData) {
+            setGameId(gameData.game._id);
+        }
         if (sessionUser) {
-            setUserId(sessionUser._id)
+            setUserId(sessionUser._id);
         }
     }, []);
 
     return (
         <>
-            <p>Message: {gameConvosData.convos.map(convo => convo.messages.map(message => <>{message.userId.email}: {message.messageText} </>))}</p>
-            <p>Send message</p>
-
-      <div>
+        <p>Derp.</p>
+            {gameConvosData && (<p>Message: {gameConvosData.convos.map(convo => convo.messages.map(message => <>{message.userId.email}: {message.messageText} </>))}</p>)}
+            {nonGameConvosData && (<p>Conversations: {nonGameConvosData.getNonGameMessages.map(convo => convo.recipients.map(recipient => <>{recipient.email} </>))}</p>)}
+            {gameConvosData && ( <div>
         <form onSubmit={handleSubmit}>
           <ul>
             {errors.map((error, idx) => (
@@ -71,7 +78,7 @@ function Messages({gameData, gameConvosData}) {
           </label>
           <button type="submit">Send</button>
         </form>
-        </div>
+        </div>)}
       </>
     )
 }

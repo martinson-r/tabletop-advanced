@@ -1,6 +1,6 @@
+const Message = require('../models/message');
 const Account = require('../models/account');
 const Game = require('../models/game');
-const Message = require('../models/message');
 let mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { ObjectId } = Schema.Types;
@@ -23,10 +23,9 @@ const resolvers = {
             return Game.find({});
         },
         game: (obj, args, context, info) => {
-            console.log('SINGLE GAME ARGS', args);
 
             //Remember when writing typedefs that this returns an array
-            return Game.find({_id: args._id})
+            return Game.findOne({_id: args._id})
             .exec();
         },
         messages: (obj, args, context, info) => {
@@ -34,12 +33,14 @@ const resolvers = {
         },
         convos: (obj, args, context, info) => {
             return Message.find({ gameId: args.gameId })
-            .populate('messages.userId');
+            .populate('messages.userId')
+            .exec();
         },
-        getNonGameMessages: (obj, args, context, info) => {
+        getNonGameMessages: async(obj, args, context, info) => {
+            console.log('ARGS', args)
             const { userId } = args;
-            console.log('USERID',userId)
-            return Message.find({messages: [{ recipients: [userId] }]});
+            console.log('USERID NON GAME MSGS', userId)
+            return Message.find({}).populate('recipients').exec();
         },
         //TODO: GetSingleNonGameConversation
         getSingleNonGameConversation: (obj, args, context, info) => {
@@ -84,27 +85,28 @@ const resolvers = {
                 const options = { upsert: true };
 
                 const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
-                .populate('messages.userId');
+                .populate('messages');
                 return updatedMessages;
             }
-                const newMessage = await Message.create({gameId: gameId, messages: [{ messageText, userId }] })
-                .populate('messages.userId');
+
+            //If Message does not exist, create it.
+                const newMessage = await Message.create({gameId, messages: [{ messageText, userId }] })
+                .populate('messages');
                 return newMessage;
         },
+
         sendNonGameMessage: async(root, args) => {
             const { userId, messageText, _id } = args;
-            console.log('ARGS', args)
 
             //look for existing message with messageId
-            const findExistingMessages = await Message.find({_id});
-            console.log(findExistingMessages)
+            const findExistingMessage = await Message.find({_id});
 
             //if existing message is found, push new messages etc into it
             //users are also added as recipients to their own messages
-            if (findExistingMessages) {
+            if (findExistingMessage.length) {
                 const updateMessages = {
                     $push:
-                    { recipients: { userId }, messages: { messageText, userId } },
+                    { recipients: [{ userId }], messages: { messageText, userId } },
                 }
 
                 //upsert: true means column will be created if it doesn't exist
@@ -112,18 +114,26 @@ const resolvers = {
 
                 const updatedMessages = await Message.findOneAndUpdate({_id, updateMessages, options})
                 .populate('messages.userId')
-                .populate('recipients.userId');
+                .populate('recipients')
+                .execPopulate();
                 return updatedMessages;
             }
-                const newMessage = await Message.create({messages: {recipients: [userId] [{ messageText, userId }]} })
-                .populate('messages.userId')
-                .populate('recipients.userId');
+
+            //if Message did not exist, create it
+                const newMessage = await Message.create({recipients: [userId], messages: [{ messageText, userId: userId }] });
+                newMessage.populate('recipients.email');
                 console.log(
                 'NEW MESSAGE', newMessage
                 )
                 return newMessage;
         },
+
+
+
     },
+
+
+
   };
 
   module.exports = resolvers;

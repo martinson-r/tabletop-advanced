@@ -56,9 +56,12 @@ const GET_GAME_CONVOS = gql`
 const GET_NON_GAME_NON_SPEC_CONVOS = gql`
 query GetNonGameNonSpecConvos($userId: ID) {
     getNonGameMessages(userId: $userId){
-       messages {
-           messageText
-       }
+        recipients {
+            email
+        }
+        messages {
+            messageText
+        }
     }
 }
 `;
@@ -78,7 +81,6 @@ const ADD_BLOCKED_USER = gql`
 const SEND_MESSAGE_TO_GAME = gql`
   mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
     sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
-        gameId
         messages {
             userId {
                 email
@@ -93,10 +95,10 @@ const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
 mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
     sendNonGameMessage(userId: $userId, messageText: $messageText, _id: $messageId){
         messages {
-           messageText
            userId {
                email
            }
+        messageText
         }
     }
 }

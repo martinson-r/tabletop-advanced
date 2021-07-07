@@ -4,6 +4,7 @@ const { ObjectId } = Schema.Types;
 const Account = require('./account');
 const Game = require('./game');
 
+
 let MessageSchema = mongoose.Schema({
     isMuted: Boolean,
 
@@ -12,14 +13,14 @@ let MessageSchema = mongoose.Schema({
     //if the Message has no gameId and isGame is false, it is a regular chat and displayed as such.
     isGame: Boolean,
     gameId: {
-        type: Schema.Types.ObjectId, ref: 'Game', index: true
+        type: ObjectId, ref: 'Game', index: true
     },
-    recipients: {
-        type: Array, userId: { type: ObjectId, ref: 'Account', index: true },
-    },
+    recipients: [{
+            type: ObjectId, ref: 'Account', index: true
+            }],
     messages: [{
         userId: {
-            type: Schema.Types.ObjectId, ref: 'Account', index: true
+            type: ObjectId, ref: 'Account', index: true
         },
         date: {
             type: Date,
@@ -40,7 +41,7 @@ let MessageSchema = mongoose.Schema({
         reportedBy: {
             type: Array, userId: { type: ObjectId, ref: 'Account', index: true },
         }
-    }]
+    }],
 });
 
 const Message = mongoose.model('Message', MessageSchema);

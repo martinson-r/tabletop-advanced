@@ -7,7 +7,7 @@ const typeDefs = gql`
     accounts: [Account]
     account(_id: ID!): [Account]
     games: [Game]
-    game(_id: ID!): [Game]
+    game(_id: ID!): Game
     messages: [Messages]
     convos(gameId: ID): [Messages]
     getNonGameMessages(userId: ID): [Messages]
@@ -60,19 +60,15 @@ const typeDefs = gql`
     players: [Account],
     spectators: [Account]
   }
-  type Conversation {
-    _id: ID,
-    recipients: [Account]
-  }
   type Message {
     userId: Account,
     messageText: String
+    date: String,
   }
   type Messages {
      _id: ID,
-     gameId: ID,
-     recipients: [ID]
-     conversationId: ID,
+     gameId: Game,
+     recipients: [Account],
      isMuted: Boolean,
      isGame: Boolean,
      messages: [Message]
@@ -80,7 +76,7 @@ const typeDefs = gql`
   type Mutation {
     blockAccount(emailToBlock: String, blockerEmail: String): Account
     sendMessageToGame(gameId: ID, userId: ID, messageText: String): Messages
-    sendNonGameMessage(userId: ID, messageText: String): Messages
+    sendNonGameMessage(userId: ID, messageText: String, _id: ID): Messages
   }
 `;
 

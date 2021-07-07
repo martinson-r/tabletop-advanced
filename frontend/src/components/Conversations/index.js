@@ -10,7 +10,7 @@ import { GET_NON_GAME_NON_SPEC_CONVOS } from "../../gql"
 
 function Conversation() {
     const sessionUser = useSelector((state) => state.session.user);
-    const [userId, setUserId] = useState("");
+    const [userId, setUserId] = useState("60e4d2241a7955e9e179501b");
 
     const [accounts, setAccount] = useState([]);
     const [loadingData, setLoading] = useState([]);
@@ -33,12 +33,13 @@ function Conversation() {
         }
         if (sessionUser) {
             setUserId(sessionUser._id);
-            console.log('USERID', userId)
+            console.log(sessionUser._id)
+            console.log('USERID:', userId)
         }
     }, []);
 
     if (loadConvos) return <p>Loading...</p>;
-  if (nonGameConvosError) return <p>Error :( </p>;
+  if (nonGameConvosError) return <p>Error :( {nonGameConvosError} </p>;
 
     if (!nonGameConvosData) {
         return (
@@ -53,8 +54,7 @@ function Conversation() {
         return (
             <div>
                 <p>TBD: Non Game Conversations</p>
-                {/* <p>Game Detail: {gameDetails.description}</p>
-                <Messages gameData={gameData} gameConvosData={gameConvosData}></Messages> */}
+                <Messages nonGameConvosData={nonGameConvosData}></Messages>
             </div>
         )
     } else {

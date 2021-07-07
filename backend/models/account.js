@@ -1,7 +1,6 @@
 let mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { ObjectId } = Schema.Types;
-const Message = require('./message')
 const { compareSync, hashSync } = require('bcryptjs');
 
 let AccountSchema = mongoose.Schema({
@@ -15,32 +14,21 @@ let AccountSchema = mongoose.Schema({
     userName: {
         type: String,
         unique: true,
-        required: true,
+        // required: true,
         trim: true
       },
     hashedPassword: {
         type: String,
         required: true
     },
-    blockedUsers: {
-        type: Array, userId: { type: ObjectId, ref: 'Account', index: true },
-    },
+    blockedUsers: [{userId: { type: ObjectId, ref: 'Account', index: true }}],
     emailVerified: {
         type: Boolean,
         required: true,
         default: false
     },
-
-    //Will query and filter conversations (including games) from here.
-    conversations: {
-        type: Array, messageId: { type: ObjectId, ref: 'Message', index: true },
-    },
-    mutedPlayers: {
-        type: Array, userId: { type: ObjectId, ref: 'Account', index: true },
-    },
-    playedWith: {
-        type: Array, userId: { type: ObjectId, ref: 'Account', index: true },
-    },
+    mutedPlayers: [{userId: { type: ObjectId, ref: 'Account', index: true }}],
+    playedWith: [{userId: { type: ObjectId, ref: 'Account', index: true }}],
     hideStrangers: {
         type: Boolean,
         default: true

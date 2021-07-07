@@ -38,6 +38,7 @@ function Game() {
 
         return (
             <div>
+                <p>Game Title: {gameDetails.title}</p>
                 <p>Game Detail: {gameDetails.description}</p>
                 <Messages gameData={gameData} gameConvosData={gameConvosData}></Messages>
             </div>
