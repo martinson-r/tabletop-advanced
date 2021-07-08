@@ -44,7 +44,7 @@ const resolvers = {
 
             //Some basic pagination. Remember that messagesToTruncate is an array because
             //find returns an array. We have to key in to index 0 and use splice and mutate array.
-            //messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-10)
+            messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-10)
 
             return messagesToTruncate;
         },
@@ -102,7 +102,7 @@ const resolvers = {
                 //TODO: paginate
                 //right now, this just limits to last 10 messages, no way to see older messages
                 //This is not an array
-                //updatedMessages.messages.splice(0, updatedMessages.messages.length-10)
+                updatedMessages.messages.splice(0, updatedMessages.messages.length-10)
 
                 pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
 
