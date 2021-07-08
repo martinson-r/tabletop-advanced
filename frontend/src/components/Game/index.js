@@ -30,6 +30,7 @@ function Game() {
       //subscribe when initial GET_GAME Query is made
       //Avoid a race condition by checking to see if game convo data has loaded before trying to
       //subscribe to it.
+      if (gameId) {
         subscribeToMore({
           document: GAME_MESSAGES_SUBSCRIPTION,
           variables: { gameId },
@@ -44,7 +45,7 @@ function Game() {
             });
           }
         });
-
+      }
       }, [])
 
     if (!gameData) {
