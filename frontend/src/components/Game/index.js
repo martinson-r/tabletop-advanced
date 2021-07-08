@@ -36,15 +36,16 @@ function Game() {
           updateQuery: (prev, { subscriptionData }) => {
             if (!subscriptionData.data) return prev;
             const newMessage = subscriptionData.data.messageAdded;
-
             console.log(subscriptionData.data)
+
+            console.log('NEW', newMessage)
 
 
             //Populate new messages
-
+            //TODO fix caching issue with newly opened game
             if (prev.convos) {
               return Object.assign({}, prev, {
-                convos: [newMessage, ...prev.convos[0].messages]
+                convos: [prev.convos[0].messages]
             });
             }
 
@@ -53,10 +54,6 @@ function Game() {
                 convos: [newMessage]
               }
             }
-
-
-
-
           }
         });
       }, [])

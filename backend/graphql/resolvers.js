@@ -37,13 +37,14 @@ const resolvers = {
         },
         convos: async (obj, args, context, info) => {
 
+            //populate messages.userId to get email etc data
             const messagesToTruncate = await Message.find({ gameId: args.gameId })
             .populate('messages.userId')
             .exec();
 
             //Some basic pagination. Remember that messagesToTruncate is an array because
             //find returns an array. We have to key in to index 0 and use splice and mutate array.
-            messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-10)
+            //messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-10)
 
             return messagesToTruncate;
         },
@@ -95,12 +96,13 @@ const resolvers = {
                 const options = { upsert: true };
 
                 const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
-                updatedMessages.populate('messages');
+                .populate('messages.userId')
+                //.exec();
 
                 //TODO: paginate
                 //right now, this just limits to last 10 messages, no way to see older messages
                 //This is not an array
-                updatedMessages.messages.splice(0, updatedMessages.messages.length-10)
+                //updatedMessages.messages.splice(0, updatedMessages.messages.length-10)
 
                 pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
 
@@ -110,6 +112,9 @@ const resolvers = {
             //If no Game chat exists, create it.
             console.log('ELSE BLOCK')
                 await Message.create({gameId, messages: [{ messageText, userId }] });
+
+                //Hard lesson: you can't populate a newly created Message. You have to create and then query
+                //in order to populate data.
                 const grabMessageArray = await Message.find({gameId}).populate('messages.userId');
                 const updatedMessages = grabMessageArray[0];
 
