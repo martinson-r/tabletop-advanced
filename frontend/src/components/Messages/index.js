@@ -10,7 +10,6 @@ import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC
 
 function Messages({...props}) {
 
-    const dispatch = useDispatch();
     const nonGameConvosData = props.nonGameConvosData;
     const gameConvosData = props.convos;
     const gameData = props.game;
@@ -31,17 +30,6 @@ function Messages({...props}) {
     };
 
     useEffect(() => {
-        //Make sure we have ALL of our data
-
-        // if (loading) {
-        //     setLoading(loading);
-        // }
-        // if (error) {
-        //     setErrors(error);
-        // }
-        // if (data) {
-        //     setAccount(data);
-        //}
         if (gameData) {
             setGameId(gameData._id);
         }
@@ -55,7 +43,7 @@ function Messages({...props}) {
     return (
       <div><p>Derp.</p>
       {gameConvosData && (<div>
-        {gameConvosData.map(convo => <div>{convo.messages.map(message => <p>{message.userId.email}: {message.messageText}</p>)}</div>)}
+        {gameConvosData.map(convo => <div key={convo._id}>{convo.messages.map(message => <p key={message._id}>{message.userId.email}: {message.messageText}</p>)}</div>)}
       </div>)}
       <form onSubmit={handleSubmit}>
          <ul>

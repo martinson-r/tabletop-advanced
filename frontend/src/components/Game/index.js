@@ -11,35 +11,41 @@ export const pubsub = new PubSub();
 
 function Game() {
 
-    // //Grab our session user
+    // Grab our session user
     const sessionUser = useSelector((state) => state.session.user);
 
+    // Grab our game ID
     const { gameId } = useParams();
 
-    //grab current game
+    //grab current game using game ID
      const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } } );
-     const { loading, error, data } = useSubscription(GAME_MESSAGES_SUBSCRIPTION, { variables: { gameId }});
+    //  const { loading, error, data } = useSubscription(GAME_MESSAGES_SUBSCRIPTION, { variables: { gameId }});
      //Note: Whenever a query returns a result in Apollo Client, that result includes a subscribeToMore function
      const { subscribeToMore, data: gameConvosData } = useQuery(
         GET_GAME_CONVOS,
         { variables: { gameId } }
       );
 
-      subscribeToMore({
-        document: GAME_MESSAGES_SUBSCRIPTION,
-        variables: { gameId },
-        updateQuery: (prev, { subscriptionData }) => {
-          if (!subscriptionData.data) return prev;
-          const newMessage = subscriptionData.data.messageAdded;
-          console.log('NEWMESSAGE', newMessage)
-          const messages = newMessage.messages
-          return Object.assign({}, prev, {
+      useEffect(() => {
+      //subscribe when initial GET_GAME Query is made
+      //Avoid a race condition by checking to see if game convo data has loaded before trying to
+      //subscribe to it.
+        subscribeToMore({
+          document: GAME_MESSAGES_SUBSCRIPTION,
+          variables: { gameId },
+          updateQuery: (prev, { subscriptionData }) => {
+            if (!subscriptionData.data) return prev;
+            const newMessage = subscriptionData.data.messageAdded;
+            const messages = newMessage.messages
 
-              convos: messages
+            //Populate new messages
+            return Object.assign({}, prev, {
+                convos: messages
+            });
+          }
+        });
 
-          });
-        }
-      })
+      }, [])
 
     if (!gameData) {
         return (
