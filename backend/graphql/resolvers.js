@@ -24,13 +24,19 @@ const resolvers = {
             .exec();
         },
         games: (obj, args, context, info) => {
-            return Game.find({});
+            return Game.find({})
+            .populate('host')
+            .exec();
         },
-        game: (obj, args, context, info) => {
+        game: async (obj, args, context, info) => {
 
             //Remember when writing typedefs that this returns an array
-            return Game.findOne({_id: args._id})
-            .exec();
+            let game = await Game.findOne({_id: args._id})
+            .populate('host')
+
+            console.log(game);
+
+            return game;
         },
         messages: (obj, args, context, info) => {
             return Message.find({});

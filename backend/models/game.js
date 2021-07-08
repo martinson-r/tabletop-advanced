@@ -59,7 +59,7 @@ let GameSchema = mongoose.Schema({
     gameCleanliness: {
         type: Number, enum: [1, 2, 3, 4, 5]
     },
-    host: { type: ObjectId, ref: 'User', index: true },
+    host: { type: ObjectId, ref: 'Account', index: true },
     guestHosts: { type: Array, userId: { type: ObjectId, ref: 'Account', index: true } },
     players: { type: Array, userId: { type: ObjectId, ref: 'Account', index: true } },
     waitlist: { type: Array, userId: { type: ObjectId, ref: 'Account', index: true } },

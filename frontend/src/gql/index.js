@@ -26,6 +26,9 @@ const GET_GAMES = gql`
         _id
         title
         description
+        host {
+            email
+        }
        }
     }
 `;
@@ -36,6 +39,9 @@ const GET_GAME = gql`
         _id
         title
         description
+        host {
+            email
+        }
        }
     }
 `;

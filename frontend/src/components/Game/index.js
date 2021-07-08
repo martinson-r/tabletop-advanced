@@ -38,11 +38,7 @@ function Game() {
             const newMessage = subscriptionData.data.messageAdded;
             console.log(subscriptionData.data)
 
-            console.log('NEW', newMessage)
-
-
             //Populate new messages
-            //TODO fix caching issue with newly opened game
             if (prev.convos) {
               return Object.assign({}, prev, {
                 convos: [prev.convos[0].messages]
@@ -67,10 +63,13 @@ function Game() {
 
     const gameDetails = gameData.game;
 
+    console.log(gameDetails)
+
         return (
             <>
             <p>Game Title: {gameDetails.title}</p>
             <p>Game Detail: {gameDetails.description}</p>
+            <p>Host: {gameDetails.host.email}</p>
             <Messages
               {...gameConvosData} {...gameData }
               ></Messages>

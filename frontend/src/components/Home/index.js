@@ -59,7 +59,7 @@ function Home() {
         return (
             <div>
                 <p>Games:</p>
-                {gameData.map(game => <p key={game._id}><Link to={`/game/${game._id}`}>{game.title}</Link> - {game.description}</p>)}
+                {gameData.map(game => <p key={game._id}><Link to={`/game/${game._id}`}>{game.title}</Link> - {game.description}, Hosted by {game.host.email}</p>)}
             </div>
         )
     }
