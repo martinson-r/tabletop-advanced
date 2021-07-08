@@ -57,31 +57,54 @@ const splitLink = split(
 
 const store = configureStore();
 
-const client = new ApolloClient({
-  //uri of graphql backend
-  link: splitLink,
+// const cache = new InMemoryCache({});
 
-  //cache query results after fetching
-  cache: new InMemoryCache({
+  const cache = new InMemoryCache({
     typePolicies: {
-      Query: {
-        Part: {
-          parts: {
-            fields: {
-              convos: { merge(existing, incoming) {
-                return incoming;
-              },
-            },
-              messageAdded: { merge(existing, incoming) {
-                return incoming;
-              },
-            },
+      Subscription: {
+        fields: {
+          //messages is what we're merging in convos, gotta key into it.
+            convos: { messages: {
+              merge(existing = [], incoming) {
+                return [...existing, ...incoming];
+              }
           }
+        }
+        }
+      },
+        Query: {
+          fields: {
+            //messages is what we're merging in convos, gotta key into it.
+              convos: { messages: {
+                merge(existing = [], incoming) {
+                  return [...existing, ...incoming];
+                }
+            }
           }
         }
       }
     }
   })
+
+//   Subscription: {
+//     fields: {
+//       convos: {
+//         merge(existing = [], incoming) {
+//           console.log('SUB INCOMING', incoming);
+//           console.log('NEW ARRAY', [...existing, ...incoming])
+//           return [...existing, ...incoming];
+//         },
+//       },
+//     },
+//   },
+// }
+// })
+
+const client = new ApolloClient({
+  //uri of graphql backend
+  link: splitLink,
+  cache: cache
+
 });
 
 ReactDOM.render(

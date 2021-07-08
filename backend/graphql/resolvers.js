@@ -43,7 +43,7 @@ const resolvers = {
 
             //Some basic pagination. Remember that messagesToTruncate is an array because
             //find returns an array. We have to key in to index 0 and use splice and mutate array.
-            messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-5)
+            messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-10)
 
             return messagesToTruncate;
         },
@@ -81,19 +81,26 @@ const resolvers = {
 
             const findExistingMessages = await Message.find({gameId});
 
-            if (findExistingMessages) {
+            console.log('EXISTING', findExistingMessages)
+
+            if (findExistingMessages.length) {
+
+                //push new data into existing game messages
                 const updateMessages = {
                     $push:
                     { messages: { messageText, userId } },
                 }
 
-                //upsert: true means blockedUsers will be created if it doesn't exist
+                //upsert: true means something will be created if it doesn't exist
                 const options = { upsert: true };
 
                 const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
                 updatedMessages.populate('messages');
 
-                console.log(updatedMessages);
+                //TODO: paginate
+                //right now, this just limits to last 10 messages, no way to see older messages
+                //This is not an array
+                updatedMessages.messages.splice(0, updatedMessages.messages.length-10)
 
                 pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
 
@@ -101,12 +108,17 @@ const resolvers = {
             }
 
             //If no Game chat exists, create it.
-                const updatedMessages = await Message.create({gameId, messages: [{ messageText, userId }] })
-                updatedMessages.populate('messages');
+            console.log('ELSE BLOCK')
+                await Message.create({gameId, messages: [{ messageText, userId }] });
+                const grabMessageArray = await Message.find({gameId}).populate('messages.userId');
+                const updatedMessages = grabMessageArray[0];
 
-                updatedMessages.messages.splice(0, updatedMessages.messages.length-5)
+                console.log('EMAIL', updatedMessages.messages[0].userId.email)
+                console.log('MSGS', updatedMessages.messages)
 
                 pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
+
+                return updatedMessages;
 
         },
 
@@ -196,6 +208,8 @@ const resolvers = {
                   return (payload.messageAdded.gameId.toString() === variables.gameId);
                 },
               ),
+
+              //old publisher
             //  () => pubsub.asyncIterator('NEW_MESSAGE')
             }
     },

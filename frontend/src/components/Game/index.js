@@ -36,13 +36,27 @@ function Game() {
           updateQuery: (prev, { subscriptionData }) => {
             if (!subscriptionData.data) return prev;
             const newMessage = subscriptionData.data.messageAdded;
-            const messages = newMessage.messages
-            console.log(prev)
+
+            console.log(subscriptionData.data)
+
 
             //Populate new messages
-            return Object.assign({}, prev, {
+
+            if (prev.convos) {
+              return Object.assign({}, prev, {
                 convos: [newMessage, ...prev.convos[0].messages]
             });
+            }
+
+            else {
+              return {
+                convos: [newMessage]
+              }
+            }
+
+
+
+
           }
         });
       }, [])
@@ -60,9 +74,9 @@ function Game() {
             <>
             <p>Game Title: {gameDetails.title}</p>
             <p>Game Detail: {gameDetails.description}</p>
-            {gameConvosData && (<Messages
+            <Messages
               {...gameConvosData} {...gameData }
-              ></Messages>)}
+              ></Messages>
 
         </>
     );

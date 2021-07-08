@@ -13,7 +13,6 @@ function Messages({...props}) {
     const nonGameConvosData = props.nonGameConvosData;
     const gameConvosData = props.convos;
     const gameData = props.game;
-    const subscribeToNewMessages = props.subscribeToNewMessages;
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState("");
     const [gameId, setGameId] = useState("");
@@ -36,15 +35,17 @@ function Messages({...props}) {
         if (sessionUser) {
             setUserId(sessionUser._id);
         }
-    }, []);
+    }, [gameData, sessionUser]);
 
 
 
     return (
       <div><p>Derp.</p>
-      {gameConvosData && (<div>
-        {gameConvosData.map(convo => <div key={convo._id}>{convo.messages.map(message => <p key={message._id}>{message.userId.email}: {message.messageText}</p>)}</div>)}
+     {gameConvosData && (<div>
+      {console.log('DATA', gameConvosData)}
+     {gameConvosData.map(message => <div key={message._id}>{message.messages.map(message => <p key={message._id}>{message.userId.email}: {message.messageText}</p>)}</div>)}
       </div>)}
+
       <form onSubmit={handleSubmit}>
          <ul>
            {errors.map((error, idx) => (
@@ -62,7 +63,7 @@ function Messages({...props}) {
          </label>
          <button type="submit">Send</button>
        </form>
-      </div>
+       </div>
     )
 }
 

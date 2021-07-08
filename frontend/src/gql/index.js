@@ -43,9 +43,11 @@ const GET_GAME = gql`
 const GET_GAME_CONVOS = gql`
     query GetGameConvos($gameId: ID) {
        convos(gameId: $gameId){
+            _id
             messages {
               _id
               userId {
+                  _id
                   email
               }
               messageText
@@ -80,9 +82,11 @@ const ADD_BLOCKED_USER = gql`
 const SEND_MESSAGE_TO_GAME = gql`
   mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
     sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
+        _id
         messages {
             _id
             userId {
+                _id
                 email
             }
             messageText
@@ -95,7 +99,9 @@ const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
 mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
     sendNonGameMessage(userId: $userId, messageText: $messageText, _id: $messageId){
         messages {
+           _id
            userId {
+               _id
                email
            }
         messageText
@@ -107,8 +113,13 @@ mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId:
 const GAME_MESSAGES_SUBSCRIPTION = gql`
   subscription OnMessageAdded($gameId: ID!) {
     messageAdded(gameId: $gameId) {
+        _id
         messages {
          _id
+         userId {
+            _id
+            email
+        }
          messageText
         }
     }
