@@ -37,10 +37,11 @@ function Game() {
             if (!subscriptionData.data) return prev;
             const newMessage = subscriptionData.data.messageAdded;
             const messages = newMessage.messages
+            console.log(prev)
 
             //Populate new messages
             return Object.assign({}, prev, {
-                convos: messages
+                convos: [newMessage, ...prev.convos[0].messages]
             });
           }
         });

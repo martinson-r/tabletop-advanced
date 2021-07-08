@@ -72,11 +72,11 @@ const client = new ApolloClient({
                 return incoming;
               },
             },
-            messageAdded: { merge(existing, incoming) {
-              return incoming;
+              messageAdded: { merge(existing, incoming) {
+                return incoming;
+              },
             },
-          },
-            }
+          }
           }
         }
       }

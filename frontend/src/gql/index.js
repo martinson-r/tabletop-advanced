@@ -44,6 +44,7 @@ const GET_GAME_CONVOS = gql`
     query GetGameConvos($gameId: ID) {
        convos(gameId: $gameId){
             messages {
+              _id
               userId {
                   email
               }
@@ -80,6 +81,7 @@ const SEND_MESSAGE_TO_GAME = gql`
   mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
     sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
         messages {
+            _id
             userId {
                 email
             }
@@ -106,6 +108,7 @@ const GAME_MESSAGES_SUBSCRIPTION = gql`
   subscription OnMessageAdded($gameId: ID!) {
     messageAdded(gameId: $gameId) {
         messages {
+         _id
          messageText
         }
     }

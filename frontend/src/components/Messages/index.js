@@ -63,37 +63,6 @@ function Messages({...props}) {
          <button type="submit">Send</button>
        </form>
       </div>
-
-
-      //   <>
-      //   <p>Derp.</p>
-      //       {gameConvosData && (
-      //         <div>
-      //           <p>Message:</p>
-      //         {/* <p>{gameConvosData.map(convo => {convo.messages.map(message => console.log(message.userId.email))})})} */}
-      //         {nonGameConvosData && (<p>Conversations: {nonGameConvosData.getNonGameMessages.map(convo => convo.recipients.map(recipient => <>{recipient.email} </>))})}</p>
-      //         </div>
-
-      //      {gameConvosData && (
-      //  <form onSubmit={handleSubmit}>
-      //    <ul>
-      //      {errors.map((error, idx) => (
-      //     //       <li key={idx}>{error}</li>
-      //     //     ))}
-      //     //   </ul>
-      //     //   <label>
-      //     //     Send Message
-      //     //     <input
-      //     //       type="text"
-      //     //       value={messageText}
-      //     //       onChange={(e) => setMessage(e.target.value)}
-      //     //       required
-      //     //     />
-      //     //   </label>
-      //     //   <button type="submit">Send</button>
-      //     // </form>)
-      //       //}
-      //  </>
     )
 }
 

@@ -58,6 +58,7 @@ const typeDefs = gql`
     spectators: [Account]
   }
   type Message {
+    _id: ID,
     userId: Account,
     messageText: String
     date: String,
