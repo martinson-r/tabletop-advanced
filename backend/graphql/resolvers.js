@@ -35,10 +35,17 @@ const resolvers = {
         messages: (obj, args, context, info) => {
             return Message.find({});
         },
-        convos: (obj, args, context, info) => {
-            return Message.find({ gameId: args.gameId })
+        convos: async (obj, args, context, info) => {
+
+            const messagesToTruncate = await Message.find({ gameId: args.gameId })
             .populate('messages.userId')
             .exec();
+
+            //Some basic pagination. Remember that messagesToTruncate is an array because
+            //find returns an array. We have to key in to index 0 and use splice and mutate array.
+            messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-5)
+
+            return messagesToTruncate;
         },
         getNonGameMessages: async(obj, args, context, info) => {
             const { userId } = args;
@@ -96,6 +103,8 @@ const resolvers = {
             //If no Game chat exists, create it.
                 const updatedMessages = await Message.create({gameId, messages: [{ messageText, userId }] })
                 updatedMessages.populate('messages');
+
+                updatedMessages.messages.splice(0, updatedMessages.messages.length-5)
 
                 pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
 
