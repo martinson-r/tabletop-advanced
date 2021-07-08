@@ -95,6 +95,19 @@ const SEND_MESSAGE_TO_GAME = gql`
   }
 `;
 
+const SUBMIT_GAME = gql`
+  mutation SubmitToGame($userId: ID, $titleText: String, $descriptionText: String) {
+    submitGame(userId: $userId, title: $titleText, description: $descriptionText) {
+            _id
+            title
+            description
+            host {
+                email
+            }
+        }
+}
+`;
+
 const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
 mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
     sendNonGameMessage(userId: $userId, messageText: $messageText, _id: $messageId){
@@ -135,5 +148,6 @@ export { GET_ACCOUNTS,
         SEND_MESSAGE_TO_GAME,
         GET_NON_GAME_NON_SPEC_CONVOS,
         SEND_NON_GAME_NON_SPEC_CONVOS,
-        GAME_MESSAGES_SUBSCRIPTION
+        GAME_MESSAGES_SUBSCRIPTION,
+        SUBMIT_GAME
      };

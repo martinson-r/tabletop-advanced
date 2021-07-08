@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 const { ObjectId } = Schema.Types;
 const Account = require('./account');
 const Game = require('./game');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 
 let MessageSchema = mongoose.Schema({
@@ -44,6 +45,8 @@ let MessageSchema = mongoose.Schema({
         }
     }],
 });
+
+MessageSchema.plugin(mongoosePaginate);
 
 const Message = mongoose.model('Message', MessageSchema);
 module.exports = Message, MessageSchema;

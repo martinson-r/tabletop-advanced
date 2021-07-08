@@ -7,9 +7,9 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Game from "./components/Game";
 import Conversations from "./components/Conversations";
+import SubmitGame from "./components/SubmitGame";
 import Navigation from "./components/Navigation";
 import * as sessionActions from "./store/session";
-
 
 function App() {
   const dispatch = useDispatch();
@@ -35,6 +35,7 @@ function App() {
         <Route path="/login" component={Login}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
         <Route path="/conversations" component={Conversations} exact={true}></Route>
+        <Route path="/submit-game" component={SubmitGame} exact={true}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

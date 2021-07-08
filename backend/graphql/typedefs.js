@@ -53,7 +53,7 @@ const typeDefs = gql`
     description: String,
     premium: Boolean,
     remote: Boolean,
-    host: [Account],
+    host: Account,
     players: [Account],
     spectators: [Account]
   }
@@ -75,6 +75,7 @@ const typeDefs = gql`
     blockAccount(emailToBlock: String, blockerEmail: String): Account
     sendMessageToGame(gameId: ID, userId: ID, messageText: String): Messages
     sendNonGameMessage(userId: ID, messageText: String, _id: ID): Messages
+    submitGame(userId: ID, title: String, description: String): Game
   }
   type Subscription {
     messageAdded(gameId: ID): Messages

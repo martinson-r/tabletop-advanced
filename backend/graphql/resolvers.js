@@ -39,12 +39,18 @@ const resolvers = {
 
             //populate messages.userId to get email etc data
             const messagesToTruncate = await Message.find({ gameId: args.gameId })
-            .populate('messages.userId')
-            .exec();
+            //.skip(0)
+            //.sort({'date': 'asc'})
+            //.limit(5)
+            .populate('messages.userId');
 
-            //Some basic pagination. Remember that messagesToTruncate is an array because
+            //Limit number of messages displayed to something reasonable.
+            //Remember that messagesToTruncate is an array because
             //find returns an array. We have to key in to index 0 and use splice and mutate array.
-            messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-10)
+            //messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-10)
+
+            //Honestly, might be best to move messages over into their own model to allow
+            //for better pagination.
 
             return messagesToTruncate;
         },
@@ -75,18 +81,15 @@ const resolvers = {
             return blocker;
           },
 
-        //send message to game
         sendMessageToGame: async(root, args) => {
 
             const { gameId, messageText, userId } = args;
 
+            //First, check to see if the game already has existing messages
             const findExistingMessages = await Message.find({gameId});
-
-            console.log('EXISTING', findExistingMessages)
-
             if (findExistingMessages.length) {
 
-                //push new data into existing game messages
+                //If so, push new data into existing game messages
                 const updateMessages = {
                     $push:
                     { messages: { messageText, userId } },
@@ -96,21 +99,24 @@ const resolvers = {
                 const options = { upsert: true };
 
                 const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
+                .skip(0)
+                //.sort({'date': 'asc'})
+                .limit(5)
                 .populate('messages.userId')
-                //.exec();
 
                 //TODO: paginate
                 //right now, this just limits to last 10 messages, no way to see older messages
-                //This is not an array
-                updatedMessages.messages.splice(0, updatedMessages.messages.length-10)
+                //updatedMessages is NOT an array
+                //updatedMessages.messages.splice(0, updatedMessages.messages.length-10)
 
+                //Broadcast to websocket
                 pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
 
                 return updatedMessages;
             }
 
             //If no Game chat exists, create it.
-            console.log('ELSE BLOCK')
+
                 await Message.create({gameId, messages: [{ messageText, userId }] });
 
                 //Hard lesson: you can't populate a newly created Message. You have to create and then query
@@ -118,9 +124,7 @@ const resolvers = {
                 const grabMessageArray = await Message.find({gameId}).populate('messages.userId');
                 const updatedMessages = grabMessageArray[0];
 
-                console.log('EMAIL', updatedMessages.messages[0].userId.email)
-                console.log('MSGS', updatedMessages.messages)
-
+                //Broadcast to websocket
                 pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
 
                 return updatedMessages;
@@ -159,6 +163,16 @@ const resolvers = {
                 newMessage.populate('recipients');
                 return newMessage;
         },
+
+        submitGame: async(root, args) => {
+            const { userId, title, description } = args;
+
+            const newGame = await Game.create({ host: userId, title, description});
+            newGame.populate('host');
+
+            return newGame;
+
+        }
 
         // - add a new recipient to an existing Message
         // - TODO: typedefs and front end
