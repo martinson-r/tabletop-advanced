@@ -62,7 +62,9 @@ let GameSchema = mongoose.Schema({
     host: { type: ObjectId, ref: 'Account', index: true },
     guestHosts: { type: Array, userId: { type: ObjectId, ref: 'Account', index: true } },
     players: { type: Array, userId: { type: ObjectId, ref: 'Account', index: true } },
-    waitlist: { type: Array, userId: { type: ObjectId, ref: 'Account', index: true } },
+
+    //ok to shove these into an array because I don't think most games will get thousands of apps
+    waitlist: [{whyJoin: String, charConcept: String, experience: String, charName: String, userId: { type: ObjectId, ref: 'Account', index: true } }],
     spectators: { type: Array, userId: { type: ObjectId, ref: 'Account', index: true } },
     moderators: { type: Array, userId: { type: ObjectId, ref: 'Account', index: true } },
 });

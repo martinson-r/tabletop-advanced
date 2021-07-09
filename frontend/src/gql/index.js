@@ -46,6 +46,16 @@ const GET_GAME = gql`
     }
 `;
 
+const GET_WAITLIST_STATUS = gql`
+    query CheckWaitlist($_id: ID!, $userId: ID!) {
+        checkWaitList(_id: $_id, userId: $userId) {
+            _id
+            title
+            description
+        }
+    }
+`;
+
 const GET_GAME_CONVOS = gql`
     query GetGameConvos($gameId: ID) {
        convos(gameId: $gameId){
@@ -114,6 +124,19 @@ const SUBMIT_GAME = gql`
 }
 `;
 
+const SUBMIT_WAITLIST_APP = gql`
+  mutation SubmitWaitlistApp($userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
+    submitWaitlistApp(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, _id: $gameId) {
+                _id
+                title
+                description
+                host {
+                    email
+                }
+    }
+}
+`;
+
 const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
 mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
     sendNonGameMessage(userId: $userId, messageText: $messageText, _id: $messageId){
@@ -155,5 +178,7 @@ export { GET_ACCOUNTS,
         GET_NON_GAME_NON_SPEC_CONVOS,
         SEND_NON_GAME_NON_SPEC_CONVOS,
         GAME_MESSAGES_SUBSCRIPTION,
-        SUBMIT_GAME
+        SUBMIT_GAME,
+        SUBMIT_WAITLIST_APP,
+        GET_WAITLIST_STATUS
      };

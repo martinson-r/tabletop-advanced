@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Messages from "../Messages";
 import { PubSub } from 'graphql-subscriptions';
 import {
@@ -70,6 +70,7 @@ function Game() {
             <p>Game Title: {gameDetails.title}</p>
             <p>Game Detail: {gameDetails.description}</p>
             <p>Host: {gameDetails.host.email}</p>
+            <p><Link to={`/waitlist/${gameDetails._id}`}>Apply To Waitlist</Link></p>
             <Messages
               {...gameConvosData} {...gameData }
               ></Messages>

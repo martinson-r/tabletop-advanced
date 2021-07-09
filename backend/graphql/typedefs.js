@@ -9,6 +9,7 @@ const typeDefs = gql`
     convos(gameId: ID): [Messages]
     getNonGameMessages(userId: ID): [Messages]
     getSingleNonGameConversation(_id: ID): [Messages]
+    checkWaitList(_id: ID, userId: ID): [Game]
   }
   type Account {
     _id: ID,
@@ -56,12 +57,21 @@ const typeDefs = gql`
     host: Account,
     players: [Account],
     spectators: [Account]
+    waitlist: [Waitlist]
   }
   type Message {
     _id: ID,
     userId: Account,
-    messageText: String
+    messageText: String,
     date: String,
+  }
+  type Waitlist {
+      _id: ID,
+      userId: Account,
+      whyJoin: String,
+      charConcept: String,
+      experience: String,
+      charName: String
   }
   type Messages {
      _id: ID,
@@ -76,6 +86,7 @@ const typeDefs = gql`
     sendMessageToGame(gameId: ID, userId: ID, messageText: String): Messages
     sendNonGameMessage(userId: ID, messageText: String, _id: ID): Messages
     submitGame(userId: ID, title: String, description: String): Game
+    submitWaitlistApp(userId: ID, charName: String, charConcept: String, whyJoin: String, experience: String, gameId: ID): Game
   }
   type Subscription {
     messageAdded(gameId: ID): Messages

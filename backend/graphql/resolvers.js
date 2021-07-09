@@ -34,8 +34,6 @@ const resolvers = {
             let game = await Game.findOne({_id: args._id})
             .populate('host')
 
-            console.log(game);
-
             return game;
         },
         messages: (obj, args, context, info) => {
@@ -68,6 +66,15 @@ const resolvers = {
         getSingleNonGameConversation: (obj, args, context, info) => {
             const { _id } = args;
             return Message.find({_id});
+        },
+
+        checkWaitList: async (obj, args, context, info) => {
+            const { _id, userId } = args;
+
+            //check if this user has applied to this game before. Must match both game _id and
+            //userId in waitlist.
+            const game = await Game.find({ _id, "waitlist.userId": { "$in": [userId] } });
+            return game;
         },
     },
     Mutation: {
@@ -178,7 +185,30 @@ const resolvers = {
 
             return newGame;
 
-        }
+        },
+
+        submitWaitlistApp: async(root, args) => {
+            const { userId, whyJoin, gameId, charConcept, charName, experience } = args;
+
+            console.log(args);
+
+            //upsert: true means column will be created if it doesn't exist
+            const options = { upsert: true };
+
+            const addApp = {
+                $push:
+                { waitlist: [{userId, whyJoin, charConcept, charName, experience}] },
+            }
+
+            const apply = await Game.findOneAndUpdate({_id: gameId}, addApp, options)
+            .populate('host');
+
+            console.log(apply);
+
+            return apply;
+
+        },
+
 
         // - add a new recipient to an existing Message
         // - TODO: typedefs and front end
