@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import SignUp from "./components/Login";
 import Game from "./components/Game";
 import Conversations from "./components/Conversations";
 import SubmitGame from "./components/SubmitGame";
@@ -34,6 +35,7 @@ function App() {
       <Navigation isLoaded={isLoaded} />
       {isLoaded &&(<Switch>
         <Route path="/login" component={Login}></Route>
+        <Route path="/signup" component={SignUp}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
         <Route path="/conversations" component={Conversations} exact={true}></Route>
         <Route path="/submit-game" component={SubmitGame} exact={true}></Route>

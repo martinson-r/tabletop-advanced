@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const sessionRouter = require('./session.js');
-const usersRouter = require('./users.js');
+// const usersRouter = require('./users.js');
 // const gamesRouter = require('./games.js');
 // const messagesRouter = require('./messages.js');
 
@@ -8,7 +8,7 @@ const usersRouter = require('./users.js');
 
 router.use('/session', sessionRouter);
 
-router.use('/users', usersRouter);
+//router.use('/users', usersRouter);
 
 // router.use('/games', gamesRouter);
 

@@ -1,9 +1,4 @@
-const Message = require('../models/message');
-const Account = require('../models/account');
-const Game = require('../models/game');
-let mongoose = require('mongoose');
-const { Schema } = mongoose;
-const { ObjectId } = Schema.Types;
+const { Message, User, Game, Conversation } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 
 const pubsub = new PubSub();
@@ -28,46 +23,35 @@ const rolldice = (number, sides) => {
 // Provide resolver functions for your schema fields
 const resolvers = {
     Query: {
-        accounts: (obj, args, context, info) => {
+        users: (obj, args, context, info) => {
             //This is where you actually query the database.
-            return Account.find({})
-            .populate('blockedUsers');
+            return User.findAll({})
           },
-        account: (obj, args, context, info) => {
-            return Account.find({_id: args._id})
-            .populate('blockedUsers')
-            .populate('mutedPlayers')
-            .populate('playedWith')
-            .exec();
+        user: async(obj, args, context, info) => {
+            const id = args._id;
+            const user = await User.findByPk(id);
+            return user;
         },
-        games: (obj, args, context, info) => {
-            //rolltest, 5 d 20
-            //console.log(rolldice(5,20));
-
-
-            return Game.find({})
-            .populate('host')
-            .exec();
+        games: async(obj, args, context, info) => {
+            let games = await Game.findAll({
+                include: [{model: User, as: "host"}]
+            });
+            console.log('GAMES', games);
+            return games;
         },
         game: async (obj, args, context, info) => {
-
-            //Remember when writing typedefs that this returns an array
-            let game = await Game.findOne({_id: args._id})
-            .populate('host')
-
+            const id = args.id;
+            let game = await Game.findByPk(id, {include: [User]});
             return game;
         },
-        messages: (obj, args, context, info) => {
-            return Message.find({});
+        messages: async(obj, args, context, info) => {
+            const message = await Message.findAll({});
+            return message;
         },
-        convos: async (obj, args, context, info) => {
 
+        convos: async (obj, args, context, info) => {
             //populate messages.userId to get email etc data
-            const messagesToTruncate = await Message.find({ gameId: args.gameId })
-            //.skip(0)
-            //.sort({'date': 'asc'})
-            //.limit(5)
-            .populate('messages.userId');
+            //const messagesToTruncate = await Conversation.findOne({ where: { gameId: args.gameId }, include: [Message] });
 
             //Limit number of messages displayed to something reasonable.
             //Remember that messagesToTruncate is an array because
@@ -77,11 +61,11 @@ const resolvers = {
             //Honestly, might be best to move messages over into their own model to allow
             //for better pagination.
 
-            return messagesToTruncate;
+            //return messagesToTruncate;
         },
         getNonGameMessages: async(obj, args, context, info) => {
             const { userId } = args;
-            return Message.find({recipients: [userId]}).populate('recipients').exec();
+            return Message.find({recipients: [userId]})
         },
         //TODO: GetSingleNonGameConversation
         getSingleNonGameConversation: (obj, args, context, info) => {
@@ -94,14 +78,14 @@ const resolvers = {
 
             //check if this user has applied to this game before. Must match both game _id and
             //userId in waitlist.
-            const game = await Game.find({ _id, "waitlist.userId": { "$in": [userId] } });
+            const game = await Game.findAll({ where: {id: _id}});
             return game;
         },
     },
     Mutation: {
         //Block accounts
-        blockAccount: async(root, args) => {
-            const accountToBlock = await Account.findOne({email: args.emailToBlock});
+        blockUser: async(root, args) => {
+            const accountToBlock = await User.findOne({where: {email: args.emailToBlock}});
 
             //push id of user to be blocked into blockedUsers
             const blockAccount = { $push:
@@ -141,10 +125,10 @@ const resolvers = {
                 const options = { upsert: true };
 
                 const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
-                .populate('messages.userId')
+
 
                 const returnNewRoll = await Message.findOne({gameId})
-                .populate('messages.userId')
+
 
                 console.log('UPDATED', returnNewRoll)
 
@@ -256,33 +240,6 @@ const resolvers = {
             return apply;
 
         },
-
-
-        // - add a new recipient to an existing Message
-        // - TODO: typedefs and front end
-        // addNewRecipientToChat: async(root, args) => {
-        //     const { userId, messageText, recipientId, _id } = args;
-
-        //     //look for existing message with messageId
-        //     const findExistingMessage = await Message.find({_id});
-
-        //     //if existing message is found, push new recipient into it
-        //     if (findExistingMessage.length) {
-        //         const updateRecipients = {
-        //             $push:
-        //             { recipients: [{ recipientId }] },
-        //         }
-
-        //         //upsert: true means column will be created if it doesn't exist
-        //         const options = { upsert: true };
-
-        //         const messageWithUpdatedRecipients = await Message.findOneAndUpdate({_id, updateRecipients, options})
-        //         .populate('messages.userId')
-        //         .populate('recipients')
-        //         .execPopulate();
-        //         return messageWithUpdatedRecipients;
-        //     }
-        // },
 
         // createNewNonGameChat: async (root, args) => {
         //     // - create a new Message, if the user indicates they want one, and add a new recipient to that Message

@@ -25,15 +25,17 @@ console.log('Hit login')
 
 export const restoreUser = () => async (dispatch) => {
     const res = await fetch('/api/session');
+    console.log('RES', res);
     dispatch(setUser(res.data.user));
     return res;
   };
 
 export const signup = (user) => async (dispatch) => {
-  const { email, password } = user;
-  const response = await fetch('/api/users/', {
+  const { userName, email, password } = user;
+  const response = await fetch('/api/session/signup', {
     method: 'POST',
     body: JSON.stringify({
+      userName,
       email,
       password
     })

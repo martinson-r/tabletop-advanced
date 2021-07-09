@@ -4,21 +4,19 @@ const { db, environment, port } = require('./config');
 const { uri }  = db;
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
+const session = require("express-session");
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const routes = require('./routes');
-const session = require("express-session");
 const MongoStore = require('connect-mongo');
 const { graphqlExpress, ApolloServer, makeExecutableSchema, gql } = require('apollo-server-express');
 const resolvers = require('./graphql/resolvers');
 const typeDefs = require('./graphql/typedefs');
+const { sequelize } = require("./db/models");
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
+const logger = require("morgan");
 
-const Account = require('./models/account');
-const Game = require('./models/game');
-const Message = require('./models/message');
-
-const { execute, subscribe } = require('graphql') ;
-const { SubscriptionServer } = require('subscriptions-transport-ws');
+const { User, Game } = require('./db/models')
 
 //asynchandler for errors
 const asynchandler = require('express-async-handler');
@@ -47,20 +45,16 @@ app.use(cookieParser());
 //Add ability to use json
 app.use(express.json());
 
-//Just to be a little safer.
+//A little extra debugging help
+app.use(logger("dev"));
+
+//Just to be a bit safer.
 // app.use(helmet({
 //     contentSecurityPolicy: false
 //   }));
 
-  //use sessions for tracking logins
-app.use(session({
-    name: 'tta.sid',
-    secret: 'superSecret',
-    resave: true,
-    store: MongoStore.create( { mongoUrl: `${uri}` } ),
-    //Avoid race conditions & obey cookie related laws
-    saveUninitialized: false
-  }));
+// set up session middleware
+
 
 const server = new ApolloServer({
     typeDefs,
@@ -74,6 +68,21 @@ const server = new ApolloServer({
       },
 });
 server.applyMiddleware({ app });
+
+const store = new SequelizeStore({ db: sequelize });
+
+//use sessions for tracking logins
+app.use(session({
+    name: 'tta.sid',
+    secret: 'superSecret',
+    resave: true,
+    store: store,
+    //Avoid race conditions & obey cookie related laws
+    saveUninitialized: false
+  }));
+
+  //don't forget this part!
+  store.sync();
 
 app.use(routes); // Connect all the routes
 

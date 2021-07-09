@@ -1,44 +1,48 @@
-const mongoose = require('mongoose');
-//Import models
-const Account = require('./models/account');
+const db = require("./db/models");
 
-const loginUser = async (req, res, user, password) => {
-    try {
-        req.session.auth = {
-            userId: user._id
-        }
-      return user;
-} catch (err) {
-    console.log(err);
-    res.status(401)
-    res.send('Something went wrong.');
-   }
-}
-
-const logoutUser = (req, res) => {
-    delete req.session.auth;
+const loginUser = (req, res, user) => {
+  req.session.auth = {
+    userId: user.id,
   };
-
-const restoreUser = async (req, res, next) => {
-    if (req.session.auth) {
-      const { userId } = req.session.auth;
-
-      try {
-        const user = await Account.findOne({_id: userId});
-
-        if (user) {
-          res.locals.authenticated = true;
-          res.locals.user = user;
-          next();
-        }
-      } catch (err) {
-        res.locals.authenticated = false;
-        next(err);
-      }
-    } else {
-      res.locals.authenticated = false;
-      next();
-    }
 };
 
-module.exports = { loginUser, logoutUser, restoreUser };
+const restoreUser = async (req, res, next) => {
+  // for debug
+  if (req.session.auth) {
+    const { userId } = req.session.auth;
+
+    try {
+      const user = await db.User.findByPk(userId);
+
+      if (user) {
+        res.locals.authenticated = true;
+        res.locals.user = user;
+        next();
+      }
+    } catch (err) {
+      res.locals.authenticated = false;
+      next(err);
+    }
+  } else {
+    res.locals.authenticated = false;
+    next();
+  }
+};
+
+const logoutUser = (req, res) => {
+  delete req.session.auth;
+};
+
+const requireAuth = (req, res, next) => {
+  if (!res.locals.authenticated) {
+    return res.redirect("/users/login?redir=true");
+  }
+  return next();
+};
+
+module.exports = {
+  loginUser,
+  logoutUser,
+  requireAuth,
+  restoreUser,
+};

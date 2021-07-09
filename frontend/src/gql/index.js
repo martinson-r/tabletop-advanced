@@ -1,8 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 
 const GET_ACCOUNTS = gql`query GetAccounts {
-    accounts {
-        _id
+    users {
+        id
         email
         userName
         blockedUsers {
@@ -13,8 +13,8 @@ const GET_ACCOUNTS = gql`query GetAccounts {
 
 const GET_CURRENT_ACCOUNT = gql`
     query GetCurrentAccount($userId: ID!) {
-        account(_id: $userId){
-            _id
+        user(id: $userId){
+            id
             email
             userName
         }
@@ -23,11 +23,11 @@ const GET_CURRENT_ACCOUNT = gql`
 const GET_GAMES = gql`
     query GetAllGames {
        games {
-        _id
+        id
         title
         description
         host {
-            email
+            userName
         }
        }
     }
@@ -35,12 +35,12 @@ const GET_GAMES = gql`
 
 const GET_GAME = gql`
     query GetSingleGame($gameId: ID!) {
-       game(_id: $gameId){
-        _id
+       game(id: $gameId){
+        id
         title
         description
-        host {
-            email
+        hostId {
+            userName
         }
        }
     }
@@ -48,8 +48,8 @@ const GET_GAME = gql`
 
 const GET_WAITLIST_STATUS = gql`
     query CheckWaitlist($_id: ID!, $userId: ID!) {
-        checkWaitList(_id: $_id, userId: $userId) {
-            _id
+        checkWaitList(id: $_id, userId: $userId) {
+            id
             title
             description
         }
@@ -59,7 +59,7 @@ const GET_WAITLIST_STATUS = gql`
 const GET_GAME_CONVOS = gql`
     query GetGameConvos($gameId: ID) {
        convos(gameId: $gameId){
-            _id
+            id
             messages {
               _id
               userId {
@@ -98,11 +98,11 @@ const ADD_BLOCKED_USER = gql`
 const SEND_MESSAGE_TO_GAME = gql`
   mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
     sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
-        _id
+        id
         messages {
-            _id
+            id
             userId {
-                _id
+                id
                 email
             }
             messageText

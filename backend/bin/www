@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const { port, db } = require('../config');
-const { uri } = db;
+const { port } = require('../config');
+const db = require('../db/models');
 const app = require('../app');
 const mongoose = require('mongoose');
 const { createServer } = require('http');
@@ -10,31 +10,22 @@ const { execute, subscribe } = require('graphql');
 const { makeExecutableSchema } = require('graphql-tools')
 const typeDefs = require('../graphql/typedefs');
 const resolvers = require('../graphql/resolvers');
+
+//makeExecutableSchema circumvents issues with Apollo GraphQL Client not recognizing Schema
 const schema = makeExecutableSchema({
    typeDefs,
    resolvers
 });
 
-//old socket.io implementation
-//const io = require('../routes/sockets');
-
-//Connect to database
-try {
-    mongoose.connect(`${uri}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
-} catch(e) {
-    console.log(e)
-}
-
-let database = mongoose.connection;
-
-//check database connection
-database.once('open', function() {
-    console.log('Connected to MongoDB!');
- });
-
-//check for database errors
-database.on('error', function(err) {
-    console.log(err);
+// Check the database connection before starting the app
+db.sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Database connection success! Sequelize is ready to use...')
+  })
+  .catch((err) => {
+      console.log('Database connection failure.');
+      console.error(err);
 });
 
 const ws = createServer(app);
