@@ -135,7 +135,7 @@ const resolvers = {
                 //push roll results into messageText
                 const updateMessages = {
                     $push:
-                    { messages: { messageText: `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`, userId } } }
+                    { : { messageText: `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`, userId } } }
 
                 //upsert: true means something will be created if it doesn't exist
                 const options = { upsert: true };

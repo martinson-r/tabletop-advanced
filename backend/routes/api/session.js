@@ -189,6 +189,7 @@ const router = express.Router();
         restoreUser,
         (req, res, next) => {
           const { user } = res.locals;
+          console.log('user after restore', user)
           if (user) {
             return res.json({
               user

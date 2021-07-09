@@ -21,8 +21,6 @@ function Home() {
     const { loading, error, data } = useQuery(GET_GAMES);
 
     console.log('data', data)
-
-    const [accounts, setAccount] = useState([]);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
 
@@ -35,9 +33,6 @@ function Home() {
         }
         if (error) {
             setError(error);
-        }
-        if (data) {
-            setAccount(data);
         }
         if (sessionUser) {
             setUserId(sessionUser.id);

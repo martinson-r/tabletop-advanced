@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
       // User.belongsToMany(models.Game, {as: "Player", through: 'PlayerJoins', foreignKey: 'userId', otherKey: 'gameId' });
       // User.belongsToMany(models.Game, {as: "GameModerator", through: 'Moderator', foreignKey: 'userId', otherKey: 'gameId' });
       // User.belongsToMany(models.Game, {as: "GameSpectator", through: 'Spectator', foreignKey: 'userId', otherKey: 'gameId' });
-      User.hasMany(models.Game, { as: "host", foreignKey: 'hostId'});
+      User.hasMany(models.Game, { as: "host", foreignKey: 'hostId' });
+      User.hasMany(models.Message, { as: "sender", foreignKey: "senderId" });
       //User.hasOne(models.AboutMe, { foreignKey: "userId"});
 
       //TODO Refactor: Blocked Users in Games should go on a joins table
@@ -31,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
       // User.belongsToMany(models.Book, { through: "PreferredBook", foreignKey: "userId", otherKey: "bookId"});
       // User.belongsToMany(models.Ruleset, { through: "PreferredRuleset", foreignKey: "userId", otherKey: "rulesetId"});
       // User.belongsToMany(models.Language, { through: "PreferredLanguage", foreignKey: "userId", otherKey: "languageId"});
-      // User.belongsToMany(models.Message, { through: "Recipient", foreignKey: "userId", otherKey: "messageId"});
+      //User.belongsToMany(models.Message, { through: "Recipient", foreignKey: "userId", otherKey: "messageId"});
     }
   };
   User.init({

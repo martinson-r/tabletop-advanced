@@ -6,7 +6,7 @@ const typeDefs = gql`
     games: [Game]
     game(id: ID!): Game
     messages: [Message]
-    convos(gameId: ID): Conversation
+    convos(gameId: ID): [Message]
     getNonGameMessages(userId: ID!): [Message]
     getSingleNonGameConversation(id: ID!): [Message]
     checkWaitList(id: ID, userId: ID!): [Game]
@@ -92,17 +92,12 @@ const typeDefs = gql`
       title: String,
       description: String
   }
-  type Conversation {
-      id: ID,
-      gameId: Game
-  }
   type Game {
     id: ID,
     title: String,
     description: String,
     premium: Boolean,
     remote: Boolean,
-    User: User,
     host: User,
     players: [User],
     spectators: [User]
@@ -116,7 +111,9 @@ const typeDefs = gql`
     createdAt: String,
     deleted: Boolean,
     reported: Boolean,
-    metaGameMessageTypeId: ID
+    metaGameMessageTypeId: ID,
+    User: User,
+    sender: User
   }
   type MetaGameMessageType {
       metaGameMessageType: String
@@ -129,23 +126,15 @@ const typeDefs = gql`
       experience: String,
       charName: String
   }
-  type Messages {
-     id: ID,
-     gameId: Game,
-     recipients: [User],
-     isMuted: Boolean,
-     isGame: Boolean,
-     conversationId: ID,
-  }
   type Mutation {
     blockUser(emailToBlock: String!, blockerEmail: String!): User
-    sendMessageToGame(gameId: ID!, userId: ID!, messageText: String!): Messages
-    sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): Messages
+    sendMessageToGame(gameId: ID!, userId: ID!, messageText: String!): Message
+    sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): Message
     submitGame(userId: ID!, title: String!, description: String!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
   }
   type Subscription {
-    messageAdded(gameId: ID!): Messages
+    messageAdded(gameId: ID!): Message
   }
   schema {
     query: Query

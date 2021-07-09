@@ -1,4 +1,4 @@
-import { fetch } from './csrf.js';
+//import { fetch } from './csrf.js';
 // import { connect } from 'react-redux';
 
 const SET_USER = 'session/setUser';
@@ -19,14 +19,14 @@ console.log('Hit login')
     method: 'POST',
     body: JSON.stringify({ userName, password })
   });
-  dispatch(setUser(res.data.user));
+  dispatch(setUser(res.user));
   return res;
 };
 
 export const restoreUser = () => async (dispatch) => {
     const res = await fetch('/api/session');
     console.log('RES', res);
-    dispatch(setUser(res.data.user));
+    dispatch(setUser(res.user));
     return res;
   };
 

@@ -30,10 +30,11 @@ function Messages({...props}) {
 
     useEffect(() => {
         if (gameData) {
-            setGameId(gameData._id);
+            setGameId(gameData.id);
         }
         if (sessionUser) {
-            setUserId(sessionUser._id);
+            setUserId(sessionUser.userId);
+            console.log('SESSION USER', sessionUser)
         }
     }, [gameData, sessionUser]);
 
@@ -43,7 +44,7 @@ function Messages({...props}) {
       <div><p>Derp.</p>
      {gameConvosData !== undefined && (<div>
     {console.log('NEW MESSAGE DATA', gameConvosData)}
-     {gameConvosData.map(message => <div key={message._id}>{message.messages.map(message => <p key={message._id}>{message.userId.email}: {message.messageText}</p>)}</div>)}
+     {gameConvosData.map(message => <div key={message._id}><p>{message.sender.userName}: {message.messageText}</p></div>)}
       </div>)}
 
       <form onSubmit={handleSubmit}>

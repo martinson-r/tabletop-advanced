@@ -10,23 +10,22 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      //Message.belongsToMany(models.User, { through: "Recipient", foreignKey: "messageId", otherKey: "userId"});
-      Message.belongsTo(models.Conversation, { foreignKey: "conversationId" });
-
-      //reportedBy needs work, probably needs to be a joins table.
-      //A message can be reported by many users, and a user can report many messages.
+      Message.belongsToMany(models.User, { as: "recipient", through: "Recipient", foreignKey: "messageId", otherKey: "userId"});
+      Message.belongsTo(models.User, { as: "sender", foreignKey: "senderId"});
     }
   };
   Message.init({
     messageText: DataTypes.STRING,
     metaGameMessageTypeId: DataTypes.INTEGER,
+    conversationTypeId: DataTypes.INTEGER,
+    gameId: DataTypes.INTEGER,
+    senderId: DataTypes.INTEGER,
     deleted: DataTypes.BOOLEAN,
     reported: DataTypes.BOOLEAN,
 
-    //This needs to be a joins table.
-    //Many users can report a message.
+    //reportedBy needs work, probably needs to be a joins table.
+      //A message can be reported by many users, and a user can report many messages.
     //reportedBy: DataTypes.INTEGER,
-    conversationId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Message',

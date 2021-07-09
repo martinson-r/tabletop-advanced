@@ -39,7 +39,7 @@ const GET_GAME = gql`
         id
         title
         description
-        hostId {
+        host {
             userName
         }
        }
@@ -59,15 +59,11 @@ const GET_WAITLIST_STATUS = gql`
 const GET_GAME_CONVOS = gql`
     query GetGameConvos($gameId: ID) {
        convos(gameId: $gameId){
-            id
-            messages {
-              _id
-              userId {
-                  _id
-                  email
-              }
-              messageText
+            sender {
+                userName
             }
+            id
+            messageText
        }
     }
 `;
@@ -78,7 +74,7 @@ query GetNonGameNonSpecConvos($userId: ID) {
         recipients {
             email
         }
-        messages {
+        message {
             messageText
         }
     }
@@ -99,11 +95,11 @@ const SEND_MESSAGE_TO_GAME = gql`
   mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
     sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
         id
-        messages {
+        message {
             id
-            userId {
+            User {
                 id
-                email
+                userName
             }
             messageText
       }
@@ -114,7 +110,7 @@ const SEND_MESSAGE_TO_GAME = gql`
 const SUBMIT_GAME = gql`
   mutation SubmitToGame($userId: ID, $titleText: String, $descriptionText: String) {
     submitGame(userId: $userId, title: $titleText, description: $descriptionText) {
-            _id
+            id
             title
             description
             host {
@@ -140,10 +136,10 @@ const SUBMIT_WAITLIST_APP = gql`
 const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
 mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
     sendNonGameMessage(userId: $userId, messageText: $messageText, _id: $messageId){
-        messages {
-           _id
-           userId {
-               _id
+        message {
+           id
+           User {
+               id
                email
            }
         messageText
@@ -155,15 +151,11 @@ mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId:
 const GAME_MESSAGES_SUBSCRIPTION = gql`
   subscription OnMessageAdded($gameId: ID!) {
     messageAdded(gameId: $gameId) {
-        _id
-        messages {
-         _id
-         userId {
-            _id
-            email
+        sender {
+            userName
         }
-         messageText
-        }
+        id
+        messageText
     }
   }
 `;

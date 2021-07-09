@@ -12,11 +12,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
-      //TODO: this will be stuff like DM requests, dice rolls, etc?
-      // messageTypeId: {
-      //   type: Sequelize.INTEGER,
-      //   references: { model: "MessageTypes", key: "id" },
-      // },
       deleted: {
         type: Sequelize.BOOLEAN
       },
@@ -26,13 +21,21 @@ module.exports = {
       // reportedBy: {
       //   type: Sequelize.INTEGER
       // },
-      conversationId: {
+      senderId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: "Conversations", key: "id" },
+        references: { model: "Users", key: "id" },
+      },
+      gameId: {
+        type: Sequelize.INTEGER,
+        references: { model: "Games", key: "id" },
       },
       metaGameMessageTypeId: {
         type: Sequelize.INTEGER,
+      },
+      conversationTypeId: {
+        type: Sequelize.INTEGER,
+        references: { model: "ConversationTypes", key: "id" },
       },
       createdAt: {
         allowNull: false,

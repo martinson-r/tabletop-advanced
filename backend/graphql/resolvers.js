@@ -36,12 +36,12 @@ const resolvers = {
             let games = await Game.findAll({
                 include: [{model: User, as: "host"}]
             });
-            console.log('GAMES', games);
+            console.log(games);
             return games;
         },
         game: async (obj, args, context, info) => {
             const id = args.id;
-            let game = await Game.findByPk(id, {include: [User]});
+            let game = await Game.findByPk(id, {include: {model: User, as: "host"}});
             return game;
         },
         messages: async(obj, args, context, info) => {
@@ -50,27 +50,19 @@ const resolvers = {
         },
 
         convos: async (obj, args, context, info) => {
-            //populate messages.userId to get email etc data
-            //const messagesToTruncate = await Conversation.findOne({ where: { gameId: args.gameId }, include: [Message] });
+            const conversation = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
+            //TODO: Pagination
 
-            //Limit number of messages displayed to something reasonable.
-            //Remember that messagesToTruncate is an array because
-            //find returns an array. We have to key in to index 0 and use splice and mutate array.
-            //messagesToTruncate[0].messages.splice(0, messagesToTruncate[0].messages.length-10)
-
-            //Honestly, might be best to move messages over into their own model to allow
-            //for better pagination.
-
-            //return messagesToTruncate;
+            return conversation;
         },
         getNonGameMessages: async(obj, args, context, info) => {
             const { userId } = args;
-            return Message.find({recipients: [userId]})
+            return Message.findAll({recipients: [userId]})
         },
         //TODO: GetSingleNonGameConversation
         getSingleNonGameConversation: (obj, args, context, info) => {
             const { _id } = args;
-            return Message.find({_id});
+            return Message.findAll({_id});
         },
 
         checkWaitList: async (obj, args, context, info) => {
@@ -84,95 +76,63 @@ const resolvers = {
     },
     Mutation: {
         //Block accounts
-        blockUser: async(root, args) => {
-            const accountToBlock = await User.findOne({where: {email: args.emailToBlock}});
+        // blockUser: async(root, args) => {
+        //     const accountToBlock = await User.findOne({where: {email: args.emailToBlock}});
 
-            //push id of user to be blocked into blockedUsers
-            const blockAccount = { $push:
-                { blockedUsers: accountToBlock._id },
-             }
+        //     //push id of user to be blocked into blockedUsers
+        //     const blockAccount = { $push:
+        //         { blockedUsers: accountToBlock._id },
+        //      }
 
-             //upsert: true means blockedUsers will be created if it doesn't exist
-             const options = { upsert: true };
+        //      //upsert: true means blockedUsers will be created if it doesn't exist
+        //      const options = { upsert: true };
 
-            const blocker = await Account.findOneAndUpdate({email: args.blockerEmail}, blockAccount, options);
-            return blocker;
-          },
+        //     const blocker = await Account.findOneAndUpdate({email: args.blockerEmail}, blockAccount, options);
+        //     return blocker;
+        //   },
 
         sendMessageToGame: async(root, args) => {
 
             const { gameId, messageText, userId } = args;
 
-            //First, check to see if the game already has existing messages
-            const findExistingMessages = await Message.find({gameId});
+            console.log('ARGS', args);
 
-            if (findExistingMessages.length) {
 
-                //Next, check to see if this is a dice roll.
+            //Check to see if this is a dice roll.
             //Fun with regex
-            let numbers = messageText.match(/(\d+)[Dd](\d+)/);
+            //let numbers = messageText.match(/(\d+)[Dd](\d+)/);
 
-            if (numbers.length) {
-                const result = rolldice(numbers[1], numbers[2]);
-                console.log(result)
+            // if (numbers.length) {
+            //     const result = rolldice(numbers[1], numbers[2]);
+            //     console.log(result)
 
-                //push roll results into messageText
-                const updateMessages = {
-                    $push:
-                    { messages: { messageText: `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`, userId } } }
+            //     //push roll results into messageText
+            //     const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
 
-                //upsert: true means something will be created if it doesn't exist
-                const options = { upsert: true };
+            //     //upsert: true means something will be created if it doesn't exist
+            //     const options = { upsert: true };
 
-                const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
+            //     const returnRoll = await Message.create({gameId, messageText, senderId: userId})
 
+            //     console.log('UPDATED', returnRoll);
 
-                const returnNewRoll = await Message.findOne({gameId})
+            //     return returnRoll;
+            // }
 
-
-                console.log('UPDATED', returnNewRoll)
-
-                return returnNewRoll;
-            }
-
-                //If it's not a dice roll, push new messageText into existing game messages
-                const updateMessages = {
-                    $push:
-                    { messages: { messageText, userId } },
-                }
-
-                //upsert: true means something will be created if it doesn't exist
-                const options = { upsert: true };
-
-                const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
-                updatedMessages.populate('messages.userId');
-
+                //If it's not a dice roll, add new messageText to existing game messages.
                 //TODO: paginate
-                //right now, this just limits to last 10 messages, no way to see older messages
-                //updatedMessages is NOT an array
-                //updatedMessages.messages.splice(0, updatedMessages.messages.length-10)
-                //May need to reconsider Postgres since cramming thousands of messages into an array
-                //we can't paginate is less than ideal.
+
+                //If no Game conversation exists, create it and add the new message.
+                //Possibly rework, put conversationType on the message itself and
+                //get rid of the extra table (and database query)
+                const newMessage = await Message.create({gameId, messageText, senderId: userId});
+                const conversation = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
+                console.log('NEW MESSAGE', conversation)
 
                 //Broadcast to websocket
-                pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
+                pubsub.publish('NEW_MESSAGE', { messageAdded: conversation })
 
-                return updatedMessages;
-            }
-
-            //If no Game chat exists, create it.
-
-                await Message.create({gameId, messages: [{ messageText, userId }] });
-
-                //Hard lesson: you can't populate a newly created Message. You have to create and then query
-                //in order to populate data.
-                const grabMessageArray = await Message.find({gameId}).populate('messages.userId');
-                const updatedMessages = grabMessageArray[0];
-
-                //Broadcast to websocket
-                pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
-
-                return updatedMessages;
+                return newMessage;
 
         },
 
@@ -196,9 +156,7 @@ const resolvers = {
                 const options = { upsert: true };
 
                 const updatedMessages = await Message.findOneAndUpdate({_id, updateMessages, options})
-                .populate('messages.userId')
-                .populate('recipients')
-                .execPopulate();
+
                 return updatedMessages;
             }
 
