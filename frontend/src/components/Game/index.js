@@ -14,11 +14,13 @@ function Game() {
     // Grab our session user
     const sessionUser = useSelector((state) => state.session.user);
 
+
     // Grab our game ID
     const { gameId } = useParams();
 
+
     //grab current game using game ID
-     const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } } );
+    const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } } );
     //  const { loading, error, data } = useSubscription(GAME_MESSAGES_SUBSCRIPTION, { variables: { gameId }});
      //Note: Whenever a query returns a result in Apollo Client, that result includes a subscribeToMore function
      const { subscribeToMore, data: gameConvosData } = useQuery(
@@ -39,18 +41,19 @@ function Game() {
             console.log(subscriptionData.data)
 
             //Populate new messages
-            if (prev.convos) {
+            // if (prev.convos) {
+            //   console.log('PREV', prev.convos)
               return Object.assign({}, prev, {
-                convos: [prev.convos[0].messages]
+                convos: [newMessage.messages, ...prev.convos]
             });
-            }
+          //   }
 
-            else {
-              return {
-                convos: [newMessage]
-              }
-            }
-          }
+          //   else {
+          //     return {
+          //       convos: [newMessage]
+          //     }
+          //   }
+           }
         });
       }, [])
 
@@ -62,8 +65,6 @@ function Game() {
 
 
     const gameDetails = gameData.game;
-
-    console.log(gameDetails)
 
         return (
             <>

@@ -41,8 +41,8 @@ function Messages({...props}) {
 
     return (
       <div><p>Derp.</p>
-     {gameConvosData && (<div>
-      {console.log('DATA', gameConvosData)}
+     {gameConvosData !== undefined && (<div>
+    {console.log('NEW MESSAGE DATA', gameConvosData)}
      {gameConvosData.map(message => <div key={message._id}>{message.messages.map(message => <p key={message._id}>{message.userId.email}: {message.messageText}</p>)}</div>)}
       </div>)}
 

@@ -57,7 +57,7 @@ const splitLink = split(
 
 const store = configureStore();
 
-// const cache = new InMemoryCache({});
+ //const cache = new InMemoryCache({});
 
   const cache = new InMemoryCache({
     typePolicies: {
@@ -83,22 +83,20 @@ const store = configureStore();
           }
         }
       }
-    }
-  })
+    },
 
-//   Subscription: {
-//     fields: {
-//       convos: {
-//         merge(existing = [], incoming) {
-//           console.log('SUB INCOMING', incoming);
-//           console.log('NEW ARRAY', [...existing, ...incoming])
-//           return [...existing, ...incoming];
-//         },
-//       },
-//     },
-//   },
-// }
-// })
+  Subscription: {
+    fields: {
+      convos: {
+        merge(existing = [], incoming) {
+          console.log('SUB INCOMING', incoming);
+          console.log('NEW ARRAY', [...existing, ...incoming])
+          return [...existing, ...incoming];
+        },
+      },
+    },
+  },
+})
 
 const client = new ApolloClient({
   //uri of graphql backend

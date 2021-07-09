@@ -8,6 +8,23 @@ const { PubSub, withFilter } = require('graphql-subscriptions');
 
 const pubsub = new PubSub();
 
+const rolldice = (number, sides) => {
+//roll `number` `side`ed dice.
+    const getRandomRoll = (sides) => {
+        return Math.floor(Math.random() * (sides - 1) + 1);
+    };
+    const diceMultiplier = (accumulator, currentValue) => accumulator + currentValue;
+
+    const diceArray = [];
+
+    for (let i = 0; i <= number; i++) {
+        diceArray.push(getRandomRoll(sides))
+    }
+    console.log(diceArray);
+    return diceArray.reduce(diceMultiplier);
+
+}
+
 // Provide resolver functions for your schema fields
 const resolvers = {
     Query: {
@@ -24,6 +41,10 @@ const resolvers = {
             .exec();
         },
         games: (obj, args, context, info) => {
+            //rolltest, 5 d 20
+            //console.log(rolldice(5,20));
+
+
             return Game.find({})
             .populate('host')
             .exec();
@@ -100,9 +121,37 @@ const resolvers = {
 
             //First, check to see if the game already has existing messages
             const findExistingMessages = await Message.find({gameId});
+
             if (findExistingMessages.length) {
 
-                //If so, push new data into existing game messages
+                //Next, check to see if this is a dice roll.
+            //Fun with regex
+            let numbers = messageText.match(/(\d+)[Dd](\d+)/);
+
+            if (numbers.length) {
+                const result = rolldice(numbers[1], numbers[2]);
+                console.log(result)
+
+                //push roll results into messageText
+                const updateMessages = {
+                    $push:
+                    { messages: { messageText: `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`, userId } } }
+
+                //upsert: true means something will be created if it doesn't exist
+                const options = { upsert: true };
+
+                const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
+                .populate('messages.userId')
+
+                const returnNewRoll = await Message.findOne({gameId})
+                .populate('messages.userId')
+
+                console.log('UPDATED', returnNewRoll)
+
+                return returnNewRoll;
+            }
+
+                //If it's not a dice roll, push new messageText into existing game messages
                 const updateMessages = {
                     $push:
                     { messages: { messageText, userId } },
@@ -112,15 +161,14 @@ const resolvers = {
                 const options = { upsert: true };
 
                 const updatedMessages = await Message.findOneAndUpdate({gameId}, updateMessages, options)
-                .skip(0)
-                //.sort({'date': 'asc'})
-                .limit(5)
-                .populate('messages.userId')
+                updatedMessages.populate('messages.userId');
 
                 //TODO: paginate
                 //right now, this just limits to last 10 messages, no way to see older messages
                 //updatedMessages is NOT an array
                 //updatedMessages.messages.splice(0, updatedMessages.messages.length-10)
+                //May need to reconsider Postgres since cramming thousands of messages into an array
+                //we can't paginate is less than ideal.
 
                 //Broadcast to websocket
                 pubsub.publish('NEW_MESSAGE', { messageAdded: updatedMessages })
@@ -146,7 +194,7 @@ const resolvers = {
 
         sendNonGameMessage: async(root, args) => {
 
-            // - send a message to an existing conversation
+            //send a message to an existing conversation
             const { userId, messageText, _id } = args;
 
             //look for existing message with messageId
@@ -255,8 +303,6 @@ const resolvers = {
              withFilter(
                 () => pubsub.asyncIterator('NEW_MESSAGE'),
                 (payload, variables) => {
-                    console.log('PAYLOAD', payload)
-                    console.log('VARIABLES', variables)
                   // Only push an update if the message is on
                   // the correct Game for this operation
                   // variables come through as string, so cast either to string or to int either way
