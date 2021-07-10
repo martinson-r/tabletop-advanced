@@ -10,54 +10,51 @@ import { GET_GAME, GET_GAME_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql
 export const pubsub = new PubSub();
 
 function Game() {
-  const { gameId } = useParams();
-
-//   if (!gameData) {
-//     return (
-//     <p>No games found. :(</p>
-//     )
-// }
     // Grab our session user
     const sessionUser = useSelector((state) => state.session.user);
-
-
     // Grab our game ID
+    const gameId = useParams();
 
-    //grab current game using game ID
-    const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } } );
+    const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } })
+    console.log('DATA', data);
 
       const { subscribeToMore, ...result } = useQuery(
         GET_GAME_CONVOS,
         { variables: { gameId } }
       );
-      const gameDetails = gameData.game;
 
       return (
-        (<div>
-         {gameDetails && (<div><p>Game Title: {gameDetails.title}</p>
-            <p>Game Detail: {gameDetails.description}</p>
-            <p>Host: {gameDetails.host.email}</p>
-            <p><Link to={`/waitlist/${gameDetails._id}`}>Apply To Waitlist</Link></p></div>)}
+        <div>
+        {data && data.games.map(game => <p>{game.title}, hosted by {game.host.userName}</p>)}
         <Messages
           {...result}
-          subscribeToNewComments={() =>
+          subscribeToNewMessages={() =>
             subscribeToMore({
               document: GAME_MESSAGES_SUBSCRIPTION,
               variables: { gameId },
               updateQuery: (prev, { subscriptionData }) => {
                 if (!subscriptionData.data) return prev;
                 const newFeedItem = subscriptionData.data.messageSent;
+                console.log('NFI', newFeedItem)
+                console.log('PREV', prev)
                 return Object.assign({}, prev, {
                   post: {
-                    comments: [newFeedItem, ...prev.messageText]
+                    comments: [newFeedItem, ...prev.post.comments]
                   }
                 });
               }
             })
           }
-        ></Messages>
-        </div>
-      ))
-    }
+        />
+      </div>
+      );
+
+
+    // return (
+    //   <div>
+    //     {data.games.map(game => <p>{game.title}, hosted by {game.host.userName}</p>)}
+    //   </div>
+    // )
+}
 
 export default Game;

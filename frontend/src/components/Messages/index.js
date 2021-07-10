@@ -8,18 +8,21 @@ import {
   } from "@apollo/client";
 import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION  } from "../../gql";
 
-function Messages({...props}) {
+function Messages({subscribeToNewMessages}) {
 
-    const nonGameConvosData = props.nonGameConvosData;
-    const gameData = props.game;
+    //const gameData = props.game;
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState("");
-    const [gameId, setGameId] = useState("");
     const [messageText, setMessage] = useState("");
+    const [gameId, setGameId] = useState("");
 
     const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText } } );
 
     const [errors, setErrors] = useState([]);
+    useEffect(() => {
+      subscribeToNewMessages();
+    },[])
+
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -27,23 +30,7 @@ function Messages({...props}) {
         updateMessages(gameId, userId, messageText)
     };
 
-    useEffect(() => {
-        if (gameData) {
-            setGameId(gameData.id);
-        }
-        if (sessionUser) {
-            setUserId(sessionUser.userId);
-        }
-    }, [gameData, sessionUser]);
-
-
-
     return (
-      <div><p>Derp.</p>
-     {result !== undefined && (<div>
-     {gameConvosData.map(message => <div key={message._id}><p>{message.sender.userName}: {message.messageText}</p></div>)}
-      </div>)}
-
       <form onSubmit={handleSubmit}>
          <ul>
            {errors.map((error, idx) => (
@@ -61,7 +48,6 @@ function Messages({...props}) {
          </label>
          <button type="submit">Send</button>
        </form>
-       </div>
     )
 }
 
