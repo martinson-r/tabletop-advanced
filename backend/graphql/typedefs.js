@@ -128,13 +128,13 @@ const typeDefs = gql`
   }
   type Mutation {
     blockUser(emailToBlock: String!, blockerEmail: String!): User
-    sendMessageToGame(gameId: ID!, userId: ID!, messageText: String!): Message
+    sendMessageToGame(gameId: ID!, userId: ID!, messageText: String!): [Message]
     sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): Message
     submitGame(userId: ID!, title: String!, description: String!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
   }
   type Subscription {
-    messageAdded(gameId: ID!): Message
+    messageSent(gameId: ID!): [Message]
   }
   schema {
     query: Query

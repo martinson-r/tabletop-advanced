@@ -11,7 +11,6 @@ import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC
 function Messages({...props}) {
 
     const nonGameConvosData = props.nonGameConvosData;
-    const gameConvosData = props.convos;
     const gameData = props.game;
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState("");
@@ -34,7 +33,6 @@ function Messages({...props}) {
         }
         if (sessionUser) {
             setUserId(sessionUser.userId);
-            console.log('SESSION USER', sessionUser)
         }
     }, [gameData, sessionUser]);
 
@@ -42,8 +40,7 @@ function Messages({...props}) {
 
     return (
       <div><p>Derp.</p>
-     {gameConvosData !== undefined && (<div>
-    {console.log('NEW MESSAGE DATA', gameConvosData)}
+     {result !== undefined && (<div>
      {gameConvosData.map(message => <div key={message._id}><p>{message.sender.userName}: {message.messageText}</p></div>)}
       </div>)}
 

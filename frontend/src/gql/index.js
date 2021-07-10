@@ -47,8 +47,8 @@ const GET_GAME = gql`
 `;
 
 const GET_WAITLIST_STATUS = gql`
-    query CheckWaitlist($_id: ID!, $userId: ID!) {
-        checkWaitList(id: $_id, userId: $userId) {
+    query CheckWaitlist($id: ID!, $userId: ID!) {
+        checkWaitList(id: $id, userId: $userId) {
             id
             title
             description
@@ -94,17 +94,13 @@ const ADD_BLOCKED_USER = gql`
 const SEND_MESSAGE_TO_GAME = gql`
   mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
     sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
-        id
-        message {
-            id
-            User {
+            sender {
                 id
                 userName
             }
             messageText
       }
     }
-  }
 `;
 
 const SUBMIT_GAME = gql`
@@ -122,8 +118,8 @@ const SUBMIT_GAME = gql`
 
 const SUBMIT_WAITLIST_APP = gql`
   mutation SubmitWaitlistApp($userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
-    submitWaitlistApp(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, _id: $gameId) {
-                _id
+    submitWaitlistApp(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
+                id
                 title
                 description
                 host {
@@ -135,7 +131,7 @@ const SUBMIT_WAITLIST_APP = gql`
 
 const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
 mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
-    sendNonGameMessage(userId: $userId, messageText: $messageText, _id: $messageId){
+    sendNonGameMessage(userId: $userId, messageText: $messageText, id: $messageId){
         message {
            id
            User {
@@ -149,13 +145,10 @@ mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId:
 `;
 
 const GAME_MESSAGES_SUBSCRIPTION = gql`
-  subscription OnMessageAdded($gameId: ID!) {
-    messageAdded(gameId: $gameId) {
-        sender {
-            userName
-        }
-        id
-        messageText
+subscription OnMessageSent($gameId: ID!) {
+    messageSent(gameId: $gameId) {
+      id
+      messageText
     }
   }
 `;

@@ -10,74 +10,54 @@ import { GET_GAME, GET_GAME_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql
 export const pubsub = new PubSub();
 
 function Game() {
+  const { gameId } = useParams();
 
+//   if (!gameData) {
+//     return (
+//     <p>No games found. :(</p>
+//     )
+// }
     // Grab our session user
     const sessionUser = useSelector((state) => state.session.user);
 
 
     // Grab our game ID
-    const { gameId } = useParams();
-
 
     //grab current game using game ID
     const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } } );
-    //  const { loading, error, data } = useSubscription(GAME_MESSAGES_SUBSCRIPTION, { variables: { gameId }});
-     //Note: Whenever a query returns a result in Apollo Client, that result includes a subscribeToMore function
-     const { subscribeToMore, data: gameConvosData } = useQuery(
+
+      const { subscribeToMore, ...result } = useQuery(
         GET_GAME_CONVOS,
         { variables: { gameId } }
       );
+      const gameDetails = gameData.game;
 
-      useEffect(() => {
-      //subscribe when initial GET_GAME Query is made
-      //Avoid a race condition by checking to see if game convo data has loaded before trying to
-      //subscribe to it.
-        subscribeToMore({
-          document: GAME_MESSAGES_SUBSCRIPTION,
-          variables: { gameId },
-          updateQuery: (prev, { subscriptionData }) => {
-            if (!subscriptionData.data) return prev;
-            const newMessage = subscriptionData.data.messageAdded;
-            console.log(subscriptionData.data)
-
-            //Populate new messages
-            // if (prev.convos) {
-            //   console.log('PREV', prev.convos)
-              return Object.assign({}, prev, {
-                convos: [newMessage.messages, ...prev.convos]
-            });
-          //   }
-
-          //   else {
-          //     return {
-          //       convos: [newMessage]
-          //     }
-          //   }
-           }
-        });
-      }, [])
-
-    if (!gameData) {
-        return (
-        <p>No games found. :(</p>
-        )
-    }
-
-
-    const gameDetails = gameData.game;
-
-        return (
-            <>
-            <p>Game Title: {gameDetails.title}</p>
+      return (
+        (<div>
+         {gameDetails && (<div><p>Game Title: {gameDetails.title}</p>
             <p>Game Detail: {gameDetails.description}</p>
             <p>Host: {gameDetails.host.email}</p>
-            <p><Link to={`/waitlist/${gameDetails._id}`}>Apply To Waitlist</Link></p>
-            <Messages
-              {...gameConvosData} {...gameData }
-              ></Messages>
-
-        </>
-    );
-}
+            <p><Link to={`/waitlist/${gameDetails._id}`}>Apply To Waitlist</Link></p></div>)}
+        <Messages
+          {...result}
+          subscribeToNewComments={() =>
+            subscribeToMore({
+              document: GAME_MESSAGES_SUBSCRIPTION,
+              variables: { gameId },
+              updateQuery: (prev, { subscriptionData }) => {
+                if (!subscriptionData.data) return prev;
+                const newFeedItem = subscriptionData.data.messageSent;
+                return Object.assign({}, prev, {
+                  post: {
+                    comments: [newFeedItem, ...prev.messageText]
+                  }
+                });
+              }
+            })
+          }
+        ></Messages>
+        </div>
+      ))
+    }
 
 export default Game;

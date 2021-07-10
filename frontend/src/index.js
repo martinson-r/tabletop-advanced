@@ -57,46 +57,46 @@ const splitLink = split(
 
 const store = configureStore();
 
- //const cache = new InMemoryCache({});
+ const cache = new InMemoryCache({});
 
-  const cache = new InMemoryCache({
-    typePolicies: {
-      Subscription: {
-        fields: {
-          //messages is what we're merging in convos, gotta key into it.
-            convos: { messages: {
-              merge(existing = [], incoming) {
-                return [...existing, ...incoming];
-              }
-          }
-        }
-        }
-      },
-        Query: {
-          fields: {
-            //messages is what we're merging in convos, gotta key into it.
-              convos: { messages: {
-                merge(existing = [], incoming) {
-                  return [...existing, ...incoming];
-                }
-            }
-          }
-        }
-      }
-    },
+//   const cache = new InMemoryCache({
+//     typePolicies: {
+//       Subscription: {
+//         fields: {
+//           //messages is what we're merging in convos, gotta key into it.
+//             convos: { messages: {
+//               merge(existing = [], incoming) {
+//                 return [...existing, ...incoming];
+//               }
+//           }
+//         }
+//         }
+//       },
+//         Query: {
+//           fields: {
+//             //messages is what we're merging in convos, gotta key into it.
+//               convos: { messages: {
+//                 merge(existing = [], incoming) {
+//                   return [...existing, ...incoming];
+//                 }
+//             }
+//           }
+//         }
+//       }
+//     },
 
-  Subscription: {
-    fields: {
-      convos: {
-        merge(existing = [], incoming) {
-          console.log('SUB INCOMING', incoming);
-          console.log('NEW ARRAY', [...existing, ...incoming])
-          return [...existing, ...incoming];
-        },
-      },
-    },
-  },
-})
+//   Subscription: {
+//     fields: {
+//       convos: {
+//         merge(existing = [], incoming) {
+//           console.log('SUB INCOMING', incoming);
+//           console.log('NEW ARRAY', [...existing, ...incoming])
+//           return [...existing, ...incoming];
+//         },
+//       },
+//     },
+//   },
+// })
 
 const client = new ApolloClient({
   //uri of graphql backend
