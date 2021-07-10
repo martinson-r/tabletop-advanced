@@ -77,23 +77,23 @@ const resolvers = {
     Mutation: {
         sendMessageToGame: async(root,args) => {
             const { gameId, messageText, userId } = args;
-            const newMessage = await Message.create({gameId,messageText,senderId:userId});
+            const senderId = userId;
+            const newMessage = await Message.create({gameId,messageText,senderId});
             const conversation = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
-            console.log('CONVERSATION', conversation)
             return conversation;
-        },
-    },
-    Subscription: {
-        messageSent: {
-          subscribe: withFilter(() => pubsub.asyncIterator('commentAdded'), (payload, variables) => {
-             console.log('payload', payload);
-            return payload.messageSent.gameId === variables.gameId;
-          }),
         }
     },
+    Subscription: {
+                messageSent: {
+                //   subscribe: withFilter(() => pubsub.asyncIterator('NEW_MESSAGE'), (payload, variables) => {
+                //      console.log('payload', payload);
+                //     return payload.messageSent.gameId === variables.gameId;
+                //   }),
+                subscribe: () => pubsub.asyncIterator('NEW_MESSAGE')
+             }
+            },
 }
-
 
 
 module.exports = resolvers;

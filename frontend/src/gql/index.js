@@ -147,7 +147,6 @@ mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId:
 const GAME_MESSAGES_SUBSCRIPTION = gql`
 subscription OnMessageSent($gameId: ID!) {
     messageSent(gameId: $gameId) {
-      id
       messageText
     }
   }

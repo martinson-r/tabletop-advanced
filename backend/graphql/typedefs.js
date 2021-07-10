@@ -106,7 +106,8 @@ const typeDefs = gql`
   }
   type Message {
     id: ID,
-    userId: User,
+    userId: ID,
+    senderId: ID,
     messageText: String,
     createdAt: String,
     deleted: Boolean,
@@ -128,8 +129,8 @@ const typeDefs = gql`
   }
   type Mutation {
     blockUser(emailToBlock: String!, blockerEmail: String!): User
-    sendMessageToGame(gameId: ID!, userId: ID!, messageText: String!): [Message]
-    sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): Message
+    sendMessageToGame(gameId: ID, userId: ID, messageText: String): [Message]
+    sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): [Message]
     submitGame(userId: ID!, title: String!, description: String!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
   }

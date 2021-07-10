@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams, Link } from "react-router-dom";
 
 
 import {
@@ -8,30 +9,58 @@ import {
   } from "@apollo/client";
 import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION  } from "../../gql";
 
-function Messages({subscribeToNewMessages}) {
-
-    //const gameData = props.game;
+function Messages() {
     const sessionUser = useSelector(state => state.session.user);
-    const [userId, setUserId] = useState("");
+    const [userId, setUserId] = useState(null);
     const [messageText, setMessage] = useState("");
-    const [gameId, setGameId] = useState("");
+    const { gameId } = useParams();
+
+    const { subscribeToMore, data, loading, error } = useQuery(
+      GET_GAME_CONVOS,
+      { variables: { gameId } }
+    );
+
+    console.log("DATA", data)
+
+    useEffect(() => {
+      subscribeToMore({
+        document: GAME_MESSAGES_SUBSCRIPTION,
+        variables: { gameId },
+        updateQuery: (prev, { subscriptionData }) => {
+          if (!subscriptionData.data) return prev;
+          const newFeedItem = subscriptionData.data.messageSent;
+          return Object.assign({}, prev, {
+              convos: [newFeedItem, ...prev.convos]
+          });
+        }
+      })
+    },[data])
+
 
     const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText } } );
 
     const [errors, setErrors] = useState([]);
     useEffect(() => {
-      subscribeToNewMessages();
-    },[])
+      if (sessionUser !== undefined) {
+        setUserId(sessionUser.id);
+      }
+    },[sessionUser])
 
 
     const handleSubmit = (e) => {
       e.preventDefault();
+      console.log('gameID', gameId, 'USERID', userId, 'text', messageText)
       setErrors([]);
-        updateMessages(gameId, userId, messageText)
+      updateMessages(gameId, userId, messageText)
     };
 
     return (
-      <form onSubmit={handleSubmit}>
+      <div>
+      {data && data.convos.map(message => <p>{message.sender.userName}: {message.messageText}</p>)}
+      {!sessionUser && (
+        <p>Please log in to send messages.</p>
+      )}
+      {sessionUser !== undefined && (<form onSubmit={handleSubmit}>
          <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>
@@ -47,7 +76,8 @@ function Messages({subscribeToNewMessages}) {
            />
          </label>
          <button type="submit">Send</button>
-       </form>
+       </form>)}
+       </div>
     )
 }
 

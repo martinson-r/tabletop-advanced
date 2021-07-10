@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       // User.belongsToMany(models.Game, {as: "GameSpectator", through: 'Spectator', foreignKey: 'userId', otherKey: 'gameId' });
       User.hasMany(models.Game, { as: "host", foreignKey: 'hostId' });
       User.hasMany(models.Message, { as: "sender", foreignKey: "senderId" });
+      //User.hasMany(models.Message, { foreignKey: "senderId" })
       //User.hasOne(models.AboutMe, { foreignKey: "userId"});
 
       //TODO Refactor: Blocked Users in Games should go on a joins table
