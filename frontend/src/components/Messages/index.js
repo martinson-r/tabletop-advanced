@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
@@ -15,6 +15,8 @@ function Messages() {
     const [userId, setUserId] = useState(null);
     const [messageText, setMessage] = useState("");
     const [sortedConvos, setSortedConvos] = useState([]);
+
+
     let offset = 0;
 
     const { gameId } = useParams();
@@ -43,15 +45,16 @@ function Messages() {
       let messageBox = document.querySelector('#messageBox');
 
       //Set the scrollTop to 580 on page load, the bottom of the scroll box.
-      messageBox.scrollTop = 580;
+      if(messageBox !== undefined) {
+        messageBox.scrollTop = 580;
 
       console.log('SCROLL', messageBox.scrollTop)
+      }
 
       //Listen for scroll event
-      messageBox.addEventListener('scroll', () => {
+      messageBox.addEventListener('scroll', (e) => {
 
-        //Once we're most of the way up...
-        if(messageBox.scrollTop < 150) {
+        if(e.target.scrollTop === 0) {
           offset += 20;
           fetchMore({
             variables: {
@@ -60,12 +63,17 @@ function Messages() {
             },
           });
         }
+
        });
     },[data])
 
 
 
     useEffect(() => {
+
+      //For some reason, if I have reached the end of pagination,
+      //and try to send a message,
+      //this craps out.
 
       subscribeToMore({
         document: GAME_MESSAGES_SUBSCRIPTION,
@@ -80,7 +88,7 @@ function Messages() {
             return x.createdAt - y.createdAt;
         });
           return Object.assign({}, prev, {
-              convos: [...convosToSort, ...newFeedItem]
+              convos: [...convosToSort, newFeedItem]
           });
         }
       })

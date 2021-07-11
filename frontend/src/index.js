@@ -70,7 +70,11 @@ const cache = new InMemoryCache({
             // immutable, and frozen in development.
             const merged = existing ? existing.slice(0) : [];
               for (let i = 0; i < incoming.length; ++i) {
-                merged[offset + i] = incoming[i];
+                  merged[offset + i] = incoming[i];
+
+                //For some reason when I hit scroll 0
+                //This goes crazy
+
             }
             return merged;
           },
