@@ -108,7 +108,12 @@ const typeDefs = gql`
     players: [User],
     spectators: [User]
     waitlist: [Waitlist]
-    ruleSetId: [Ruleset]
+    ruleSetId: ID
+    languageId: ID
+    gameTypeId: ID
+    Ruleset: Ruleset
+    Language: Language
+    GameType: GameType
   }
   type Message {
     id: ID,
@@ -137,7 +142,7 @@ const typeDefs = gql`
     blockUser(emailToBlock: String!, blockerEmail: String!): User
     sendMessageToGame(gameId: ID, userId: ID, messageText: String): [Message]
     sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): [Message]
-    submitGame(userId: ID!, title: String!, description: String!): Game
+    submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
   }
   type Subscription {

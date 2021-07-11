@@ -19,8 +19,6 @@ function Home() {
 
     //grab all games
     const { loading, error, data } = useQuery(GET_GAMES);
-
-    console.log('data', data)
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
 

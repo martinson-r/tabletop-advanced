@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       //Game.belongsToMany(models.User, {as: "UserModerator", through: 'Moderator', foreignKey: 'gameId', otherKey: 'userId' });
       // Game.belongsToMany(models.Application, {through: 'Waitlist', foreignKey: 'gameId', otherKey: 'applicationId' });
-      // Game.belongsTo(models.GameType, {foreignKey: "gameTypeId"});
+      Game.belongsTo(models.GameType, {foreignKey: "gameTypeId"});
       // Game.belongsTo(models.GameSize, {foreignKey: "gameSizeId"});
       // Game.belongsTo(models.GameFrequency, {foreignKey: "gameFrequencyId"});
       // Game.belongsTo(models.GameCleanliness, {foreignKey: "gameCleanlinessId"});
@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
        Game.belongsTo(models.User, { as: "host", foreignKey: 'hostId'});
       //Game.belongsTo(models.User, {as: "GuestHost", foreignKey: "guestHostId"});
       // Game.belongsTo(models.Ruleset, {foreignKey: "ruleSetId"});
-      // Game.belongsTo(models.Language, {foreignKey: "languageId"});
+      Game.belongsTo(models.Language, {foreignKey: "languageId"});
       // Game.belongsTo(models.GameTime, {foreignKey: "gameTimeId"});
       // Game.belongsTo(models.GameFrequency, {foreignKey: "gameFrequencyId"});
       // Game.belongsTo(models.GameSize, {foreignKey: "gameSizeId"});

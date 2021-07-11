@@ -10,13 +10,18 @@ import { SUBMIT_GAME, GET_GAME_CREATION_INFO  } from "../../gql";
 
 function SubmitGame() {
 
+
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState("");
+
+    //Actual user selections
     const [titleText, setTitle] = useState("");
     const [descriptionText, setDescription] = useState("");
     const [gameTypeId, setGameTypeId] = useState(1);
     const [gameLanguageId, setGameLanguageId] = useState(1);
     const [gameRulesetId, setGameRulesetId] = useState(1);
+
+    //Info to populate form fields
     const [gameLanguages, setGameLanguages] = useState([]);
     const [gameRulesets, setGameRulesets] = useState([]);
     const [gameTypes, setGameTypes] = useState([]);
@@ -26,17 +31,15 @@ function SubmitGame() {
 
      //grab available gameType, language, etc info from database
      const { loading, error, data } = useQuery(GET_GAME_CREATION_INFO);
-     console.log('INFO:', data);
 
-
-    const [submitGame] = useMutation(SUBMIT_GAME, { variables: { titleText, userId, descriptionText } } );
+    const [submitGame] = useMutation(SUBMIT_GAME, { variables: { titleText, userId, descriptionText, gameLanguageId, gameRulesetId, gameTypeId } } );
 
     const [errors, setErrors] = useState([]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-        submitGame(userId, titleText, descriptionText)
+        submitGame(userId, titleText, descriptionText, gameLanguageId, gameRulesetId, gameTypeId)
     };
 
     useEffect(() => {
@@ -44,8 +47,7 @@ function SubmitGame() {
             setUserId(sessionUser._id);
         }
         if (data !== undefined) {
-          console.log('DATA?', data)
-          setGameLanguages(data.getGameCreationInfo.languages);
+        setGameLanguages(data.getGameCreationInfo.languages);
         setGameRulesets(data.getGameCreationInfo.rulesets);
         setGameTypes(data.getGameCreationInfo.gameTypes);
         }
@@ -53,10 +55,6 @@ function SubmitGame() {
 
     return (
       <div>
-    <p>Derp.</p>
-
-    {console.log('TYPES', gameTypes)}
-
       {data && <form onSubmit={handleSubmit}>
          <ul>
            {errors.map((error, idx) => (

@@ -91,7 +91,14 @@ const resolvers = {
             const conversation = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
             return conversation;
-        }
+        },
+        submitGame: async(root, args) => {
+                        const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId } = args;
+                        console.log(args);
+
+                        const newGame = await Game.create({ hostId: userId, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
+                        return newGame;
+                    }
     },
     Subscription: {
                 messageSent: {
