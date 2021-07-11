@@ -10,6 +10,12 @@ const typeDefs = gql`
     getNonGameMessages(userId: ID!): [Message]
     getSingleNonGameConversation(id: ID!): [Message]
     checkWaitList(id: ID, userId: ID!): [Game]
+    getGameCreationInfo: GameCreationInfo
+  }
+  type GameCreationInfo {
+    languages: [Language],
+    rulesets: [Ruleset]
+    gameTypes: [GameType]
   }
   type User {
     id: ID,
@@ -58,7 +64,10 @@ const typeDefs = gql`
       description: String
   }
   type Ruleset {
-      name: String
+      ruleset: String
+  }
+  type GameType {
+      type: String
   }
   type GameTime {
       startHour: Int,
@@ -67,9 +76,6 @@ const typeDefs = gql`
       endMinutes: Int,
       timeZoneId: Int,
       amPmId: Int
-  }
-  type GameType {
-      type: String
   }
   type TimeZone {
       timeZone: String

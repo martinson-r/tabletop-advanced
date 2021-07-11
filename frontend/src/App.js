@@ -38,7 +38,7 @@ function App() {
         <Route path="/signup" component={SignUp}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
         <Route path="/conversations" component={Conversations} exact={true}></Route>
-        <Route path="/submit-game" component={SubmitGame} exact={true}></Route>
+        <Route path="/start-game" component={SubmitGame} exact={true}></Route>
         <Route path="/waitlist/:gameId" component={JoinWaitList} exact={true}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}

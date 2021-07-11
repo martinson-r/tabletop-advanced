@@ -14,34 +14,18 @@ function Game() {
     const sessionUser = useSelector((state) => state.session.user);
     // Grab our game ID
     const { gameId } = useParams();
-    console.log('ID PRELOAD', gameId)
 
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } })
-
-      const { subscribeToMore, ...result } = useQuery(
-        GET_GAME_CONVOS,
-        { variables: { gameId } }
-      );
-
-      console.log('RESULT', result)
-
       return (
         <div>
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p></>)}
         {data !== undefined &&(<p>{data.game.description}</p>)}
 
         {data !== undefined && (<Messages
-          {...result}
         />)}
       </div>
       );
 
-
-    // return (
-    //   <div>
-    //     {data.games.map(game => <p>{game.title}, hosted by {game.host.userName}</p>)}
-    //   </div>
-    // )
 }
 
 export default Game;

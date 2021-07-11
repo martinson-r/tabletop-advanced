@@ -20,8 +20,6 @@ function Messages() {
       { variables: { gameId } }
     );
 
-    console.log("DATA", data)
-
     useEffect(() => {
       subscribeToMore({
         document: GAME_MESSAGES_SUBSCRIPTION,
@@ -49,7 +47,6 @@ function Messages() {
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      console.log('gameID', gameId, 'USERID', userId, 'text', messageText)
       setErrors([]);
       updateMessages(gameId, userId, messageText)
     };

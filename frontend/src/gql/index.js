@@ -81,6 +81,22 @@ query GetNonGameNonSpecConvos($userId: ID) {
 }
 `;
 
+const GET_GAME_CREATION_INFO = gql`
+query GetGameCreationInfo {
+    getGameCreationInfo {
+        languages {
+            language
+        }
+        rulesets {
+            ruleset
+        }
+        gameTypes {
+            type
+        }
+    }
+}
+`;
+
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
   mutation AddBlockedUser($email: String) {
@@ -110,7 +126,7 @@ const SUBMIT_GAME = gql`
             title
             description
             host {
-                email
+                userName
             }
         }
 }
@@ -164,5 +180,6 @@ export { GET_ACCOUNTS,
         GAME_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
         SUBMIT_WAITLIST_APP,
-        GET_WAITLIST_STATUS
+        GET_WAITLIST_STATUS,
+        GET_GAME_CREATION_INFO
      };

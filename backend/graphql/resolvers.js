@@ -1,4 +1,4 @@
-const { Message, User, Game, Application } = require('../db/models');
+const { Message, User, Game, Application, Language, Ruleset, GameType } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 
 const pubsub = new PubSub();
@@ -72,6 +72,15 @@ const resolvers = {
             //userId in waitlist.
             const game = await Game.findAll({ where: {id}});
             return game;
+        },
+
+        getGameCreationInfo: async(obj, args, context, info) => {
+            //We can return an object formatted however I want, as long as
+            //our Typedefs are set up correctly!
+            const languages = await Language.findAll();
+            const rulesets = await Ruleset.findAll();
+            const gameTypes = await GameType.findAll();
+            return {languages, rulesets, gameTypes};
         }
     },
     Mutation: {
