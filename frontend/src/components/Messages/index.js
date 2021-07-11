@@ -18,6 +18,9 @@ function Messages() {
     const [offset, setOffset] = useState(0)
 
     const messageBoxRef = useRef(null);
+    const messagesRef = useRef(null);
+
+    const scrollRef = useRef(null);
 
     const { gameId } = useParams();
 
@@ -41,24 +44,34 @@ function Messages() {
     }
 
     useEffect(() => {
+
+
+      //Double check to make sure data is not undefined.
       if (data !== undefined) {
 
         //Must make a copy. Apollo gets angry otherwise.
         let convosToSort = [...data.convos];
 
+        //Sort the copy.
         convosToSort.sort(function(x, y){
           return x.createdAt - y.createdAt;
       });
+
+      //set sortedConvos to the sorted copy.
       setSortedConvos(convosToSort);
       }
+
     },[data])
 
     useEffect(() => {
-     console.log(messageBoxRef.current);
 
+    //Have to use offset to set the scrollTop initially, because otherwise
+    //scrollTop resets every time we get more sortedConvos data.
+    if (sortedConvos !== undefined && offset === 0) {
       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
-      console.log('HEIGHT', messageBoxRef.current.scrollHeight)
-      },[])
+    }
+
+      },[sortedConvos, offset]);
 
 
 
@@ -80,8 +93,15 @@ function Messages() {
           convosToSort.sort(function(x, y){
             return x.createdAt - y.createdAt;
         });
+
+
+        messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+
+
+        //goes blank. May be a caching issue. convosToSort and newFeedItem both look good to me.
+        //no idea what the problem is right now.
           return Object.assign({}, prev, {
-              convos: [...convosToSort, newFeedItem]
+              convos: [...convosToSort, ...newFeedItem]
           });
         }
       })
@@ -101,8 +121,7 @@ function Messages() {
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      let messageBox = document.querySelector('#messageBox');
-      //messageBox.scrollTop = 580;
+      //scrollRef.current.scrollIntoView({behavior: "smooth"})
       updateMessages(gameId, userId, messageText)
 
     };
@@ -111,7 +130,8 @@ function Messages() {
       <div>
 
       <div ref={messageBoxRef} onScroll={scrollEvent} id="messageBox">
-      {data && sortedConvos.map(message => <p className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
+      {data && sortedConvos.map(message => <p ref={messagesRef} className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
+      <div ref={scrollRef} />
       </div>
 
 
