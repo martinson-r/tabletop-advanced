@@ -15,17 +15,30 @@ function Messages() {
     const [userId, setUserId] = useState(null);
     const [messageText, setMessage] = useState("");
     const [sortedConvos, setSortedConvos] = useState([]);
+    const [offset, setOffset] = useState(0)
 
-
-    let offset = 0;
+    const messageBoxRef = useRef(null);
 
     const { gameId } = useParams();
 
     let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
       //add offset
       GET_GAME_CONVOS,
-      { variables: { gameId, offset: 0 } }
+      { variables: { gameId, offset } }
     );
+
+    const scrollEvent = (e) => {
+      console.log('current top', e.target.scrollTop)
+      if (e.target.scrollTop < 50) {
+        setOffset(offset + 20)
+          fetchMore({
+            variables: {
+              gameId,
+              offset
+            }
+            });
+          }
+    }
 
     useEffect(() => {
       if (data !== undefined) {
@@ -41,31 +54,11 @@ function Messages() {
     },[data])
 
     useEffect(() => {
-      // //Grab the messageBox
-      let messageBox = document.querySelector('#messageBox');
+     console.log(messageBoxRef.current);
 
-      //Set the scrollTop to 580 on page load, the bottom of the scroll box.
-      if(messageBox !== undefined) {
-        messageBox.scrollTop = 580;
-
-      console.log('SCROLL', messageBox.scrollTop)
-      }
-
-      //Listen for scroll event
-      messageBox.addEventListener('scroll', (e) => {
-
-        if(e.target.scrollTop === 0) {
-          offset += 20;
-          fetchMore({
-            variables: {
-              gameId,
-              offset
-            },
-          });
-        }
-
-       });
-    },[data])
+      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+      console.log('HEIGHT', messageBoxRef.current.scrollHeight)
+      },[])
 
 
 
@@ -109,7 +102,7 @@ function Messages() {
       e.preventDefault();
       setErrors([]);
       let messageBox = document.querySelector('#messageBox');
-      messageBox.scrollTop = 580;
+      //messageBox.scrollTop = 580;
       updateMessages(gameId, userId, messageText)
 
     };
@@ -117,7 +110,7 @@ function Messages() {
     return (
       <div>
 
-      <div id="messageBox">
+      <div ref={messageBoxRef} onScroll={scrollEvent} id="messageBox">
       {data && sortedConvos.map(message => <p className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
       </div>
 
