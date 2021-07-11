@@ -85,7 +85,30 @@ const resolvers = {
     },
     Mutation: {
         sendMessageToGame: async(root,args) => {
-            const { gameId, messageText, userId } = args;
+
+        const { gameId, messageText, userId } = args;
+
+            //Check to see if this is a dice roll.
+            //Fun with regex
+            const numbers = messageText.match(/(\d+)[Dd](\d+)/);
+
+            console.log('NUMBERS', numbers)
+
+            if (numbers !== null) {
+                const result = rolldice(numbers[1], numbers[2]);
+
+                //push roll results into messageText
+                const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
+
+                //upsert: true means something will be created if it doesn't exist
+                const roll = await Message.create({gameId, messageText, senderId: userId});
+
+                const returnRoll = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
+                pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
+                return returnRoll;
+
+            }
+
             const senderId = userId;
             const newMessage = await Message.create({gameId,messageText,senderId});
             const conversation = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
