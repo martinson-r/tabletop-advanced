@@ -28,7 +28,7 @@ function Messages() {
           if (!subscriptionData.data) return prev;
           const newFeedItem = subscriptionData.data.messageSent;
           return Object.assign({}, prev, {
-              convos: [newFeedItem, ...prev.convos]
+              convos: [...prev.convos, newFeedItem]
           });
         }
       })

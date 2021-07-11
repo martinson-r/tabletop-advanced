@@ -1,5 +1,6 @@
 const { Message, User, Game, Application, Language, Ruleset, GameType } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
+const { Op } = require('sequelize');
 
 const pubsub = new PubSub();
 
@@ -45,15 +46,21 @@ const resolvers = {
             return game;
         },
         messages: async(obj, args, context, info) => {
-            const message = await Message.findAll({});
+            const message = await Message.findAll();
             return message;
         },
 
         convos: async (obj, args, context, info) => {
-            const conversation = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
-            //TODO: Pagination
+            //First, we get the latest entries. They'll be "backwards".
+            const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:5});
 
-            return conversation;
+            //Then, we flip them.
+            conversation.rows.sort(function(x, y){
+                return x.createdAt - y.createdAt;
+            });
+
+            //This allows us to avoid too many expensive database operations using Offset.
+            return conversation.rows;
         },
         getNonGameMessages: async(obj, args, context, info) => {
             const { userId } = args;
@@ -101,19 +108,26 @@ const resolvers = {
                 const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
 
                 //upsert: true means something will be created if it doesn't exist
-                const roll = await Message.create({gameId, messageText, senderId: userId});
+                await Message.create({gameId, messageText, senderId: userId});
 
-                const returnRoll = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
-                pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
-                return returnRoll;
+                const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:5});
+                returnRoll.rows.sort(function(x, y){
+                    return x.createdAt - y.createdAt;
+                })
+
+                pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll.rows});
+                return returnRoll.rows;
 
             }
 
             const senderId = userId;
-            const newMessage = await Message.create({gameId,messageText,senderId});
-            const conversation = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
-            pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
-            return conversation;
+            await Message.create({gameId,messageText,senderId});
+            const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:5});
+            conversation.rows.sort(function(x, y){
+                return x.createdAt - y.createdAt;
+            })
+            pubsub.publish('NEW_MESSAGE', {messageSent: conversation.rows});
+            return conversation.rows;
         },
         submitGame: async(root, args) => {
                         const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId } = args;
