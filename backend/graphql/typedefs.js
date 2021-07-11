@@ -6,7 +6,7 @@ const typeDefs = gql`
     games: [Game]
     game(id: ID!): Game
     messages: [Message]
-    convos(gameId: ID): [Message]
+    convos(gameId: ID, offset: Int): [Message]
     getNonGameMessages(userId: ID!): [Message]
     getSingleNonGameConversation(id: ID!): [Message]
     checkWaitList(id: ID, userId: ID!): [Game]

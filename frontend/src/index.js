@@ -57,46 +57,31 @@ const splitLink = split(
 
 const store = configureStore();
 
- const cache = new InMemoryCache({});
+//const cache = new InMemoryCache({});
 
-//   const cache = new InMemoryCache({
-//     typePolicies: {
-//       Subscription: {
-//         fields: {
-//           //messages is what we're merging in convos, gotta key into it.
-//             convos: { messages: {
-//               merge(existing = [], incoming) {
-//                 return [...existing, ...incoming];
-//               }
-//           }
-//         }
-//         }
-//       },
-//         Query: {
-//           fields: {
-//             //messages is what we're merging in convos, gotta key into it.
-//               convos: { messages: {
-//                 merge(existing = [], incoming) {
-//                   return [...existing, ...incoming];
-//                 }
-//             }
-//           }
-//         }
-//       }
-//     },
+const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        convos: {
+          keyArgs: [],
+          merge(existing, incoming, { args: { offset = 0 }}) {
+            // Slicing is necessary because the existing data is
+            // immutable, and frozen in development.
+            const merged = existing ? existing.slice(0) : [];
+              for (let i = 0; i < incoming.length; ++i) {
+                merged[offset + i] = incoming[i];
+            }
+            return merged;
+          },
+        },
+      },
+    },
+  },
+});
 
-//   Subscription: {
-//     fields: {
-//       convos: {
-//         merge(existing = [], incoming) {
-//           console.log('SUB INCOMING', incoming);
-//           console.log('NEW ARRAY', [...existing, ...incoming])
-//           return [...existing, ...incoming];
-//         },
-//       },
-//     },
-//   },
-// })
+
+
 
 const client = new ApolloClient({
   //uri of graphql backend

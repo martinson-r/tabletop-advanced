@@ -52,14 +52,15 @@ const resolvers = {
 
         convos: async (obj, args, context, info) => {
             //First, we get the latest entries. They'll be "backwards".
-            const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:5});
+            const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
 
-            //Then, we flip them.
-            conversation.rows.sort(function(x, y){
-                return x.createdAt - y.createdAt;
-            });
+            //Then, we flip them. This allows us to avoid too many
+            //expensive database operations using Offset.
 
-            //This allows us to avoid too many expensive database operations using Offset.
+            // conversation.rows.sort(function(x, y){
+            //     return x.createdAt - y.createdAt;
+            // });
+
             return conversation.rows;
         },
         getNonGameMessages: async(obj, args, context, info) => {
@@ -107,13 +108,12 @@ const resolvers = {
                 //push roll results into messageText
                 const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
 
-                //upsert: true means something will be created if it doesn't exist
                 await Message.create({gameId, messageText, senderId: userId});
 
-                const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:5});
-                returnRoll.rows.sort(function(x, y){
-                    return x.createdAt - y.createdAt;
-                })
+                const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
+                // returnRoll.rows.sort(function(x, y){
+                //     return x.createdAt - y.createdAt;
+                // })
 
                 pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll.rows});
                 return returnRoll.rows;
@@ -122,10 +122,11 @@ const resolvers = {
 
             const senderId = userId;
             await Message.create({gameId,messageText,senderId});
-            const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:5});
-            conversation.rows.sort(function(x, y){
-                return x.createdAt - y.createdAt;
-            })
+
+            const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
+            // conversation.rows.sort(function(x, y){
+            //     return x.createdAt - y.createdAt;
+            // })
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation.rows});
             return conversation.rows;
         },

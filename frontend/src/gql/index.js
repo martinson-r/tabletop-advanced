@@ -57,13 +57,14 @@ const GET_WAITLIST_STATUS = gql`
 `;
 
 const GET_GAME_CONVOS = gql`
-    query GetGameConvos($gameId: ID) {
-       convos(gameId: $gameId){
+    query GetGameConvos($gameId: ID, $offset: Int) {
+       convos(gameId: $gameId, offset: $offset){
             sender {
                 userName
             }
             id
             messageText
+            createdAt
        }
     }
 `;
