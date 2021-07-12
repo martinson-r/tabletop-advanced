@@ -18,9 +18,6 @@ function Messages() {
     const [offset, setOffset] = useState(0)
 
     const messageBoxRef = useRef(null);
-    const messagesRef = useRef(null);
-
-    const scrollRef = useRef(null);
 
     const { gameId } = useParams();
 
@@ -31,20 +28,31 @@ function Messages() {
     );
 
     const scrollEvent = (e) => {
-      console.log('current top', e.target.scrollTop)
-      if (e.target.scrollTop < 50) {
+      if (e.target.scrollTop === 0) {
+        //Let's make sure we're not asking
+        //for something that doesn't exist
+        //(a perpetually increasing offset)
+
+        //fetchMore will happily try to grab something with an offset
+        //that doesn't exist, and overwrite incoming data with
+        //an empty array. We need to stop offsetting ASAP.
+
+        //This is complicated by the fact that we may have received more
+        //messages via Subscription in the meantime, and possibly sent a few.
+
+        if (offset <= sortedConvos.length) {
         setOffset(offset + 20)
-          fetchMore({
-            variables: {
-              gameId,
-              offset
-            }
-            });
+        fetchMore({
+          variables: {
+            gameId,
+            offset
           }
+          });
+        }
+      }
     }
 
     useEffect(() => {
-
 
       //Double check to make sure data is not undefined.
       if (data !== undefined) {
@@ -58,8 +66,12 @@ function Messages() {
       });
 
       //set sortedConvos to the sorted copy.
-      setSortedConvos(convosToSort);
+      //BUT! Check to make sure it's NOT EMPTY, or you'll
+      //blank out your whole conversations array.
+      if (convosToSort.length) {
+        setSortedConvos([...convosToSort]);
       }
+    }
 
     },[data])
 
@@ -67,43 +79,31 @@ function Messages() {
 
     //Have to use offset to set the scrollTop initially, because otherwise
     //scrollTop resets every time we get more sortedConvos data.
-    if (sortedConvos !== undefined && offset === 0) {
+    if (offset === 0) {
       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
     }
-
-      },[sortedConvos, offset]);
+  },[data, offset]);
 
 
 
     useEffect(() => {
-
-      //For some reason, if I have reached the end of pagination,
-      //and try to send a message,
-      //this craps out.
-
       subscribeToMore({
         document: GAME_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
         updateQuery: (prev, { subscriptionData }) => {
-          console.log('PREV', prev)
           if (!subscriptionData.data) return prev;
-          const newFeedItem = subscriptionData.data.messageSent;
-          console.log('NEW SUBSCRIPTION ITEM', newFeedItem)
-          let convosToSort = [...prev.convos];
-          convosToSort.sort(function(x, y){
-            return x.createdAt - y.createdAt;
-        });
+          const newFeedItem = subscriptionData.data;
 
+          //For whatever reason, this breaks when scrollTop is 0.
+          //Possibly because we previously fetched and published something that
+          //was undefined?
 
-        messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
-
-
-        //goes blank. May be a caching issue. convosToSort and newFeedItem both look good to me.
-        //no idea what the problem is right now.
+          //Somehow, incoming is getting set to an empty array.
+          //I suspect caching issue.
           return Object.assign({}, prev, {
-              convos: [...convosToSort, ...newFeedItem]
+            convos: [newFeedItem, ...prev.convos]
           });
-        }
+          }
       })
     },[])
 
@@ -121,17 +121,34 @@ function Messages() {
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      //scrollRef.current.scrollIntoView({behavior: "smooth"})
-      updateMessages(gameId, userId, messageText)
+      console.log('VARS', 'game', gameId, 'user', userId, 'text', messageText)
 
+      if (messageBoxRef.current.scrollTop !== 0) {
+
+        //Offset is fine at this point. No need to do anything with it.
+        updateMessages(gameId, userId, messageText);
+      } else {
+
+        //We scrolled too far if the scrollTop === 0
+        //Our incoming messages will get wiped out because
+        //offset is too high and fetchMore will happily fetch
+        //somethign that doesn't exist.
+        //Our offset's always 20, though, so we can just decrement it.
+        setOffset(offset - 20);
+        updateMessages(gameId, userId, messageText);
+      }
+
+      //Going to have to get the height of the div once it changes
+      //and set the scroll to that, or something
+      //trying to get the height and scroll to it just gets you to
+      //halfway down, or the old height of the div.
     };
 
     return (
       <div>
 
       <div ref={messageBoxRef} onScroll={scrollEvent} id="messageBox">
-      {data && sortedConvos.map(message => <p ref={messagesRef} className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
-      <div ref={scrollRef} />
+      {sortedConvos && sortedConvos.map(message => <p ref={messagesRef} className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
       </div>
 
 

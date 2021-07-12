@@ -60,6 +60,7 @@ const GET_GAME_CONVOS = gql`
     query GetGameConvos($gameId: ID, $offset: Int) {
        convos(gameId: $gameId, offset: $offset){
             sender {
+                id
                 userName
             }
             id
@@ -116,6 +117,7 @@ const SEND_MESSAGE_TO_GAME = gql`
                 userName
             }
             messageText
+            createdAt
       }
     }
 `;
@@ -164,7 +166,12 @@ mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId:
 const GAME_MESSAGES_SUBSCRIPTION = gql`
 subscription OnMessageSent($gameId: ID!) {
     messageSent(gameId: $gameId) {
-      messageText
+        sender {
+            id
+            userName
+        }
+        messageText
+        createdAt
     }
   }
 `;

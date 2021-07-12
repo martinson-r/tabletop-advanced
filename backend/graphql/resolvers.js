@@ -51,17 +51,9 @@ const resolvers = {
         },
 
         convos: async (obj, args, context, info) => {
-            //First, we get the latest entries. They'll be "backwards".
             const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
+                return conversation.rows;
 
-            //Then, we flip them. This allows us to avoid too many
-            //expensive database operations using Offset.
-
-            // conversation.rows.sort(function(x, y){
-            //     return x.createdAt - y.createdAt;
-            // });
-
-            return conversation.rows;
         },
         getNonGameMessages: async(obj, args, context, info) => {
             const { userId } = args;
@@ -94,7 +86,7 @@ const resolvers = {
     Mutation: {
         sendMessageToGame: async(root,args) => {
 
-        const { gameId, messageText, userId } = args;
+        const { gameId, messageText, userId, offset } = args;
 
             //Check to see if this is a dice roll.
             //Fun with regex
@@ -115,20 +107,20 @@ const resolvers = {
                 //     return x.createdAt - y.createdAt;
                 // })
 
-                pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll.rows});
-                return returnRoll.rows;
+                pubsub.publish('NEW_MESSAGE', {convos: returnRoll.rows});
+
 
             }
 
             const senderId = userId;
+            console.log(args)
             await Message.create({gameId,messageText,senderId});
 
-            const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
-            // conversation.rows.sort(function(x, y){
-            //     return x.createdAt - y.createdAt;
-            // })
-            pubsub.publish('NEW_MESSAGE', {messageSent: conversation.rows});
-            return conversation.rows;
+            const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
+
+            console.log(conversation);
+            pubsub.publish('NEW_MESSAGE', {convos: conversation.rows});
+
         },
         submitGame: async(root, args) => {
                         const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId } = args;
@@ -140,11 +132,17 @@ const resolvers = {
     },
     Subscription: {
                 messageSent: {
-                //   subscribe: withFilter(() => pubsub.asyncIterator('NEW_MESSAGE'), (payload, variables) => {
-                //      console.log('payload', payload);
-                //     return payload.messageSent.gameId === variables.gameId;
-                //   }),
-                subscribe: () => pubsub.asyncIterator('NEW_MESSAGE')
+                    //Add filter later
+                  subscribe: withFilter(() => pubsub.asyncIterator('NEW_MESSAGE'), (payload, variables) => {
+                      //console.log('payload', payload);
+                      console.log('vars', variables)
+                      console.log(payload.convos[0].gameId)
+                    console.log('match?', payload.convos[0].gameId.toString() === variables.gameId)
+
+                    //Yes, you have to cast it to a string...
+                    return payload.convos[0].gameId.toString() === variables.gameId;
+                  }),
+                // subscribe: () => pubsub.asyncIterator('NEW_MESSAGE')
              }
             },
 }
