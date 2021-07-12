@@ -9,6 +9,7 @@ import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
 import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION  } from "../../gql";
+import { parseValue } from "graphql";
 
 function Messages() {
     const sessionUser = useSelector(state => state.session.user);
@@ -39,8 +40,10 @@ function Messages() {
 
         //This is complicated by the fact that we may have received more
         //messages via Subscription in the meantime, and possibly sent a few.
+        //remember, it's findAndCountAll; you can COUNT what you get back.
 
-        if (offset <= sortedConvos.length) {
+        //TODO: check Count to make sure there are more records to fetch
+        if (sortedConvos.length < data.convos.count) {
         setOffset(offset + 20)
         fetchMore({
           variables: {
@@ -49,7 +52,9 @@ function Messages() {
           }
           });
         }
-      }
+        }
+
+console.log('OFFSET', offset);
     }
 
     useEffect(() => {
@@ -57,20 +62,23 @@ function Messages() {
       //Double check to make sure data is not undefined.
       if (data !== undefined) {
 
-        //Must make a copy. Apollo gets angry otherwise.
-        let convosToSort = [...data.convos];
+        //Don't forget to add your old sorted conversations back in,
+        //or you lose them... but you need to dedupe.
 
-        //Sort the copy.
-        convosToSort.sort(function(x, y){
-          return x.createdAt - y.createdAt;
-      });
+        //Also, check to see that your data.convos.rows isn't empty, or you'll
+        //blank out your whole array.
 
-      //set sortedConvos to the sorted copy.
-      //BUT! Check to make sure it's NOT EMPTY, or you'll
-      //blank out your whole conversations array.
-      if (convosToSort.length) {
-        setSortedConvos([...convosToSort]);
-      }
+        if (data.convos.rows.length) {
+          const toDedupe = new Set([...sortedConvos,...data.convos.rows]);
+
+          //Sort it. Sets are unsorted. Must turn it into an array first.
+          const convosToSort = [...toDedupe]
+          convosToSort.sort(function(x, y){
+           return x.createdAt - y.createdAt;
+       });
+
+         setSortedConvos([...convosToSort]);
+       }
     }
 
     },[data])
@@ -92,16 +100,23 @@ function Messages() {
         variables: { gameId },
         updateQuery: (prev, { subscriptionData }) => {
           if (!subscriptionData.data) return prev;
-          const newFeedItem = subscriptionData.data;
+          console.log(subscriptionData.data)
+          const newFeedItem = subscriptionData.data.messageSent;
+
+          console.log('SUB', subscriptionData)
+
+          console.log('NEW', newFeedItem)
 
           //For whatever reason, this breaks when scrollTop is 0.
           //Possibly because we previously fetched and published something that
           //was undefined?
 
-          //Somehow, incoming is getting set to an empty array.
-          //I suspect caching issue.
+          console.log('PREV', prev);
+
+          //This part is broken.
+
           return Object.assign({}, prev, {
-            convos: [newFeedItem, ...prev.convos]
+            convos: {...prev.rows, ...newFeedItem}
           });
           }
       })
@@ -121,20 +136,8 @@ function Messages() {
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      console.log('VARS', 'game', gameId, 'user', userId, 'text', messageText)
-
-      if (messageBoxRef.current.scrollTop !== 0) {
 
         //Offset is fine at this point. No need to do anything with it.
-        updateMessages(gameId, userId, messageText);
-      } else {
-
-        //We scrolled too far if the scrollTop === 0
-        //Our incoming messages will get wiped out because
-        //offset is too high and fetchMore will happily fetch
-        //somethign that doesn't exist.
-        //Our offset's always 20, though, so we can just decrement it.
-        setOffset(offset - 20);
         updateMessages(gameId, userId, messageText);
       }
 
@@ -142,13 +145,12 @@ function Messages() {
       //and set the scroll to that, or something
       //trying to get the height and scroll to it just gets you to
       //halfway down, or the old height of the div.
-    };
 
     return (
       <div>
 
       <div ref={messageBoxRef} onScroll={scrollEvent} id="messageBox">
-      {sortedConvos && sortedConvos.map(message => <p ref={messagesRef} className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
+      {sortedConvos && sortedConvos.map(message => <p className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
       </div>
 
 

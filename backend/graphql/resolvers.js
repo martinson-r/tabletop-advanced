@@ -52,7 +52,8 @@ const resolvers = {
 
         convos: async (obj, args, context, info) => {
             const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
-                return conversation.rows;
+            console.log('CONVO', conversation)
+            return conversation;
 
         },
         getNonGameMessages: async(obj, args, context, info) => {
@@ -92,7 +93,7 @@ const resolvers = {
             //Fun with regex
             const numbers = messageText.match(/(\d+)[Dd](\d+)/);
 
-            console.log('NUMBERS', numbers)
+            //console.log('NUMBERS', numbers)
 
             if (numbers !== null) {
                 const result = rolldice(numbers[1], numbers[2]);
@@ -107,7 +108,7 @@ const resolvers = {
                 //     return x.createdAt - y.createdAt;
                 // })
 
-                pubsub.publish('NEW_MESSAGE', {convos: returnRoll.rows});
+                pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
 
 
             }
@@ -117,9 +118,9 @@ const resolvers = {
             await Message.create({gameId,messageText,senderId});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
+            console.log('CONVO', conversation)
 
-            console.log(conversation);
-            pubsub.publish('NEW_MESSAGE', {convos: conversation.rows});
+            pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
 
         },
         submitGame: async(root, args) => {
@@ -135,14 +136,16 @@ const resolvers = {
                     //Add filter later
                   subscribe: withFilter(() => pubsub.asyncIterator('NEW_MESSAGE'), (payload, variables) => {
                       //console.log('payload', payload);
-                      console.log('vars', variables)
-                      console.log(payload.convos[0].gameId)
-                    console.log('match?', payload.convos[0].gameId.toString() === variables.gameId)
+                    //   console.log('vars', variables)
+                    //   console.log('payload', payload)
+                    //   console.log(payload.messageSent.rows[0].gameId)
+                    // console.log('match?', payload.messageSent.rows[0].gameId.toString() === variables.gameId)
 
                     //Yes, you have to cast it to a string...
-                    return payload.convos[0].gameId.toString() === variables.gameId;
+
+                    return payload.messageSent.rows[0].gameId.toString() === variables.gameId;
                   }),
-                // subscribe: () => pubsub.asyncIterator('NEW_MESSAGE')
+                //subscribe: () => pubsub.asyncIterator('NEW_MESSAGE')
              }
             },
 }

@@ -1,4 +1,6 @@
 const { gql } = require('apollo-server-express');
+// convos(gameId: ID, offset: Int): [Message]
+
 const typeDefs = gql`
   type Query {
     users: [User]
@@ -6,7 +8,7 @@ const typeDefs = gql`
     games: [Game]
     game(id: ID!): Game
     messages: [Message]
-    convos(gameId: ID, offset: Int): [Message]
+    convos(gameId: ID, offset: Int): CountAll
     getNonGameMessages(userId: ID!): [Message]
     getSingleNonGameConversation(id: ID!): [Message]
     checkWaitList(id: ID, userId: ID!): [Game]
@@ -69,6 +71,10 @@ const typeDefs = gql`
   type GameType {
       type: String
   }
+  type CountAll {
+    rows: [Message]
+    count: Int
+  }
   type GameTime {
       startHour: Int,
       endHour: Int,
@@ -76,6 +82,9 @@ const typeDefs = gql`
       endMinutes: Int,
       timeZoneId: Int,
       amPmId: Int
+  }
+  type rows {
+    rows: [Message]
   }
   type TimeZone {
       timeZone: String
@@ -140,13 +149,13 @@ const typeDefs = gql`
   }
   type Mutation {
     blockUser(emailToBlock: String!, blockerEmail: String!): User
-    sendMessageToGame(gameId: ID, userId: ID, messageText: String): [Message]
+    sendMessageToGame(gameId: ID, userId: ID, messageText: String): CountAll
     sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): [Message]
     submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
   }
   type Subscription {
-    messageSent(gameId: ID!): [Message]
+    messageSent(gameId: ID!): CountAll
   }
   schema {
     query: Query

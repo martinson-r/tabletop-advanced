@@ -59,6 +59,9 @@ const GET_WAITLIST_STATUS = gql`
 const GET_GAME_CONVOS = gql`
     query GetGameConvos($gameId: ID, $offset: Int) {
        convos(gameId: $gameId, offset: $offset){
+        count
+        rows {
+            id
             sender {
                 id
                 userName
@@ -68,6 +71,7 @@ const GET_GAME_CONVOS = gql`
             createdAt
        }
     }
+}
 `;
 
 const GET_NON_GAME_NON_SPEC_CONVOS = gql`
@@ -112,14 +116,18 @@ const ADD_BLOCKED_USER = gql`
 const SEND_MESSAGE_TO_GAME = gql`
   mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
     sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
+        count
+        rows {
             sender {
                 id
                 userName
             }
+            id
             messageText
             createdAt
+       }
+        }
       }
-    }
 `;
 
 const SUBMIT_GAME = gql`
@@ -166,13 +174,18 @@ mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId:
 const GAME_MESSAGES_SUBSCRIPTION = gql`
 subscription OnMessageSent($gameId: ID!) {
     messageSent(gameId: $gameId) {
-        sender {
+        count
+        rows {
             id
-            userName
+            sender {
+                id
+                userName
+            }
+            id
+            messageText
+            createdAt
+       }
         }
-        messageText
-        createdAt
-    }
   }
 `;
 
