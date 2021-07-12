@@ -42,7 +42,6 @@ function Messages() {
         //messages via Subscription in the meantime, and possibly sent a few.
         //remember, it's findAndCountAll; you can COUNT what you get back.
 
-        //TODO: check Count to make sure there are more records to fetch
         if (sortedConvos.length < data.convos.count) {
         setOffset(offset + 20)
         fetchMore({
@@ -67,6 +66,10 @@ console.log('OFFSET', offset);
 
         //Also, check to see that your data.convos.rows isn't empty, or you'll
         //blank out your whole array.
+
+        //Ideally, deduping would be done in the cache, but I'm
+        //having a hard time with that and want to get this
+        //working.
 
         if (data.convos.rows.length) {
           const toDedupe = new Set([...sortedConvos,...data.convos.rows]);
