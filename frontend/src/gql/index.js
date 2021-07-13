@@ -130,6 +130,16 @@ const SEND_MESSAGE_TO_GAME = gql`
       }
 `;
 
+const CHANGE_EMAIL = gql`
+mutation ChangeEmail($userId: ID!, $newEmail: String!) {
+    changeEmail(userId: $userId, newEmail: $newEmail) {
+        id
+        userName
+        email
+    }
+}
+`
+
 //IDs are required on backend but if I don't mark them required on frontend,
 //we get a 404...
 //Took me forever to troubleshoot this.
@@ -203,5 +213,6 @@ export { GET_ACCOUNTS,
         SUBMIT_GAME,
         SUBMIT_WAITLIST_APP,
         GET_WAITLIST_STATUS,
-        GET_GAME_CREATION_INFO
+        GET_GAME_CREATION_INFO,
+        CHANGE_EMAIL
      };

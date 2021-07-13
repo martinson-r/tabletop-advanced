@@ -38,6 +38,7 @@ function SubmitGame() {
      //We also need to grab the data GraphQL returns.
      //We have to use a callback to get that sweet, sweet data out.
      //Then, we redirect the user to their new game.
+     //We could also do a useEffect with a dependency, I guess.
     const [submitGame] = useMutation(SUBMIT_GAME, { variables: { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId }, onCompleted: submitGame => { history.push(`/game/${submitGame.submitGame.id}`) }});
 
 
@@ -47,7 +48,6 @@ function SubmitGame() {
       e.preventDefault();
       setErrors([]);
       submitGame(userId, title, description, gameLanguageId, gameRulesetId, gameTypeId);
-      //history.push(`/game/${submitGame.id}`)
     };
 
     useEffect(() => {

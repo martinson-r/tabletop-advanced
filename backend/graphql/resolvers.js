@@ -29,7 +29,8 @@ const resolvers = {
             return User.findAll({})
           },
         user: async(obj, args, context, info) => {
-            const id = args._id;
+            console.log(args);
+            const {id} = args
             const user = await User.findByPk(id);
             return user;
         },
@@ -131,7 +132,14 @@ const resolvers = {
                         // const returnGame = await Game.findByPk(newGame.id, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
                         // return returnGame;
                         return newGame;
-                    }
+                    },
+        changeEmail: async(root, args) => {
+            const {userId, newEmail} = args;
+            const foundUser = await User.findByPk(userId)
+            foundUser.email = newEmail;
+            await foundUser.save();
+            return foundUser;
+        },
     },
     Subscription: {
                 messageSent: {

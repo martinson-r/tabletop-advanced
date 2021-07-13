@@ -153,6 +153,7 @@ const typeDefs = gql`
     sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): [Message]
     submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
+    changeEmail(userId: ID!, newEmail: String!): User
   }
   type Subscription {
     messageSent(gameId: ID!): CountAll
