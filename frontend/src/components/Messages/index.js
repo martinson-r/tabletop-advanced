@@ -3,6 +3,7 @@ import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import "./messages.css";
+import { v4 as uuidv4 } from 'uuid';
 
 
 import {
@@ -18,6 +19,8 @@ function Messages() {
     const [sortedConvos, setSortedConvos] = useState([]);
     const [offset, setOffset] = useState(0)
     const [submittedMessage, setSubmittedMessage] = useState(false);
+    const [isScrolling, setIsScrolling] = useState(false);
+
     const convoStatus = useRef(sortedConvos);
 
     const messageBoxRef = useRef(null);
@@ -31,32 +34,32 @@ function Messages() {
       { variables: { gameId, offset } }
     );
 
-    const scrollEvent = (e) => {
+    // const scrollEvent = (e) => {
 
-      if (e.target.scrollTop === 0) {
-        //Let's make sure we're not asking
-        //for something that doesn't exist
-        //(a perpetually increasing offset)
+    //   if (e.target.scrollTop === 0) {
+    //     //Let's make sure we're not asking
+    //     //for something that doesn't exist
+    //     //(a perpetually increasing offset)
 
-        //fetchMore will happily try to grab something with an offset
-        //that doesn't exist, and overwrite incoming data with
-        //an empty array. We need to stop offsetting ASAP.
+    //     //fetchMore will happily try to grab something with an offset
+    //     //that doesn't exist, and overwrite incoming data with
+    //     //an empty array. We need to stop offsetting ASAP.
 
-        //This is complicated by the fact that we may have received more
-        //messages via Subscription in the meantime, and possibly sent a few.
-        //remember, it's findAndCountAll; you can COUNT what you get back.
+    //     //This is complicated by the fact that we may have received more
+    //     //messages via Subscription in the meantime, and possibly sent a few.
+    //     //remember, it's findAndCountAll; you can COUNT what you get back.
 
-        if (sortedConvos.length < data.convos.count) {
-        setOffset(offset + 20)
-        fetchMore({
-          variables: {
-            gameId,
-            offset
-          }
-          });
-        }
-        }
-    }
+    //     if (sortedConvos.length < data.convos.count) {
+    //     setOffset(offset + 20)
+    //     fetchMore({
+    //       variables: {
+    //         gameId,
+    //         offset
+    //       }
+    //       });
+    //     }
+    //     }
+    // }
 
     useEffect(() => {
 
@@ -134,6 +137,67 @@ function Messages() {
       }
     },[sessionUser])
 
+    useEffect(() => {
+      //Listen for scroll and provide more chat
+        messageBoxRef.current.addEventListener('wheel', function scrolled() {
+          setIsScrolling(true);
+
+          //This could be DRYed up.
+          if (messageBoxRef.current.scrollTop === 0) {
+            //setTimeout so we don't flood the server with requests.
+            setTimeout(() => {
+              if (sortedConvos && data !== undefined) {
+                if (sortedConvos.length < data.convos.count) {
+                  setOffset(offset + 20)
+                  fetchMore({
+                    variables: {
+                      gameId,
+                      offset
+                    }
+                  });
+             }
+          }
+        },300);
+        if (sortedConvos && data !== undefined) {
+          //p tags with current font size are 18 px high and 16 px margin
+                  //for a total height of 34
+                  //about 20 of them are displayed per refresh, but we an adjust.
+                  //Our scrollbar sticks to the top - stuff is "added to" the bottom, despite
+                  //the new data being at the top of the chat.
+                  //So we have to adjust it.
+          const addedWindowHeight = (data.convos.length * 34) - 16; //There's no top or bottom margin.
+          messageBoxRef.current.scroll({ top: 0, left: 0, behavior: 'smooth'});
+
+          //clean up event listener after repositioning the scrollbar.
+          messageBoxRef.current.removeEventListener("wheel", scrolled, false);
+          setIsScrolling(false);
+          }
+
+      }
+    }, {passive: true});
+
+    //Alternatively, users may just drag the scrollbar up to the top...
+    //If we don't check if they're using the wheel, the server
+    //goes nuts.
+
+    //NOTE: this doesn't currently work... not sure why.
+    if (messageBoxRef.current.scrollTop === 0 && isScrolling === false) {
+      console.log('boom');
+        if (sortedConvos && data !== undefined) {
+          if (sortedConvos.length < data.convos.count) {
+            setOffset(offset + 20)
+            fetchMore({
+              variables: {
+                gameId,
+                offset
+              }
+            });
+       }
+      }
+    }
+
+  },[sortedConvos])
+
     useEffect(()=> {
 
       //If offset is 0, we haven't loaded any more info.
@@ -143,6 +207,7 @@ function Messages() {
       if (offset === 0) {
         messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
       }
+
       //This is weird, but it works.
       //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
       //Then, check to see if this is a case where a message has been submitted.
@@ -165,12 +230,10 @@ function Messages() {
     return (
       <div>
 
-      <div ref={messageBoxRef} onScroll={scrollEvent} id="messageBox">
-      {sortedConvos && sortedConvos.map(message => <p key={message.id} className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
+      <div ref={messageBoxRef} id="messageBox">
+      {sortedConvos && sortedConvos.map(message => <p key={uuidv4()} className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
       {sortedConvos && (<div ref={scrollDiv}></div>)}
       </div>
-
-
 
       {!sessionUser && (
         <p>Please log in to send messages.</p>
