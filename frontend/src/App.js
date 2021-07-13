@@ -3,6 +3,7 @@ import './App.css';
 import { BrowserRouter, Route, Switch, NavLink } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import SignUp from "./components/Login";
@@ -17,6 +18,7 @@ import * as sessionActions from "./store/session";
 
 function App() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [isLoaded, setIsLoaded] = useState(false);
   const sessionUser = useSelector(state => state.session.user);
 
@@ -27,6 +29,7 @@ function App() {
   const logout = (e) => {
     e.preventDefault();
     dispatch(sessionActions.logout());
+    history.push('/login');
   };
 
   return (
