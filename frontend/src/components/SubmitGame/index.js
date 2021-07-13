@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 
 
 import {
@@ -13,10 +15,11 @@ function SubmitGame() {
 
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState("");
+    const history = useHistory();
 
     //Actual user selections
-    const [titleText, setTitle] = useState("");
-    const [descriptionText, setDescription] = useState("");
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
     const [gameTypeId, setGameTypeId] = useState(1);
     const [gameLanguageId, setGameLanguageId] = useState(1);
     const [gameRulesetId, setGameRulesetId] = useState(1);
@@ -32,19 +35,24 @@ function SubmitGame() {
      //grab available gameType, language, etc info from database
      const { loading, error, data } = useQuery(GET_GAME_CREATION_INFO);
 
-    const [submitGame] = useMutation(SUBMIT_GAME, { variables: { titleText, userId, descriptionText, gameLanguageId, gameRulesetId, gameTypeId } } );
+     //We also need to grab the data GraphQL returns.
+     //We have to use a callback to get that sweet, sweet data out.
+     //Then, we redirect the user to their new game.
+    const [submitGame] = useMutation(SUBMIT_GAME, { variables: { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId }, onCompleted: submitGame => { history.push(`/game/${submitGame.submitGame.id}`) }});
+
 
     const [errors, setErrors] = useState([]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-        submitGame(userId, titleText, descriptionText, gameLanguageId, gameRulesetId, gameTypeId)
+      submitGame(userId, title, description, gameLanguageId, gameRulesetId, gameTypeId);
+      //history.push(`/game/${submitGame.id}`)
     };
 
     useEffect(() => {
-        if (sessionUser) {
-            setUserId(sessionUser._id);
+        if (sessionUser !== undefined && sessionUser !== null) {
+            setUserId(sessionUser.id);
         }
         if (data !== undefined) {
         setGameLanguages(data.getGameCreationInfo.languages);
@@ -65,7 +73,7 @@ function SubmitGame() {
            Title:
            <input
              type="text"
-             value={titleText}
+             value={title}
              onChange={(e) => setTitle(e.target.value)}
              required
            />
@@ -74,7 +82,7 @@ function SubmitGame() {
            Description:
            <input
              type="text"
-             value={descriptionText}
+             value={description}
              onChange={(e) => setDescription(e.target.value)}
              required
            />
@@ -83,19 +91,19 @@ function SubmitGame() {
            Game Type:
            {/* {console.log('TYPES', gameTypes)} */}
            <select value={gameTypeId} onChange={updateGameTypeId}>
-            {gameTypes.map(gameType => <option value={1}>{gameType.type}</option>)}
+            {gameTypes.map(gameType => <option key={uuidv4()} value={1}>{gameType.type}</option>)}
             </select>
          </label>
          <label>
            Ruleset:
            <select value={gameRulesetId} onChange={updateGameRulesetId}>
-             {gameRulesets.map(ruleset => <option value={ruleset.id}>{ruleset.ruleset}</option>)}
+             {gameRulesets.map(ruleset => <option key={uuidv4()} alue={ruleset.id}>{ruleset.ruleset}</option>)}
              </select>
          </label>
          <label>
            Language:
            <select value={gameLanguageId} onChange={updateGameLanguageId}>
-             {gameLanguages.map(language => <option value={language.id}>{language.language}</option>)}
+             {gameLanguages.map(language => <option key={uuidv4()} value={language.id}>{language.language}</option>)}
              </select>
          </label>
          <button type="submit">Send</button>

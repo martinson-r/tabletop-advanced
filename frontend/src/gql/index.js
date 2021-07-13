@@ -11,7 +11,7 @@ const GET_ACCOUNTS = gql`query GetAccounts {
       }
 }`;
 
-const GET_CURRENT_ACCOUNT = gql`
+const GET_CURRENT_USER = gql`
     query GetCurrentAccount($userId: ID!) {
         user(id: $userId){
             id
@@ -130,16 +130,17 @@ const SEND_MESSAGE_TO_GAME = gql`
       }
 `;
 
+//IDs are required on backend but if I don't mark them required on frontend,
+//we get a 404...
+//Took me forever to troubleshoot this.
+
 const SUBMIT_GAME = gql`
-  mutation SubmitToGame($userId: ID, $titleText: String, $descriptionText: String) {
-    submitGame(userId: $userId, title: $titleText, description: $descriptionText) {
-            id
-            title
-            description
-            host {
-                userName
-            }
-        }
+  mutation SubmitGame($userId: ID!, $title: String!, $description: String!, $gameRulesetId: ID!, $gameTypeId: ID!, $gameLanguageId: ID!) {
+    submitGame(userId: $userId, title: $title, description: $description, gameRulesetId: $gameRulesetId, gameTypeId: $gameTypeId, gameLanguageId: $gameLanguageId) {
+        id
+        title
+        description
+    }
 }
 `;
 
@@ -190,7 +191,7 @@ subscription OnMessageSent($gameId: ID!) {
 `;
 
 export { GET_ACCOUNTS,
-        GET_CURRENT_ACCOUNT,
+        GET_CURRENT_USER,
         ADD_BLOCKED_USER,
         GET_GAMES,
         GET_GAME,

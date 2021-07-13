@@ -11,6 +11,7 @@ import Conversations from "./components/Conversations";
 import SubmitGame from "./components/SubmitGame";
 import JoinWaitList from "./components/JoinWaitList";
 import Navigation from "./components/Navigation";
+import Dashboard from "./components/Dashboard";
 import * as sessionActions from "./store/session";
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
         <Route path="/conversations" component={Conversations} exact={true}></Route>
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
+        <Route path="/dashboard" component={Dashboard} exact={true}></Route>
         <Route path="/waitlist/:gameId" component={JoinWaitList} exact={true}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}

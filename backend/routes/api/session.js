@@ -139,7 +139,9 @@ const router = express.Router();
         const hashedPassword = await bcrypt.hash(password, 10);
         user.hashedPassword = hashedPassword;
         await user.save();
-        res.json({user});
+
+        //We really don't want to send more than this back.
+        res.json({user: {userName: user.userName, email: user.email, id: user.id}});
       } else {
         const errors = validatorErrors.array().map((error) => error.msg);
         res.json({errors})
@@ -164,7 +166,7 @@ const router = express.Router();
           );
           if (passwordMatch) {
             loginUser(req, res, user);
-            res.json({user})
+            res.json({user: {userName: user.userName, email: user.email, id: user.id}});
           }
         }
         errors.push("Username and password do not match.");
@@ -176,7 +178,8 @@ const router = express.Router();
   );
 
   // Logout
-  router.post("/logout", (req, res) => {
+  router.delete("/logout", (req, res) => {
+    console.log(req)
     logoutUser(req, res);
     res.json({
       message: "Logout successful",
@@ -192,7 +195,7 @@ const router = express.Router();
           console.log('user after restore', user)
           if (user) {
             return res.json({
-              user
+              user: {userName: user.userName, email: user.email, id: user.id}
             });
           } else return res.json({message: 'no user found'});
         }

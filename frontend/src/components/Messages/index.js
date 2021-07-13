@@ -132,7 +132,7 @@ function Messages() {
 
     const [errors, setErrors] = useState([]);
     useEffect(() => {
-      if (sessionUser !== undefined) {
+      if (sessionUser !== undefined && sessionUser !== null) {
         setUserId(sessionUser.id);
       }
     },[sessionUser])
@@ -159,20 +159,12 @@ function Messages() {
           }
         },300);
         if (sortedConvos && data !== undefined) {
-          //p tags with current font size are 18 px high and 16 px margin
-                  //for a total height of 34
-                  //about 20 of them are displayed per refresh, but we an adjust.
-                  //Our scrollbar sticks to the top - stuff is "added to" the bottom, despite
-                  //the new data being at the top of the chat.
-                  //So we have to adjust it.
-          const addedWindowHeight = (data.convos.length * 34) - 16; //There's no top or bottom margin.
           messageBoxRef.current.scroll({ top: 0, left: 0, behavior: 'smooth'});
 
           //clean up event listener and getter after repositioning the scrollbar.
           messageBoxRef.current.removeEventListener("wheel", scrolled, false);
           setIsScrolling(false);
           }
-
       }
     }, {passive: true});
 
@@ -181,6 +173,8 @@ function Messages() {
     //the server goes nuts.
     messageBoxRef.current.addEventListener('scroll', () => {
       if (isScrolling === false) {
+        //Checking for 0 for now. Eventually check for a higher value
+        //and maybe use setTimeout
         if (messageBoxRef.current.scrollTop === 0) {
         if (sortedConvos && data !== undefined) {
             if (sortedConvos.length < data.convos.count) {

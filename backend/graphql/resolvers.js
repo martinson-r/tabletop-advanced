@@ -125,9 +125,11 @@ const resolvers = {
         },
         submitGame: async(root, args) => {
                         const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId } = args;
-                        console.log(args);
+
 
                         const newGame = await Game.create({ hostId: userId, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
+                        // const returnGame = await Game.findByPk(newGame.id, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
+                        // return returnGame;
                         return newGame;
                     }
     },

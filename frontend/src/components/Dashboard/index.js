@@ -18,10 +18,10 @@ function Home() {
     // const { loading, error, data } = useQuery(GET_CURRENT_ACCOUNT, { variables: { userId } }, );
 
     //grab all games
+    //TODO: Replace with query to grab games only relating to the user
     const { loading, error, data } = useQuery(GET_GAMES);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
-
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -53,6 +53,9 @@ function Home() {
 
         return (
             <div>
+                {/* TODO: Load games user is hosting and playing in */}
+                {/* TODO: icon/highlight when games user is hosting have waitlist apps */}
+                {/* TODO: icon/highlight when games user is playing in have new activity */}
                 <p>Active Games:</p>
                 {gameData.map(game => <p key={game.id}><Link to={`/game/${game.id}`}>{game.title}</Link> - {game.description}, Hosted by {game.host.userName}</p>)}
             </div>
