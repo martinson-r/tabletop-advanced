@@ -168,7 +168,7 @@ function Messages() {
           const addedWindowHeight = (data.convos.length * 34) - 16; //There's no top or bottom margin.
           messageBoxRef.current.scroll({ top: 0, left: 0, behavior: 'smooth'});
 
-          //clean up event listener after repositioning the scrollbar.
+          //clean up event listener and getter after repositioning the scrollbar.
           messageBoxRef.current.removeEventListener("wheel", scrolled, false);
           setIsScrolling(false);
           }
@@ -177,25 +177,25 @@ function Messages() {
     }, {passive: true});
 
     //Alternatively, users may just drag the scrollbar up to the top...
-    //If we don't check if they're using the wheel, the server
-    //goes nuts.
-
-    //NOTE: this doesn't currently work... not sure why.
-    if (messageBoxRef.current.scrollTop === 0 && isScrolling === false) {
-      console.log('boom');
+    //If we don't check if they're scrolling instead of using the wheel,
+    //the server goes nuts.
+    messageBoxRef.current.addEventListener('scroll', () => {
+      if (isScrolling === false) {
+        if (messageBoxRef.current.scrollTop === 0) {
         if (sortedConvos && data !== undefined) {
-          if (sortedConvos.length < data.convos.count) {
-            setOffset(offset + 20)
-            fetchMore({
-              variables: {
-                gameId,
-                offset
-              }
-            });
-       }
+            if (sortedConvos.length < data.convos.count) {
+              setOffset(offset + 20)
+              fetchMore({
+                variables: {
+                  gameId,
+                  offset
+                }
+              });
+            }
+         }
+        }
       }
-    }
-
+    });
   },[sortedConvos])
 
     useEffect(()=> {
