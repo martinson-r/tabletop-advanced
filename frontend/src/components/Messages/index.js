@@ -17,8 +17,11 @@ function Messages() {
     const [messageText, setMessage] = useState("");
     const [sortedConvos, setSortedConvos] = useState([]);
     const [offset, setOffset] = useState(0)
+    const [submittedMessage, setSubmittedMessage] = useState(false);
+    const convoStatus = useRef(sortedConvos);
 
     const messageBoxRef = useRef(null);
+    const scrollDiv = useRef(null)
 
     const { gameId } = useParams();
 
@@ -29,6 +32,7 @@ function Messages() {
     );
 
     const scrollEvent = (e) => {
+
       if (e.target.scrollTop === 0) {
         //Let's make sure we're not asking
         //for something that doesn't exist
@@ -52,8 +56,6 @@ function Messages() {
           });
         }
         }
-
-console.log('OFFSET', offset);
     }
 
     useEffect(() => {
@@ -71,6 +73,7 @@ console.log('OFFSET', offset);
         //having a hard time with that and want to get this
         //working.
 
+
         if (data.convos.rows.length) {
           const toDedupe = new Set([...sortedConvos,...data.convos.rows]);
 
@@ -84,18 +87,14 @@ console.log('OFFSET', offset);
        }
     }
 
-    },[data])
+
+    },[data]);
 
     useEffect(() => {
-
-    //Have to use offset to set the scrollTop initially, because otherwise
-    //scrollTop resets every time we get more sortedConvos data.
-    if (offset === 0) {
-      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
-    }
-  },[data, offset]);
-
-
+      if ( offset !== undefined && offset === 0 ) {
+        messageBoxRef.current.scrollTop = 580;
+      }
+    },[sortedConvos])
 
     useEffect(() => {
       subscribeToMore({
@@ -135,6 +134,24 @@ console.log('OFFSET', offset);
       }
     },[sessionUser])
 
+    useEffect(()=> {
+
+      //If offset is 0, we haven't loaded any more info.
+      //We don't want to keep forcing the scrollbar to the bottom every time new
+      //info loads, but we DO need all of sortedConvos to load before we set
+      //scrollTop.
+      if (offset === 0) {
+        messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+      }
+      //This is weird, but it works.
+      //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
+      //Then, check to see if this is a case where a message has been submitted.
+      //If a message was just submitted, force scroll to bottom and reset submittedMessage status.
+      if (submittedMessage === true) {
+        messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
+      }
+        setSubmittedMessage(false)
+  },[sortedConvos])
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -142,19 +159,17 @@ console.log('OFFSET', offset);
 
         //Offset is fine at this point. No need to do anything with it.
         updateMessages(gameId, userId, messageText);
-      }
-
-      //Going to have to get the height of the div once it changes
-      //and set the scroll to that, or something
-      //trying to get the height and scroll to it just gets you to
-      //halfway down, or the old height of the div.
+        setSubmittedMessage(true);
+    }
 
     return (
       <div>
 
       <div ref={messageBoxRef} onScroll={scrollEvent} id="messageBox">
-      {sortedConvos && sortedConvos.map(message => <p className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
+      {sortedConvos && sortedConvos.map(message => <p key={message.id} className="indivMessage">{message.sender.userName}: {message.messageText}</p>)}
+      {sortedConvos && (<div ref={scrollDiv}></div>)}
       </div>
+
 
 
       {!sessionUser && (
