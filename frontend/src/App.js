@@ -32,6 +32,10 @@ function App() {
     history.push('/login');
   };
 
+  if (!sessionUser) {
+    history.push('/login');
+  }
+
   return (
     <div className="App">
       {sessionUser&&(<div className="logout" onClick={logout}>Log Out</div>)}

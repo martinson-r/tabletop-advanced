@@ -56,7 +56,6 @@ const handleNewPasswordSubmit = (e) => {
 }
 
     return (
-
     <div>
     <p>Hello, {userName}!</p>
     <p>Your email: {email}</p>
