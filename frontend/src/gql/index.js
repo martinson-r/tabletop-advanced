@@ -140,6 +140,16 @@ mutation ChangeEmail($userId: ID!, $newEmail: String!) {
 }
 `
 
+const CHANGE_PASSWORD = gql`
+mutation ChangePassword($userId: ID!, $newPassword: String!, $oldPassword: String!) {
+    changePassword(userId: $userId, newPassword: $newPassword, oldPassword: $oldPassword) {
+        id
+        userName
+        email
+    }
+}
+`
+
 //IDs are required on backend but if I don't mark them required on frontend,
 //we get a 404...
 //Took me forever to troubleshoot this.
@@ -214,5 +224,6 @@ export { GET_ACCOUNTS,
         SUBMIT_WAITLIST_APP,
         GET_WAITLIST_STATUS,
         GET_GAME_CREATION_INFO,
-        CHANGE_EMAIL
+        CHANGE_EMAIL,
+        CHANGE_PASSWORD
      };

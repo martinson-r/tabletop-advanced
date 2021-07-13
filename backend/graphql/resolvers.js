@@ -1,6 +1,8 @@
 const { Message, User, Game, Application, Language, Ruleset, GameType } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
+const { UserInputError } = require('apollo-server-express');
+const bcrypt = require('bcryptjs');
 
 const pubsub = new PubSub();
 
@@ -139,6 +141,33 @@ const resolvers = {
             foundUser.email = newEmail;
             await foundUser.save();
             return foundUser;
+        },
+        changePassword: async(root, args) => {
+            const {userId, oldPassword, newPassword} = args;
+            console.log(args);
+            const user = await User.findByPk(userId);
+
+            //Make sure the user has re-entered their old password correctly
+            //and is therefore authorized to do this.
+            const passwordMatch = await bcrypt.compare(
+                oldPassword,
+                user.hashedPassword.toString()
+              );
+              if (passwordMatch) {
+                //Update user password with hashed version of new password
+                //they provided
+                await user.update({hashedPassword: bcrypt.hashSync(newPassword)});
+                console.log("Update successful.")
+              } else {
+                //Provide an Apollo error that the user cannot do this.
+                throw new UserInputError('Please enter correct account password.');
+
+              }
+
+              //How to send back a success response?
+              //"Password successfully changed."
+              //I guess if an error isn't thrown, we know.
+              return user;
         },
     },
     Subscription: {

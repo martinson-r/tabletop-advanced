@@ -6,25 +6,28 @@ import { PubSub } from 'graphql-subscriptions';
 import {
     useQuery, useMutation, useSubscription, InMemoryCache
   } from "@apollo/client";
-import { GET_CURRENT_USER, CHANGE_EMAIL } from "../../gql"
-
-
+import { GET_CURRENT_USER, CHANGE_EMAIL, CHANGE_PASSWORD } from "../../gql"
 
 function Account() {
     // Grab our session user
 const sessionUser = useSelector((state) => state.session.user);
 const userId = sessionUser.id;
 
-const { loading, error, data } = useQuery(GET_CURRENT_USER, { variables: { userId } });
-console.log('DATA', data)
+const { loading, data } = useQuery(GET_CURRENT_USER, { variables: { userId } });
 
 const [email, setEmail] = useState("");
 const [userName, setUserName] = useState("");
 const [newEmail, setNewEmail] = useState("")
+const [oldPassword, setOldPassword] = useState("");
 const [newPassword, setNewPassword] = useState("");
+const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+const [inputErrors, setInputErrors] = useState([]);
 
-// { setEmail(changeEmail.changeEmail.email) }
-const [changeEmail] = useMutation(CHANGE_EMAIL, { variables: { userId, newEmail }, onCompleted: changeEmail => console.log(changeEmail)});
+const [changeEmail] = useMutation(CHANGE_EMAIL, { variables: { userId, newEmail }});
+
+//errorpolicy must be set correctly for us to grab the errors and use them while still
+//displaying the page.
+const [changePassword, { error }] = useMutation(CHANGE_PASSWORD, { variables: { userId, oldPassword, newPassword }, errorPolicy: 'all'});
 
 useEffect(() => {
     //Sometimes the page renders before our data comes back.
@@ -42,6 +45,13 @@ changeEmail(userId, newEmail);
 
 const handleNewPasswordSubmit = (e) => {
     e.preventDefault();
+    if (newPassword === newPasswordConfirm) {
+            changePassword(userId, newPassword, oldPassword);
+    } else {
+        setInputErrors([{message: "Password confirmation must match."}]);
+        console.log("Password confirmation must match.")
+    }
+    e.preventDefault();
 }
 
     return (
@@ -51,11 +61,7 @@ const handleNewPasswordSubmit = (e) => {
     <p>Your email: {email}</p>
     <p>Change email:</p>
     <form onSubmit={handleEmailSubmit}>
-         {/* <ul>
-           {errors.map((error, idx) => (
-             <li key={idx}>{error}</li>
-           ))}
-         </ul> */}
+        {/* TODO: Require password confirmation as well. */}
          <label>
            New email address:
            <input
@@ -69,6 +75,42 @@ const handleNewPasswordSubmit = (e) => {
         </form>
 
     <p>Change password:</p>
+    <form onSubmit={handleNewPasswordSubmit}>
+        <ul>
+           {/* Make sure we have errors in order to avoid race conditions */}
+           {error && error.graphQLErrors.map(({ message }, i) => (
+        <li key={i}>{message}</li>
+           ))}
+           {inputErrors && inputErrors.map(({ message }, i) => (
+        <li key={i}>{message}</li>
+           ))}
+         </ul>
+         <label>
+           Confirm old password:
+           <input
+             type="password"
+             onChange={(e) => setOldPassword(e.target.value)}
+             required
+           />
+         </label>
+         <label>
+           Enter new password:
+           <input
+             type="password"
+             onChange={(e) => setNewPassword(e.target.value)}
+             required
+           />
+         </label>
+         <label>
+           Confirm new password:
+           <input
+             type="password"
+             onChange={(e) => setNewPasswordConfirm(e.target.value)}
+             required
+           />
+         </label>
+         <button type="submit">Change password</button>
+        </form>
     </div>
     )
 
