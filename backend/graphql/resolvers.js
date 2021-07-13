@@ -136,11 +136,20 @@ const resolvers = {
                         return newGame;
                     },
         changeEmail: async(root, args) => {
-            const {userId, newEmail} = args;
-            const foundUser = await User.findByPk(userId)
+            const {userId, newEmail, changeEmailPassword} = args;
+            const foundUser = await User.findByPk(userId);
+            const passwordMatch = await bcrypt.compare(
+                changeEmailPassword,
+                foundUser.hashedPassword.toString()
+              );
+              if (passwordMatch) {
             foundUser.email = newEmail;
             await foundUser.save();
             return foundUser;
+              } else {
+                //Provide an Apollo error that the user cannot do this.
+                throw new UserInputError('Please enter correct account password.');
+              }
         },
         changePassword: async(root, args) => {
             const {userId, oldPassword, newPassword} = args;

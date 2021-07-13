@@ -131,8 +131,8 @@ const SEND_MESSAGE_TO_GAME = gql`
 `;
 
 const CHANGE_EMAIL = gql`
-mutation ChangeEmail($userId: ID!, $newEmail: String!) {
-    changeEmail(userId: $userId, newEmail: $newEmail) {
+mutation ChangeEmail($userId: ID!, $newEmail: String!, $changeEmailPassword: String!) {
+    changeEmail(userId: $userId, newEmail: $newEmail, changeEmailPassword: $changeEmailPassword) {
         id
         userName
         email

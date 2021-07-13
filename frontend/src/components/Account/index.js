@@ -20,10 +20,11 @@ const [userName, setUserName] = useState("");
 const [newEmail, setNewEmail] = useState("")
 const [oldPassword, setOldPassword] = useState("");
 const [newPassword, setNewPassword] = useState("");
+const [changeEmailPassword, setChangeEmailPassword] = useState("");
 const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
 const [inputErrors, setInputErrors] = useState([]);
 
-const [changeEmail] = useMutation(CHANGE_EMAIL, { variables: { userId, newEmail }});
+const [changeEmail, {error: emailError}] = useMutation(CHANGE_EMAIL, { variables: { userId, newEmail, changeEmailPassword }, errorPolicy: 'all'});
 
 //errorpolicy must be set correctly for us to grab the errors and use them while still
 //displaying the page.
@@ -40,7 +41,7 @@ useEffect(() => {
 
 const handleEmailSubmit = (e) => {
 e.preventDefault();
-changeEmail(userId, newEmail);
+changeEmail(userId, newEmail, changeEmailPassword);
 }
 
 const handleNewPasswordSubmit = (e) => {
@@ -61,13 +62,29 @@ const handleNewPasswordSubmit = (e) => {
     <p>Your email: {email}</p>
     <p>Change email:</p>
     <form onSubmit={handleEmailSubmit}>
-        {/* TODO: Require password confirmation as well. */}
+        <ul>
+           {/* Make sure we have errors in order to avoid race conditions */}
+           {emailError && emailError.graphQLErrors.map(({ message }, i) => (
+         <li key={i}>{message}</li>
+           ))}
+           {inputErrors && inputErrors.map(({ message }, i) => (
+        <li key={i}>{message}</li>
+           ))}
+         </ul>
          <label>
            New email address:
            <input
              type="text"
              value={newEmail}
              onChange={(e) => setNewEmail(e.target.value)}
+             required
+           />
+         </label>
+         <label>
+           Confirm password:
+           <input
+             type="password"
+             onChange={(e) => setChangeEmailPassword(e.target.value)}
              required
            />
          </label>

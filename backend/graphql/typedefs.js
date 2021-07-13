@@ -153,7 +153,7 @@ const typeDefs = gql`
     sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): [Message]
     submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
-    changeEmail(userId: ID!, newEmail: String!): User
+    changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
   }
   type Subscription {
