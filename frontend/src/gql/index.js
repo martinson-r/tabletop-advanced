@@ -69,6 +69,7 @@ const GET_GAME_CONVOS = gql`
             id
             messageText
             createdAt
+            deleted
        }
     }
 }
@@ -125,6 +126,7 @@ const SEND_MESSAGE_TO_GAME = gql`
             id
             messageText
             createdAt
+            deleted
        }
         }
       }
@@ -133,29 +135,36 @@ const SEND_MESSAGE_TO_GAME = gql`
 const EDIT_MESSAGE = gql`
 mutation EditMessage($messageId: ID, $userId: ID, $editMessageText: String) {
 editMessage(messageId: $messageId, userId: $userId, editMessageText: $editMessageText) {
-    sender {
-        id
-        userName
+    count
+        rows {
+            sender {
+                id
+                userName
+            }
+            id
+            messageText
+            createdAt
+            deleted
+       }
     }
-    id
-    messageText
-    createdAt
-}
 }
 `
 
 const DELETE_MESSAGE = gql`
 mutation DeleteMessage($messageId: ID, $userId: ID) {
 deleteMessage(messageId: $messageId, userId: $userId) {
-    sender {
+    count
+    rows {
+        sender {
+            id
+            userName
+        }
         id
-        userName
-    }
-    id
-    messageText
-    createdAt
-    deleted
-}
+        messageText
+        createdAt
+        deleted
+   }
+ }
 }
 `
 
@@ -234,8 +243,9 @@ subscription OnMessageSent($gameId: ID!) {
             id
             messageText
             createdAt
+            deleted
        }
-        }
+    }
   }
 `;
 

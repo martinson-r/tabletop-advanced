@@ -122,8 +122,6 @@ const resolvers = {
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
 
         },
-
-        //TODO: Edit message (subscription)
         editMessage: async(root, args) => {
             const { messageId, editMessageText, userId } = args;
             console.log(args);
@@ -132,25 +130,21 @@ const resolvers = {
             //findAndCountAll seems weird, but our subscription expects something with rows and a count.
             const message = await Message.findAndCountAll({where: { id: messageId}, include: [{model: User, as: "sender"}], limit: 1 })
             pubsub.publish('NEW_MESSAGE', {messageSent: message});
-            return message;
         },
 
         //TODO: "Delete" message (subscription)
         deleteMessage: async(root, args) => {
             const { messageId, userId } = args;
+            console.log(args);
             await Message.update({ deleted: true }, { where: { id: messageId, senderId: userId }});
-            const message = await Message.findByPk(messageId, { include: [{model: User, as: "sender"}] })
-            pubsub.publish('MESSAGE_DELETED', {messageDeleted: message});
+            const message = await Message.findAndCountAll({where: { id: messageId}, include: [{model: User, as: "sender"}], limit: 1 });
+            pubsub.publish('NEW_MESSAGE', {messageSent: message});
             return message;
         },
 
         submitGame: async(root, args) => {
                         const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId } = args;
-
-
                         const newGame = await Game.create({ hostId: userId, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
-                        // const returnGame = await Game.findByPk(newGame.id, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
-                        // return returnGame;
                         return newGame;
                     },
         changeEmail: async(root, args) => {

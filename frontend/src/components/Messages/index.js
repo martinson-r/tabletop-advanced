@@ -10,13 +10,14 @@ import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
 import { EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
-import { parseValue } from "graphql";
 
 function Messages() {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
-    const [messageId, setMessageId] = useState(null)
+    const [messageId, setMessageId] = useState(null);
+    const [messageToDelete, setMessageToDelete] = useState(null);
     const [messageText, setMessage] = useState("");
+    const [newMessage, setNewMessage] = useState(null);
     const [editDisplay, setEditDisplay] = useState(false);
     const [editMessageText, setEditMessageText] = useState("");
     const [sortedConvos, setSortedConvos] = useState([]);
@@ -37,7 +38,7 @@ function Messages() {
 
     const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText } } );
     const [editMessage] = useMutation(EDIT_MESSAGE, { variables: { messageId, userId, editMessageText } } );
-    const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId, userId } } );
+    const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
 
     useEffect(() => {
 
@@ -66,29 +67,40 @@ function Messages() {
            return x.createdAt - y.createdAt;
        });
 
-       console.log('TO SORT', convosToSort)
+      //I should probably do this with the cache once I figure that out.
+      //I'd like to get it working, though.
 
-      //figure out how to replace edited messages with newer ones
-      //and do it in the least-expensive way
-      //It's likely more recent messages will be edited, so we can try from the end
-      //And work our way backwards.
+      //Code below is much more performant than my last solution, although
+      //it still flashes briefly on Safari.
 
-      //We can also make the assumption that the edited message is the latest one in the array.
-      //This is hacky, and the screen flashes on Safari. It occasionally ends up
-      //belatedly updating receiving clients with nothing but the edited message...
-      for (let i = convosToSort.length-1; i > 0; i--) {
-        if (convosToSort[i-1].id === convosToSort[convosToSort.length-1].id) {
-          //If it matches, slice it out. Mutate original array.
-          convosToSort.splice(i-1, 1);
-        }
-      }
+      //Find items in array only with unique ids.
+      //It's not working for deleted items, though.
 
-         setSortedConvos([...convosToSort]);
+      //Make a copy
+      const convosRemoved = convosToSort.slice()
+      //flip it
+      .reverse()
+      //filter it. i is index.
+      .filter((message,i,convosToSort)=>
+      //returns the index of the first element in the array that
+      //satisfies the provided testing function
+      //(in this case, the first index where the ids match)
+      convosToSort.findIndex(messageToCompare=>(messageToCompare.id === message.id))===i)
+      //flip it back
+      .reverse()
+
+      setSortedConvos([...convosRemoved]);
        }
     }
+    },[data, newMessage]);
 
+    //Have to set this in a setter and listen to it due to race condition.
+    useEffect(() => {
+      if (messageToDelete !== null) {
+        deleteMessage(messageToDelete, userId);
+      }
 
-    },[data]);
+    },[messageToDelete])
 
     useEffect(() => {
       if ( offset !== undefined && offset === 0 ) {
@@ -99,6 +111,7 @@ function Messages() {
     //Subscription for messages
     //This hopefully covers all, edits and deletions included
     useEffect(() => {
+      if (data !== undefined) {
       subscribeToMore({
         document: GAME_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
@@ -106,7 +119,7 @@ function Messages() {
           if (!subscriptionData.data) return prev;
           console.log(subscriptionData.data)
           const newFeedItem = subscriptionData.data.messageSent;
-          //const newEdit = subscriptionData.data.messageEdited;
+          setNewMessage(newFeedItem)
 
           console.log('SUB', subscriptionData)
 
@@ -121,43 +134,8 @@ function Messages() {
             });
           }
       })
-    },[]);
-
-    // //Subscription for edited messages
-    // useEffect(() => {
-    //   subscribeToMore({
-    //     document: EDITED_MESSAGES_SUBSCRIPTION,
-
-    //     //We only need the messageId, it should be unique
-    //     //no matter what game.
-    //     variables: { messageId, gameId },
-    //     updateQuery: (prev, { subscriptionData }) => {
-    //       if (!subscriptionData.data) return prev;
-    //       console.log(subscriptionData.data)
-    //       const newFeedItem = subscriptionData.data.messageEdited;
-
-    //       console.log('SUB', subscriptionData)
-
-    //       console.log('NEW', newFeedItem)
-
-    //       console.log('PREV', prev);
-
-    //       //Find the message and replace its text.
-    //       //Kind of "expensive" in terms of operations, but
-    //       //I don't think people will do this a lot...
-
-    //       if (data.convos.rows.length) {
-    //         console.log('SORTED', sortedConvos)
-    //       }
-
-
-    //       // const messageToEdit = sortedConvos.rows.find(message => message.id === messageId)
-
-    //       // console.log('To edit:', messageToEdit);
-    //       //messageToEdit.messageText = newFeedItem.messageText;
-    //       }
-    // })
-    // },[])
+    }
+    },[sortedConvos]);
 
     const [errors, setErrors] = useState([]);
     useEffect(() => {
@@ -259,11 +237,15 @@ function Messages() {
     }
 
     const editMessageBox = (messageText) => (e) => {
-      //how to get the messageText...
-      console.log('target id', e.target.id)
       setMessageId(e.target.id)
       setEditMessageText(messageText)
       setEditDisplay(true);
+    }
+
+    //attempting to pass in more than one variable breaks this.
+    const deleteMessageBox = (messageToDeleteId) => (e) => {
+        setMessageToDelete(messageToDeleteId);
+        console.log('TO DELETE', messageToDelete)
     }
 
     return (
@@ -271,20 +253,11 @@ function Messages() {
 
       <div ref={messageBoxRef} id="messageBox">
 
-      {/* TODO: Edit messages */}
-      {/* TODO: Flag messages deleted/hide */}
-      {/*
-      Trickier than it sounds. You have to get the updated message back &
-      hide it or jam that data in. Matching up id and replacing messageText is
-      probably the way to go.
-
-      This also might be a new subscription? Listening for edited
-      or deleted messages.
-      */}
-
       {/* Possibly pass message to a subcomponent via props and then set a state indicating
       if it is being edited or not to display the message vs the form */}
-      {sortedConvos && sortedConvos.map(message => <p key={uuidv4()} className="indivMessage">{message.sender.userName}: {message.messageText} <button id={message.id} onClick={editMessageBox(message.messageText)}>edit</button></p>)}
+      {sortedConvos && sortedConvos.map(message => <p key={uuidv4()} className="indivMessage">{message.sender.userName}: {message.deleted !== true &&
+      (<span>{message.messageText} <button id={message.id} onClick={editMessageBox(message.messageText)}>edit</button>
+      <button onClick={deleteMessageBox(message.id, userId)}>delete</button></span>)} {message.deleted === true && (<i>message deleted</i>)}</p>)}
       {editDisplay === true && (<form onSubmit={editMessageSubmit}>
       {/* <ul>
         {errors.map((error, idx) => (
