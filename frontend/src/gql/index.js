@@ -37,6 +37,7 @@ const GET_GAMES = gql`
        games {
         id
         title
+        active
         description
         host {
             userName
@@ -60,6 +61,20 @@ const GET_GAME = gql`
         }
        }
     }
+`;
+
+//Maybe just grab waitlists and games they are a player in at the same time
+//Possibly add hostId to Application so I can see
+//If they are hosting as well
+const MY_GAMES = gql`
+query MyGames($userId: ID) {
+    getMyGames(userId: $userId) {
+        id
+        title
+        accepted
+        isPlayer
+    }
+}
 `;
 
 const GET_WAITLIST_STATUS = gql`

@@ -21,6 +21,7 @@ function Home() {
     const { loading, error, data } = useQuery(GET_GAMES);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
+    const [displayInactive, setDisplayInactive] = useState(false);
 
 
     useEffect(() => {
@@ -40,6 +41,11 @@ function Home() {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :( </p>;
 
+    const changeDisplayInactive = () => {
+        setDisplayInactive(!displayInactive)
+    }
+
+
     if (!data) {
         return (
         <p>No games found. :(</p>
@@ -51,13 +57,27 @@ function Home() {
         //Just turning data.games into something easier to work with
         const gameData = data.games;
 
-        return (
-            <div>
-                <p>Active Games:</p>
-                {gameData.map(game => <p key={game.id}><Link to={`/game/${game.id}`}>{game.title}</Link> - {game.description}, Hosted by {game.host.userName}</p>)}
-            </div>
-        )
+     return (
+
+         <div>
+             <div>
+            <label>Show inactive games</label>
+            <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
+        </div>
+
+        <p>Active Games:</p>
+        {gameData.map((game) =>
+        (game.active === true && (<p><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
+        )}
+
+        {/* Show inactive games conditionally */}
+        {displayInactive === true && (<span><p>Inactive Games:</p>
+        {gameData.map((game) =>
+        (game.active === false && (<p><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
+        )}</span>)}
+        </div>
+     )
+     }
     }
-}
 
 export default Home;
