@@ -13,11 +13,11 @@ const removeUser = () => ({
   type: REMOVE_USER
 });
 
-export const login = ({ email, password }) => async (dispatch) => {
+export const login = ({ userName, password }) => async (dispatch) => {
 console.log('Hit login')
-  const res = await fetch('/api/session/', {
+  const res = await fetch('/api/session/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ userName, password })
   });
   dispatch(setUser(res.data.user));
   return res;
@@ -25,26 +25,28 @@ console.log('Hit login')
 
 export const restoreUser = () => async (dispatch) => {
     const res = await fetch('/api/session');
+    console.log('RES', res);
     dispatch(setUser(res.data.user));
     return res;
   };
 
 export const signup = (user) => async (dispatch) => {
-  const { email, password } = user;
-  const response = await fetch('/api/users/', {
+  const { userName, email, password } = user;
+  const response = await fetch('/api/session/signup', {
     method: 'POST',
     body: JSON.stringify({
+      userName,
       email,
       password
     })
   });
 
-  dispatch(setUser(response.user));
+  dispatch(setUser(response.data.user));
   return response;
 };
 
 export const logout = () => async (dispatch) => {
-  const response = await fetch('/api/session/', {
+  const response = await fetch('/api/session/logout', {
     method: 'DELETE'
   });
   dispatch(removeUser());

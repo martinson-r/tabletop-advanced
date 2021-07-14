@@ -1,8 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 
 const GET_ACCOUNTS = gql`query GetAccounts {
-    accounts {
-        _id
+    users {
+        id
         email
         userName
         blockedUsers {
@@ -11,10 +11,10 @@ const GET_ACCOUNTS = gql`query GetAccounts {
       }
 }`;
 
-const GET_CURRENT_ACCOUNT = gql`
+const GET_CURRENT_USER = gql`
     query GetCurrentAccount($userId: ID!) {
-        account(_id: $userId){
-            _id
+        user(id: $userId){
+            id
             email
             userName
         }
@@ -23,34 +23,55 @@ const GET_CURRENT_ACCOUNT = gql`
 const GET_GAMES = gql`
     query GetAllGames {
        games {
-        _id
+        id
         title
         description
+        host {
+            userName
+        }
        }
     }
 `;
 
 const GET_GAME = gql`
     query GetSingleGame($gameId: ID!) {
-       game(_id: $gameId){
-        _id
+       game(id: $gameId){
+        id
         title
         description
+        host {
+            userName
+        }
        }
     }
 `;
 
+const GET_WAITLIST_STATUS = gql`
+    query CheckWaitlist($id: ID!, $userId: ID!) {
+        checkWaitList(id: $id, userId: $userId) {
+            id
+            title
+            description
+        }
+    }
+`;
+
 const GET_GAME_CONVOS = gql`
-    query GetGameConvos($gameId: ID) {
-       convos(gameId: $gameId){
-            messages {
-              userId {
-                  email
-              }
-              messageText
+    query GetGameConvos($gameId: ID, $offset: Int) {
+       convos(gameId: $gameId, offset: $offset){
+        count
+        rows {
+            id
+            sender {
+                id
+                userName
             }
+            id
+            messageText
+            createdAt
        }
     }
+}
 `;
 
 const GET_NON_GAME_NON_SPEC_CONVOS = gql`
@@ -59,14 +80,28 @@ query GetNonGameNonSpecConvos($userId: ID) {
         recipients {
             email
         }
-        messages {
+        message {
             messageText
         }
     }
 }
 `;
 
-
+const GET_GAME_CREATION_INFO = gql`
+query GetGameCreationInfo {
+    getGameCreationInfo {
+        languages {
+            language
+        }
+        rulesets {
+            ruleset
+        }
+        gameTypes {
+            type
+        }
+    }
+}
+`;
 
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
@@ -81,21 +116,103 @@ const ADD_BLOCKED_USER = gql`
 const SEND_MESSAGE_TO_GAME = gql`
   mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
     sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
-        messages {
-            userId {
-                email
+        count
+        rows {
+            sender {
+                id
+                userName
             }
+            id
             messageText
+            createdAt
+       }
+        }
       }
+`;
+
+const EDIT_MESSAGE = gql`
+mutation EditMessage($messageId: ID, $userId: ID, $editMessageText: String) {
+editMessage(messageId: $messageId, userId: $userId, editMessageText: $editMessageText) {
+    sender {
+        id
+        userName
     }
-  }
+    id
+    messageText
+    createdAt
+}
+}
+`
+
+const DELETE_MESSAGE = gql`
+mutation DeleteMessage($messageId: ID, $userId: ID) {
+deleteMessage(messageId: $messageId, userId: $userId) {
+    sender {
+        id
+        userName
+    }
+    id
+    messageText
+    createdAt
+    deleted
+}
+}
+`
+
+const CHANGE_EMAIL = gql`
+mutation ChangeEmail($userId: ID!, $newEmail: String!, $changeEmailPassword: String!) {
+    changeEmail(userId: $userId, newEmail: $newEmail, changeEmailPassword: $changeEmailPassword) {
+        id
+        userName
+        email
+    }
+}
+`
+
+const CHANGE_PASSWORD = gql`
+mutation ChangePassword($userId: ID!, $newPassword: String!, $oldPassword: String!) {
+    changePassword(userId: $userId, newPassword: $newPassword, oldPassword: $oldPassword) {
+        id
+        userName
+        email
+    }
+}
+`
+
+//IDs are required on backend but if I don't mark them required on frontend,
+//we get a 404...
+//Took me forever to troubleshoot this.
+
+const SUBMIT_GAME = gql`
+  mutation SubmitGame($userId: ID!, $title: String!, $description: String!, $gameRulesetId: ID!, $gameTypeId: ID!, $gameLanguageId: ID!) {
+    submitGame(userId: $userId, title: $title, description: $description, gameRulesetId: $gameRulesetId, gameTypeId: $gameTypeId, gameLanguageId: $gameLanguageId) {
+        id
+        title
+        description
+    }
+}
+`;
+
+const SUBMIT_WAITLIST_APP = gql`
+  mutation SubmitWaitlistApp($userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
+    submitWaitlistApp(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
+                id
+                title
+                description
+                host {
+                    email
+                }
+    }
+}
 `;
 
 const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
 mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
-    sendNonGameMessage(userId: $userId, messageText: $messageText, _id: $messageId){
-        messages {
-           userId {
+    sendNonGameMessage(userId: $userId, messageText: $messageText, id: $messageId){
+        message {
+           id
+           User {
+               id
                email
            }
         messageText
@@ -104,13 +221,42 @@ mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId:
 }
 `;
 
+const GAME_MESSAGES_SUBSCRIPTION = gql`
+subscription OnMessageSent($gameId: ID!) {
+    messageSent(gameId: $gameId) {
+        count
+        rows {
+            id
+            sender {
+                id
+                userName
+            }
+            id
+            messageText
+            createdAt
+       }
+        }
+  }
+`;
+
+
+
 export { GET_ACCOUNTS,
-        GET_CURRENT_ACCOUNT,
+        GET_CURRENT_USER,
         ADD_BLOCKED_USER,
         GET_GAMES,
         GET_GAME,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,
+        EDIT_MESSAGE,
+        DELETE_MESSAGE,
         GET_NON_GAME_NON_SPEC_CONVOS,
-        SEND_NON_GAME_NON_SPEC_CONVOS
+        SEND_NON_GAME_NON_SPEC_CONVOS,
+        GAME_MESSAGES_SUBSCRIPTION,
+        SUBMIT_GAME,
+        SUBMIT_WAITLIST_APP,
+        GET_WAITLIST_STATUS,
+        GET_GAME_CREATION_INFO,
+        CHANGE_EMAIL,
+        CHANGE_PASSWORD
      };

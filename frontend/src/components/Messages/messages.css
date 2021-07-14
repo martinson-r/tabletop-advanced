@@ -1,0 +1,12 @@
+#messageBox {
+    border: 2px solid palevioletred;
+    height:300px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    padding: 0;
+    display: block;
+}
+
+#messageBox:hover {
+    overflow-y: scroll;
+  }

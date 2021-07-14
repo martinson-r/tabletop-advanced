@@ -16,7 +16,8 @@ function Navigation({ isLoaded }){
       <div className="navigation">
       <h1 className="header"><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></h1>
       <NavLink to="/">Find a Game</NavLink>
-      <NavLink to="/tables/create">Host a Game</NavLink>
+      <NavLink to="/start-game">Start a Game</NavLink>
+      <NavLink to="/account">Account</NavLink>
       <div className="search-messages">
         <div><NavLink to={`/conversations`}><i className="far fa-envelope"></i></NavLink></div>
         {/* <ProfileButton user={sessionUser} />

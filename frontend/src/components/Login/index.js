@@ -8,13 +8,14 @@ function Login() {
     const history = useHistory();
     const dispatch = useDispatch();
     const [email, setEmail] = useState("");
+    const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState([]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      return dispatch(sessionActions.login({ email, password })).then((res) => {
+      return dispatch(sessionActions.login({ userName, password })).then((res) => {
         history.push("/");
       }).catch(
         (res) => {
@@ -34,11 +35,11 @@ function Login() {
             ))}
           </ul>
           <label>
-            Username or Email
+            Username
             <input
               type="text"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
               required
             />
           </label>

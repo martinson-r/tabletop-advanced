@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 const { ObjectId } = Schema.Types;
 const Account = require('./account');
 const Game = require('./game');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 
 let MessageSchema = mongoose.Schema({
@@ -15,6 +16,7 @@ let MessageSchema = mongoose.Schema({
     gameId: {
         type: ObjectId, ref: 'Game', index: true
     },
+    //recipients must be filled with objectIds NOT set to a key in order for this to work.
     recipients: [{
             type: ObjectId, ref: 'Account', index: true
             }],
@@ -43,6 +45,8 @@ let MessageSchema = mongoose.Schema({
         }
     }],
 });
+
+MessageSchema.plugin(mongoosePaginate);
 
 const Message = mongoose.model('Message', MessageSchema);
 module.exports = Message, MessageSchema;

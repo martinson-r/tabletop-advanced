@@ -1,27 +1,33 @@
 const { gql } = require('apollo-server-express');
-const Account = require('../models/account');
+// convos(gameId: ID, offset: Int): [Message]
 
-//type Account defines what you expect to get back from Query accounts:
 const typeDefs = gql`
   type Query {
-    accounts: [Account]
-    account(_id: ID!): [Account]
+    users: [User]
+    user(id: ID!): User
     games: [Game]
-    game(_id: ID!): Game
-    messages: [Messages]
-    convos(gameId: ID): [Messages]
-    getNonGameMessages(userId: ID): [Messages]
-    getSingleNonGameConversation(_id: ID): [Messages]
+    game(id: ID!): Game
+    messages: [Message]
+    convos(gameId: ID, offset: Int): CountAll
+    getNonGameMessages(userId: ID!): [Message]
+    getSingleNonGameConversation(id: ID!): [Message]
+    checkWaitList(id: ID, userId: ID!): [Game]
+    getGameCreationInfo: GameCreationInfo
   }
-  type Account {
-    _id: ID,
+  type GameCreationInfo {
+    languages: [Language],
+    rulesets: [Ruleset]
+    gameTypes: [GameType]
+  }
+  type User {
+    id: ID,
     email: String,
     userName: String,
     hashedPassword: String,
-    blockedUsers: [Account],
+    blockedUsers: [User],
     emailVerified: Boolean,
-    mutedPlayers: [Account],
-    playedWith: [Account],
+    mutedPlayers: [User],
+    playedWith: [User],
     hideStrangers: Boolean,
     sportsmanship: [String],
     gamesHosted: Int,
@@ -30,53 +36,135 @@ const typeDefs = gql`
     reactionsGiven: Int,
     sessionsPlayed: Int,
     hostPoints: Int,
-    badges: [String],
+    badges: [Badge],
     firstName: String,
-    pronouns: [String],
+    pronouns: String,
     bio: String,
-    preferredLanguages: [String],
+    preferredLanguages: [Language],
     avatar: String,
     profanity: Boolean,
-    books: [String],
-    rulesets: [String],
-    gameTimes: [String],
-    gameTypes: [String],
-    gameFrequency: [String],
+    books: [Book],
+    rulesets: [Ruleset],
+    gameTimes: [GameTime],
+    gameTypes: [GameType],
+    gameFrequency: [GameFrequency],
     homebrew: Boolean,
     houserules: Boolean,
-    gameCleanliness: [String],
+    gameCleanliness: [GameCleanliness],
     postalCode: String,
-    stateOrProvince: String,
-    country: String,
-    timeZone: String
+    stateOrProvince: StateProvince,
+    country: Country,
+    timeZone: TimeZone
+  }
+  type Language {
+      language: String
+  }
+  type Book {
+      title: String,
+      author: String,
+      publisher: String,
+      description: String
+  }
+  type Ruleset {
+      ruleset: String
+  }
+  type GameType {
+      type: String
+  }
+  type CountAll {
+    rows: [Message]
+    count: Int
+  }
+  type GameTime {
+      startHour: Int,
+      endHour: Int,
+      startMinutes: Int,
+      endMinutes: Int,
+      timeZoneId: Int,
+      amPmId: Int
+  }
+  type rows {
+    rows: [Message]
+  }
+  type TimeZone {
+      timeZone: String
+  }
+  type GameFrequency {
+      frequency: String
+  }
+  type GameCleanliness {
+      cleanliness: String
+  }
+  type StateProvince {
+      name: String
+  }
+  type Country {
+      name: String
+  }
+  type Badge {
+      id: ID,
+      imageUrl: String,
+      title: String,
+      description: String
   }
   type Game {
-    _id: ID,
+    id: ID,
     title: String,
     description: String,
     premium: Boolean,
     remote: Boolean,
-    host: [Account],
-    players: [Account],
-    spectators: [Account]
+    host: User,
+    players: [User],
+    spectators: [User]
+    waitlist: [Waitlist]
+    ruleSetId: ID
+    languageId: ID
+    gameTypeId: ID
+    Ruleset: Ruleset
+    Language: Language
+    GameType: GameType
   }
   type Message {
-    userId: Account,
-    messageText: String
-    date: String,
+    id: ID,
+    userId: ID,
+    senderId: ID,
+    messageText: String,
+    createdAt: String,
+    deleted: Boolean,
+    reported: Boolean,
+    metaGameMessageTypeId: ID,
+    User: User,
+    sender: User
   }
-  type Messages {
-     _id: ID,
-     gameId: Game,
-     recipients: [Account],
-     isMuted: Boolean,
-     isGame: Boolean,
-     messages: [Message]
+  type MetaGameMessageType {
+      metaGameMessageType: String
+  }
+  type Waitlist {
+      id: ID,
+      userId: User,
+      whyJoin: String,
+      charConcept: String,
+      experience: String,
+      charName: String
   }
   type Mutation {
-    blockAccount(emailToBlock: String, blockerEmail: String): Account
-    sendMessageToGame(gameId: ID, userId: ID, messageText: String): Messages
-    sendNonGameMessage(userId: ID, messageText: String, _id: ID): Messages
+    blockUser(emailToBlock: String!, blockerEmail: String!): User
+    sendMessageToGame(gameId: ID, userId: ID, messageText: String): CountAll
+    editMessage(messageId: ID, userId: ID, editMessageText: String): Message
+    deleteMessage(messageId: ID, userId: ID): Message
+    sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): [Message]
+    submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
+    submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
+    changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
+    changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
+  }
+  type Subscription {
+    messageSent(gameId: ID!): CountAll,
+  }
+  schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
   }
 `;
 

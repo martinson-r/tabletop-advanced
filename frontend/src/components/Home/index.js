@@ -19,8 +19,6 @@ function Home() {
 
     //grab all games
     const { loading, error, data } = useQuery(GET_GAMES);
-
-    const [accounts, setAccount] = useState([]);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
 
@@ -34,11 +32,8 @@ function Home() {
         if (error) {
             setError(error);
         }
-        if (data) {
-            setAccount(data);
-        }
         if (sessionUser) {
-            setUserId(sessionUser._id);
+            setUserId(sessionUser.id);
         }
     }, []);
 
@@ -58,8 +53,8 @@ function Home() {
 
         return (
             <div>
-                <p>Games:</p>
-                {gameData.map(game => <p key={game._id}><Link to={`/game/${game._id}`}>{game.title}</Link> - {game.description}</p>)}
+                <p>Active Games:</p>
+                {gameData.map(game => <p key={game.id}><Link to={`/game/${game.id}`}>{game.title}</Link> - {game.description}, Hosted by {game.host.userName}</p>)}
             </div>
         )
     }

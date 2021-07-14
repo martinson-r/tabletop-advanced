@@ -1,0 +1,135 @@
+//     Mutation: {
+//     sendMessageToGame: async(root, args) => {
+
+//     const { gameId, messageText, userId } = args;
+
+//     console.log('ARGS', args);
+
+//     await Message.create({gameId, messageText, senderId: userId});
+//     const conversation = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
+//     //console.log(conversation)
+//     //Broadcast to websocket
+//     pubsub.publish('NEW_MESSAGE', conversation)
+
+//     //return conversation;
+//     //Check to see if this is a dice roll.
+//     //Fun with regex
+//     // let numbers = messageText.match(/(\d+)[Dd](\d+)/);
+
+//     // if (numbers.length) {
+//     // const result = rolldice(numbers[1], numbers[2]);
+
+//     // //push roll results into messageText
+//     // const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
+
+//     // //upsert: true means something will be created if it doesn't exist
+//     // const returnRoll = await Message.create({gameId, messageText, senderId: userId})
+
+//     // console.log('UPDATED', returnRoll);
+
+//     // return returnRoll;
+
+//     //If it's not a dice roll, add new messageText to existing game messages.
+//     //TODO: paginate
+
+//     //If no Game conversation exists, create it and add the new message.
+//     //Possibly rework, put conversationType on the message itself and
+//     //get rid of the extra table (and database query)
+//     //}
+// },
+// submitGame: async(root, args) => {
+//             const { userId, title, description } = args;
+//             console.log(args);
+
+//             //Fix hard coding done for testing
+//             const newGame = await Game.create({ hostId: userId, title, description, gameTypeId:1, ruleSetId:1, languageId:1});
+
+//             return newGame;
+//         }
+//     }
+// // }
+// // //     Mutation: {
+// // sendMessageToGame: async(root, args) => {
+
+// //     const { gameId, messageText, userId } = args;
+
+// //     console.log('ARGS', args);
+
+// //     await Message.create({gameId, messageText, senderId: userId});
+// //     const conversation = await Message.findAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}]});
+// //     //console.log(conversation)
+// //     //Broadcast to websocket
+// //     pubsub.publish('NEW_MESSAGE', conversation)
+
+// //     //return conversation;
+// //     //Check to see if this is a dice roll.
+// //     //Fun with regex
+// //     // let numbers = messageText.match(/(\d+)[Dd](\d+)/);
+
+// //     // if (numbers.length) {
+// //     // const result = rolldice(numbers[1], numbers[2]);
+
+// //     // //push roll results into messageText
+// //     // const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
+
+// //     // //upsert: true means something will be created if it doesn't exist
+// //     // const returnRoll = await Message.create({gameId, messageText, senderId: userId})
+
+// //     // console.log('UPDATED', returnRoll);
+
+// //     // return returnRoll;
+
+// //     //If it's not a dice roll, add new messageText to existing game messages.
+// //     //TODO: paginate
+
+// //     //If no Game conversation exists, create it and add the new message.
+// //     //Possibly rework, put conversationType on the message itself and
+// //     //get rid of the extra table (and database query)
+// //     //}
+// // },
+// // //         },
+// // //         submitGame: async(root, args) => {
+// // //         const { userId, title, description } = args;
+// // //         console.log(args);
+
+// // //         //Fix hard coding done for testing
+// // //         const newGame = await Game.create({ hostId: userId, title, description, gameTypeId:1, ruleSetId:1, languageId:1});
+
+// // //         return newGame;
+// // //     },
+
+// // //     submitWaitlistApp: async(root, args) => {
+// // //         const { userId, whyJoin, gameId, charConcept, charName, experience } = args;
+
+// // //         console.log(args);
+
+// // //         const apply = await Application.create({gameId, userId, whyJoin, gameId, charConcept, charName, experience})
+
+// // //         console.log(apply);
+
+// // //         return apply;
+// // //     }
+// // // },
+// // //     Subscription: {
+// // //         messageAdded: {
+// // subscribe:
+// //  withFilter(
+// // //     () => pubsub.asyncIterator('NEW_MESSAGE'),
+// // //     (payload, variables) => {
+// // //       // Only push an update if the message is on
+// // //       // the correct Game for this operation
+// // //       // variables come through as string, so cast either to string or to int either way
+// // //       return (payload.messageAdded.gameId.toString() === variables.gameId);
+// // //     },
+// // //   ),
+
+// //   //old publisher
+// //   () => pubsub.asyncIterator('NEW_MESSAGE'),
+// // //               (payload, variables) => {
+// // //                   console.log('PAYLOAD', payload, 'VARIABLES', variables)
+// // //                   return true;
+// // //               }
+// // //              )
+// // //         }
+// // //     }
+// // // }

@@ -1,53 +1,32 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Messages from "../Messages";
-
+import { PubSub } from 'graphql-subscriptions';
 import {
-    useQuery,
+    useQuery, useSubscription, InMemoryCache
   } from "@apollo/client";
-import { GET_GAME, GET_GAME_CONVOS } from "../../gql"
+import { GET_GAME, GET_GAME_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql"
+export const pubsub = new PubSub();
 
 function Game() {
-
-    // //Grab our session user
+    // Grab our session user
     const sessionUser = useSelector((state) => state.session.user);
-
+    // Grab our game ID
     const { gameId } = useParams();
 
-    //grab current game
-    const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } } );
+    const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } })
+      return (
+        <div>
+        {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p></>)}
+        {data !== undefined &&(<p>{data.game.description}</p>)}
+        {data !== undefined && sessionUser && (<Link to={`/waitlist/${gameId}`}>Join Waitlist</Link>)}
 
-    //grab game convos
-    const { loading: loadConvos, error: gameConvos, data: gameConvosData } = useQuery(GET_GAME_CONVOS, { variables: { gameId } } );
+        {data !== undefined && (<Messages
+        />)}
+      </div>
+      );
 
-  if (loadGame) return <p>Loading...</p>;
-  if (gameError) return <p>Error :( </p>;
-
-    if (!gameData) {
-        return (
-        <p>No games found. :(</p>
-        )
-    }
-
-    if (gameData && gameConvosData) {
-
-        console.log('gameData', gameData)
-
-        const gameDetails = gameData.game;
-
-        return (
-            <div>
-                <p>Game Title: {gameDetails.title}</p>
-                <p>Game Detail: {gameDetails.description}</p>
-                <Messages gameData={gameData} gameConvosData={gameConvosData}></Messages>
-            </div>
-        )
-    } else {
-        return (
-            <p>derp.</p>
-        )
-    }
 }
 
 export default Game;
