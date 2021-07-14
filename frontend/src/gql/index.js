@@ -41,6 +41,7 @@ const GET_GAME = gql`
         description
         host {
             userName
+            id
         }
        }
     }
@@ -204,13 +205,9 @@ const SUBMIT_GAME = gql`
 
 const SUBMIT_WAITLIST_APP = gql`
   mutation SubmitWaitlistApp($userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
-    submitWaitlistApp(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
+    joinWaitlist(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
                 id
-                title
-                description
-                host {
-                    email
-                }
+
     }
 }
 `;

@@ -124,6 +124,15 @@ const typeDefs = gql`
     Language: Language
     GameType: GameType
   }
+  type Application {
+    id: ID
+    userId: ID
+    gameId: ID
+    whyJoin: String
+    charConcept: String
+    charName: String
+    experience: String
+  }
   type Message {
     id: ID,
     userId: ID,
@@ -157,6 +166,7 @@ const typeDefs = gql`
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
+    joinWaitlist(userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
   }
   type Subscription {
     messageSent(gameId: ID!): CountAll,

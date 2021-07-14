@@ -14,15 +14,15 @@ function Game() {
     const sessionUser = useSelector((state) => state.session.user);
     // Grab our game ID
     const { gameId } = useParams();
+    const userId = sessionUser.id;
 
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } })
       return (
         <div>
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p></>)}
         {data !== undefined &&(<p>{data.game.description}</p>)}
-        {data !== undefined && sessionUser && (<><Link to={`/waitlist/${gameId}`}>Join Waitlist</Link><br /></>)}
+        {data !== undefined && sessionUser && data.game.host.id !== userId.toString() && (<><Link to={`/waitlist/${gameId}`}>Join Waitlist</Link><br /></>)}
         {data !== undefined && (<Link to={`/game/${gameId}/gameroom`}>Enter game room</Link>)}
-        <Messages />
       </div>
       );
 

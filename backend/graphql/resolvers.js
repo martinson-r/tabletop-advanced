@@ -131,7 +131,6 @@ const resolvers = {
             pubsub.publish('NEW_MESSAGE', {messageSent: message});
         },
 
-        //TODO: "Delete" message (subscription)
         deleteMessage: async(root, args) => {
             const { messageId, userId } = args;
             console.log(args);
@@ -164,7 +163,6 @@ const resolvers = {
         },
         changePassword: async(root, args) => {
             const {userId, oldPassword, newPassword} = args;
-            console.log(args);
             const user = await User.findByPk(userId);
 
             //Make sure the user has re-entered their old password correctly
@@ -189,6 +187,13 @@ const resolvers = {
               //I guess if an error isn't thrown, we know.
               return user;
         },
+        joinWaitlist: async(root, args) => {
+            //If userId is hostId, do not allow.
+            console.log(args);
+            const { userId, gameId, whyJoin, charConcept, charName, experience } = args;
+            const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
+            return newApp;
+        }
     },
     Subscription: {
             messageSent: {
