@@ -26,15 +26,21 @@ function App() {
     dispatch(sessionActions.restoreUser()).then(() => setIsLoaded(true));
   }, [dispatch]);
 
+  useEffect(() => {
+    //check if loaded first, sometimes session can be a little later
+    //coming back before user gets pushed to login page.
+    if (isLoaded === true && !sessionUser) {
+      history.push('/login');
+    }
+  }, [isLoaded])
+
   const logout = (e) => {
     e.preventDefault();
     dispatch(sessionActions.logout());
     history.push('/login');
   };
 
-  if (!sessionUser) {
-    history.push('/login');
-  }
+
 
   return (
     <div className="App">

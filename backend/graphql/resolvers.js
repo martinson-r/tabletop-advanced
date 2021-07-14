@@ -55,7 +55,6 @@ const resolvers = {
 
         convos: async (obj, args, context, info) => {
             const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
-            console.log('CONVO', conversation)
             return conversation;
 
         },
@@ -112,8 +111,6 @@ const resolvers = {
                 // })
 
                 pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
-
-
             }
 
             const senderId = userId;
@@ -121,11 +118,32 @@ const resolvers = {
             await Message.create({gameId,messageText,senderId});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
-            console.log('CONVO', conversation)
 
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
 
         },
+
+        //TODO: Edit message (subscription)
+        editMessage: async(root, args) => {
+            const { messageId, editMessageText, userId } = args;
+            console.log(args);
+            await Message.update({ messageText: editMessageText }, { where: { id: messageId, senderId: userId }});
+
+            //findAndCountAll seems weird, but our subscription expects something with rows and a count.
+            const message = await Message.findAndCountAll({where: { id: messageId}, include: [{model: User, as: "sender"}], limit: 1 })
+            pubsub.publish('NEW_MESSAGE', {messageSent: message});
+            return message;
+        },
+
+        //TODO: "Delete" message (subscription)
+        deleteMessage: async(root, args) => {
+            const { messageId, userId } = args;
+            await Message.update({ deleted: true }, { where: { id: messageId, senderId: userId }});
+            const message = await Message.findByPk(messageId, { include: [{model: User, as: "sender"}] })
+            pubsub.publish('MESSAGE_DELETED', {messageDeleted: message});
+            return message;
+        },
+
         submitGame: async(root, args) => {
                         const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId } = args;
 
@@ -180,22 +198,14 @@ const resolvers = {
         },
     },
     Subscription: {
-                messageSent: {
-                    //Add filter later
-                  subscribe: withFilter(() => pubsub.asyncIterator('NEW_MESSAGE'), (payload, variables) => {
-                      //console.log('payload', payload);
-                    //   console.log('vars', variables)
-                    //   console.log('payload', payload)
-                    //   console.log(payload.messageSent.rows[0].gameId)
-                    // console.log('match?', payload.messageSent.rows[0].gameId.toString() === variables.gameId)
-
+            messageSent: {
+                //Filter so we only broadcast/update game this applies to
+                subscribe: withFilter(() => pubsub.asyncIterator('NEW_MESSAGE'), (payload, variables) => {
                     //Yes, you have to cast it to a string...
-
                     return payload.messageSent.rows[0].gameId.toString() === variables.gameId;
-                  }),
-                //subscribe: () => pubsub.asyncIterator('NEW_MESSAGE')
-             }
+                }),
             },
+        },
 }
 
 

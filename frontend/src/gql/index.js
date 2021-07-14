@@ -130,6 +130,35 @@ const SEND_MESSAGE_TO_GAME = gql`
       }
 `;
 
+const EDIT_MESSAGE = gql`
+mutation EditMessage($messageId: ID, $userId: ID, $editMessageText: String) {
+editMessage(messageId: $messageId, userId: $userId, editMessageText: $editMessageText) {
+    sender {
+        id
+        userName
+    }
+    id
+    messageText
+    createdAt
+}
+}
+`
+
+const DELETE_MESSAGE = gql`
+mutation DeleteMessage($messageId: ID, $userId: ID) {
+deleteMessage(messageId: $messageId, userId: $userId) {
+    sender {
+        id
+        userName
+    }
+    id
+    messageText
+    createdAt
+    deleted
+}
+}
+`
+
 const CHANGE_EMAIL = gql`
 mutation ChangeEmail($userId: ID!, $newEmail: String!, $changeEmailPassword: String!) {
     changeEmail(userId: $userId, newEmail: $newEmail, changeEmailPassword: $changeEmailPassword) {
@@ -210,6 +239,8 @@ subscription OnMessageSent($gameId: ID!) {
   }
 `;
 
+
+
 export { GET_ACCOUNTS,
         GET_CURRENT_USER,
         ADD_BLOCKED_USER,
@@ -217,6 +248,8 @@ export { GET_ACCOUNTS,
         GET_GAME,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,
+        EDIT_MESSAGE,
+        DELETE_MESSAGE,
         GET_NON_GAME_NON_SPEC_CONVOS,
         SEND_NON_GAME_NON_SPEC_CONVOS,
         GAME_MESSAGES_SUBSCRIPTION,

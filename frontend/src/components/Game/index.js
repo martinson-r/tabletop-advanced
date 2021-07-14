@@ -20,6 +20,7 @@ function Game() {
         <div>
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p></>)}
         {data !== undefined &&(<p>{data.game.description}</p>)}
+        {data !== undefined && sessionUser && (<Link to={`/waitlist/${gameId}`}>Join Waitlist</Link>)}
 
         {data !== undefined && (<Messages
         />)}
