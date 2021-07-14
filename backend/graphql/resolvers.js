@@ -57,8 +57,8 @@ const resolvers = {
             return AboutMe.findAll({where: userId, include: User })
         },
         getNonGameMessages: async(obj, args, context, info) => {
-            const { userId } = args;
-            return Message.findAll({recipients: [userId]})
+            const { conversationId } = args;
+            return Message.findAll({where: conversationId, include: [User]})
         },
         //TODO: GetSingleNonGameConversation
         getSingleNonGameConversation: (obj, args, context, info) => {

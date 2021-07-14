@@ -21,8 +21,13 @@ function Home() {
     const { loading, error, data } = useQuery(GET_GAMES);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
+
+    //This needs to be more complicated than simple toggles since
+    //multiple conditions can exist
     const [displayInactive, setDisplayInactive] = useState(false);
     const [displayClosedWaitlist, setDisplayClosedWaitlist] = useState(false);
+    //TOGGLE: homebrew
+    //TOGGLE: houserules
 
 
     useEffect(() => {
@@ -44,6 +49,10 @@ function Home() {
 
     const changeDisplayInactive = () => {
         setDisplayInactive(!displayInactive)
+    }
+
+    const changeDisplayClosedWaitlist = () => {
+        setDisplayClosedWaitlist(!displayClosedWaitlist)
     }
 
 

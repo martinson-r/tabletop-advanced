@@ -53,7 +53,11 @@ function JoinWaitList({...props}) {
 
     return (
       <div>
-    {console.log('data', gameData)}
+    {!userId && (
+      //TODO: login link with history push back to initial game page they were
+      //looking at
+      <p>Please log in to apply for this game.</p>
+    )}
     {/* TODO: Conditionally display form or "You are on the waitlist" or "You are a player in this game" or "You are this game's host" */}
     {gameData && gameData.game.host.id === userId.toString() && (
       <p>You are currently hosting this game.</p>
