@@ -106,20 +106,19 @@ const resolvers = {
                 await Message.create({gameId, messageText, senderId: userId});
 
                 const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
-                // returnRoll.rows.sort(function(x, y){
-                //     return x.createdAt - y.createdAt;
-                // })
 
-                pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
-            }
-
-            const senderId = userId;
+                pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
+            } else if (numbers === null) {
+                const senderId = userId;
             console.log(args)
             await Message.create({gameId,messageText,senderId});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
+                }
+
+
 
         },
         editMessage: async(root, args) => {
