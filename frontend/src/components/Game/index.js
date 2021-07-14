@@ -16,7 +16,10 @@ function Game() {
     const { gameId } = useParams();
     const userId = sessionUser.id;
 
-    const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } })
+    const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } });
+
+    console.log('DATA', data);
+
       return (
         <div>
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p></>)}

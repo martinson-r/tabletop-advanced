@@ -5,6 +5,7 @@ const typeDefs = gql`
   type Query {
     users: [User]
     user(id: ID!): User
+    about(id: ID): [AboutMe]
     games: [Game]
     game(id: ID!): Game
     messages: [Message]
@@ -55,6 +56,14 @@ const typeDefs = gql`
     stateOrProvince: StateProvince,
     country: Country,
     timeZone: TimeZone
+  }
+  type AboutMe {
+    bio: String,
+    userId: ID,
+    User: User,
+    pronouns: String,
+    firstName: String,
+    imageUrl: String
   }
   type Language {
       language: String
@@ -115,14 +124,17 @@ const typeDefs = gql`
     remote: Boolean,
     host: User,
     players: [User],
-    spectators: [User]
-    waitlist: [Waitlist]
-    ruleSetId: ID
-    languageId: ID
-    gameTypeId: ID
-    Ruleset: Ruleset
-    Language: Language
-    GameType: GameType
+    spectators: [User],
+    waitlist: [Waitlist],
+    ruleSetId: ID,
+    languageId: ID,
+    gameTypeId: ID,
+    Ruleset: Ruleset,
+    Language: Language,
+    GameType: GameType,
+    allowPlayerEdits: Boolean,
+    allowPlayerDeletes: Boolean,
+    active: Boolean
   }
   type Application {
     id: ID

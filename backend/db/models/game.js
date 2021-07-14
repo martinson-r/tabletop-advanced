@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
     public: DataTypes.BOOLEAN,
     premium: DataTypes.BOOLEAN,
     active: DataTypes.BOOLEAN,
-    waitlistOpen: DataTypes.BOOLEAN,
+    waitListOpen: DataTypes.BOOLEAN,
     allowPlayerEdits: DataTypes.BOOLEAN,
     allowPlayerDeletes: DataTypes.BOOLEAN,
     locationId: DataTypes.INTEGER,

@@ -1,4 +1,4 @@
-const { Message, User, Game, Application, Language, Ruleset, GameType } = require('../db/models');
+const { Message, User, Game, Application, Language, Ruleset, GameType, AboutMe } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -30,33 +30,31 @@ const resolvers = {
             //This is where you actually query the database.
             return User.findAll({})
           },
-        user: async(obj, args, context, info) => {
+        user:(obj, args, context, info) => {
             console.log(args);
             const {id} = args
-            const user = await User.findByPk(id);
-            return user;
+            return User.findByPk(id);
         },
-        games: async(obj, args, context, info) => {
-            let games = await Game.findAll({
+        games: (obj, args, context, info) => {
+            return Game.findAll({
                 include: [{model: User, as: "host"}]
             });
-            console.log(games);
-            return games;
+
         },
-        game: async (obj, args, context, info) => {
+        game: (obj, args, context, info) => {
             const id = args.id;
-            let game = await Game.findByPk(id, {include: {model: User, as: "host"}});
-            return game;
+            return Game.findByPk(id, {include: {model: User, as: "host"}});
         },
-        messages: async(obj, args, context, info) => {
-            const message = await Message.findAll();
-            return message;
+        messages: (obj, args, context, info) => {
+            return Message.findAll();
         },
 
         convos: async (obj, args, context, info) => {
-            const conversation = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
-            return conversation;
-
+            return Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
+        },
+        about: (obj, args, context, info) => {
+            const { userId } = args;
+            return AboutMe.findAll({where: userId, include: User })
         },
         getNonGameMessages: async(obj, args, context, info) => {
             const { userId } = args;

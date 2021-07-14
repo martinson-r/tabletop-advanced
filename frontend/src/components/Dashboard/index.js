@@ -53,6 +53,9 @@ function Home() {
 
         return (
             <div>
+                <p>Games I'm Hosting:</p>
+                <p>Games I'm Playing In:</p>
+                <p>My Waitlist:</p>
                 {/* TODO: Load games user is hosting and playing in */}
                 {/* TODO: icon/highlight when games user is hosting have waitlist apps */}
                 {/* TODO: icon/highlight when games user is playing in have new activity */}

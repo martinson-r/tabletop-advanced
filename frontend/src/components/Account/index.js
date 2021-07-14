@@ -6,14 +6,14 @@ import { PubSub } from 'graphql-subscriptions';
 import {
     useQuery, useMutation, useSubscription, InMemoryCache
   } from "@apollo/client";
-import { GET_CURRENT_USER, CHANGE_EMAIL, CHANGE_PASSWORD } from "../../gql"
+import { GET_USER, CHANGE_EMAIL, CHANGE_PASSWORD } from "../../gql"
 
 function Account() {
     // Grab our session user
 const sessionUser = useSelector((state) => state.session.user);
 const userId = sessionUser.id;
 
-const { loading, data } = useQuery(GET_CURRENT_USER, { variables: { userId } });
+const { loading, data } = useQuery(GET_USER, { variables: { userId } });
 
 const [email, setEmail] = useState("");
 const [userName, setUserName] = useState("");

@@ -14,7 +14,7 @@ module.exports = {
         references: { model: "Users", key: "id" },
       },
       firstName: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       bio: {
         type: Sequelize.TEXT
@@ -23,6 +23,9 @@ module.exports = {
         type: Sequelize.STRING
       },
       homebrew: {
+        type: Sequelize.BOOLEAN
+      },
+      houserules: {
         type: Sequelize.BOOLEAN
       },
       profanity: {

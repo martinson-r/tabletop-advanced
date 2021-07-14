@@ -17,6 +17,7 @@ function MessageBox(props) {
     const message = props.message;
     const userId = props.userId;
     const gameId = props.gameId;
+    const gameData = props.gameData;
 
     const [messageId, setMessageId] = useState(null);
     const [messageToDelete, setMessageToDelete] = useState(null);

@@ -11,12 +11,24 @@ const GET_ACCOUNTS = gql`query GetAccounts {
       }
 }`;
 
-const GET_CURRENT_USER = gql`
+const GET_USER = gql`
     query GetCurrentAccount($userId: ID!) {
         user(id: $userId){
             id
             email
             userName
+        }
+    }`;
+
+    const GET_ABOUT = gql`
+    query GetCurrentAccount($userId: ID!) {
+        about(id: $userId){
+            firstName
+            pronouns
+            bio
+            User {
+                userName
+            }
         }
     }`;
 
@@ -39,6 +51,9 @@ const GET_GAME = gql`
         id
         title
         description
+        allowPlayerEdits,
+        allowPlayerDeletes,
+        active,
         host {
             userName
             id
@@ -249,7 +264,8 @@ subscription OnMessageSent($gameId: ID!) {
 
 
 export { GET_ACCOUNTS,
-        GET_CURRENT_USER,
+        GET_USER,
+        GET_ABOUT,
         ADD_BLOCKED_USER,
         GET_GAMES,
         GET_GAME,
@@ -265,5 +281,5 @@ export { GET_ACCOUNTS,
         GET_WAITLIST_STATUS,
         GET_GAME_CREATION_INFO,
         CHANGE_EMAIL,
-        CHANGE_PASSWORD
+        CHANGE_PASSWORD,
      };

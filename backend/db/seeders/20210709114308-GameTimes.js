@@ -16,7 +16,7 @@ module.exports = {
       startMinutes: 30,
       endMinutes: 0,
       timeZoneId: 2,
-      amPmId: 2,
+      am: true,
       },
       {
         startHour: 3,
@@ -24,7 +24,7 @@ module.exports = {
         startMinutes: 0,
         endMinutes: 15,
         timeZoneId: 3,
-        amPmId: 2,
+        am: true,
         }], {});
   },
 

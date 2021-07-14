@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { GET_GAME, EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
 
 function Messages() {
     const sessionUser = useSelector(state => state.session.user);
@@ -25,6 +25,8 @@ function Messages() {
     const messageBoxRef = useRef(null);
 
     const { gameId } = useParams();
+
+    const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
 
     let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
       //add offset
@@ -220,7 +222,7 @@ function Messages() {
 
       <div ref={messageBoxRef} id="messageBox">
        {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} />)}
+      {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
       </div>
 
       {!sessionUser && (
