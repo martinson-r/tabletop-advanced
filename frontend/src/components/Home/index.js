@@ -22,6 +22,7 @@ function Home() {
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
     const [displayInactive, setDisplayInactive] = useState(false);
+    const [displayClosedWaitlist, setDisplayClosedWaitlist] = useState(false);
 
 
     useEffect(() => {
@@ -63,6 +64,8 @@ function Home() {
              <div>
             <label>Show inactive games</label>
             <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
+            <label>Show waitlist closed</label>
+            <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
         </div>
 
         <p>Active Games:</p>
