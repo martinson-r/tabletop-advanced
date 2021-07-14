@@ -60,6 +60,18 @@ module.exports = {
       profanityOk: {
         type: Sequelize.BOOLEAN
       },
+      active: {
+        type: Sequelize.BOOLEAN
+      },
+      waitListOpen: {
+        type: Sequelize.BOOLEAN,
+      },
+      allowPlayerEdits: {
+        type: Sequelize.BOOLEAN,
+      },
+      allowPlayerDeletes: {
+        type: Sequelize.BOOLEAN,
+      },
       gameCleanlinessId: {
         type: Sequelize.INTEGER,
         references: { model: "GameCleanlinesses", key: "id" },

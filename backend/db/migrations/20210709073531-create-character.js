@@ -16,6 +16,11 @@ module.exports = {
         type: Sequelize.INTEGER,
         references: { model: "Games", key: "id" },
       },
+      //TODO:
+      // characterSheetId: {
+      //   type: Sequelize.INTEGER,
+      //   references: { model: "CharacterSheets", key: "id" },
+      // },
       name: {
         type: Sequelize.STRING
       },

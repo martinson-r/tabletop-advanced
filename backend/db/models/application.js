@@ -20,7 +20,11 @@ module.exports = (sequelize, DataTypes) => {
     whyJoin: DataTypes.TEXT,
     charName: DataTypes.STRING,
     charConcept: DataTypes.TEXT,
-    experience: DataTypes.TEXT
+    experience: DataTypes.TEXT,
+    ignored: DataTypes.BOOLEAN,
+    accepted: DataTypes.BOOLEAN,
+    isPlayer: DataTypes.BOOLEAN,
+    requestDate: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Application',

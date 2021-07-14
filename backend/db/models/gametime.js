@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     startMinutes: DataTypes.INTEGER,
     endMinutes: DataTypes.INTEGER,
     timeZoneId: DataTypes.INTEGER,
-    amPmId: DataTypes.INTEGER,
+    am: DataTypes.BOOLEAN,
   }, {
     sequelize,
     modelName: 'GameTime',

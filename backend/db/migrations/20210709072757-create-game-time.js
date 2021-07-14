@@ -43,9 +43,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         references: { model: "TimeZones", key: "id" },
       },
-      amPmId: {
-        type: Sequelize.INTEGER,
-        references: { model: "AmPms", key: "id" },
+      am: {
+        type: Sequelize.BOOLEAN,
       },
       createdAt: {
         allowNull: false,

@@ -34,6 +34,18 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false,
       },
+      ignored: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      accepted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      isPlayer: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
