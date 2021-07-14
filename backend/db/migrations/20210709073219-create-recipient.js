@@ -13,6 +13,11 @@ module.exports = {
         allowNull: false,
         references: { model: "Users", key: "id" },
       },
+      conversationId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: "Conversations", key: "id" },
+      },
       messageId: {
         type: Sequelize.INTEGER,
         allowNull: false,

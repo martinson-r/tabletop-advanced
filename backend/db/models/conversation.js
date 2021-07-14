@@ -14,8 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Conversation.init({
-    gameId: DataTypes.INTEGER,
-    conversationTypeId: DataTypes.INTEGER
+
   }, {
     sequelize,
     modelName: 'Conversation',
