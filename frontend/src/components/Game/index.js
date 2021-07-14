@@ -20,10 +20,9 @@ function Game() {
         <div>
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p></>)}
         {data !== undefined &&(<p>{data.game.description}</p>)}
-        {data !== undefined && sessionUser && (<Link to={`/waitlist/${gameId}`}>Join Waitlist</Link>)}
-
-        {data !== undefined && (<Messages
-        />)}
+        {data !== undefined && sessionUser && (<><Link to={`/waitlist/${gameId}`}>Join Waitlist</Link><br /></>)}
+        {data !== undefined && (<Link to={`/game/${gameId}/gameroom`}>Enter game room</Link>)}
+        <Messages />
       </div>
       );
 

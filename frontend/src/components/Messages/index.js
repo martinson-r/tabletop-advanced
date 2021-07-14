@@ -3,6 +3,7 @@ import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import "./messages.css";
+import MessageBox from "../MessageBox";
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -14,12 +15,8 @@ import { EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SE
 function Messages() {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
-    const [messageId, setMessageId] = useState(null);
-    const [messageToDelete, setMessageToDelete] = useState(null);
     const [messageText, setMessage] = useState("");
     const [newMessage, setNewMessage] = useState(null);
-    const [editDisplay, setEditDisplay] = useState(false);
-    const [editMessageText, setEditMessageText] = useState("");
     const [sortedConvos, setSortedConvos] = useState([]);
     const [offset, setOffset] = useState(0)
     const [submittedMessage, setSubmittedMessage] = useState(false);
@@ -37,8 +34,6 @@ function Messages() {
 
 
     const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText } } );
-    const [editMessage] = useMutation(EDIT_MESSAGE, { variables: { messageId, userId, editMessageText } } );
-    const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
 
     useEffect(() => {
 
@@ -93,14 +88,6 @@ function Messages() {
        }
     }
     },[data, newMessage]);
-
-    //Have to set this in a setter and listen to it due to race condition.
-    useEffect(() => {
-      if (messageToDelete !== null) {
-        deleteMessage(messageToDelete, userId);
-      }
-
-    },[messageToDelete])
 
     useEffect(() => {
       if ( offset !== undefined && offset === 0 ) {
@@ -228,60 +215,18 @@ function Messages() {
         setSubmittedMessage(true);
     }
 
-
-    const editMessageSubmit = (e) => {
-      setEditDisplay(false);
-      if (editMessageText) {
-        editMessage(userId, messageId, editMessageText);
-      }
-    }
-
-    const editMessageBox = (messageText) => (e) => {
-      setMessageId(e.target.id)
-      setEditMessageText(messageText)
-      setEditDisplay(true);
-    }
-
-    //attempting to pass in more than one variable breaks this.
-    const deleteMessageBox = (messageToDeleteId) => (e) => {
-        setMessageToDelete(messageToDeleteId);
-        console.log('TO DELETE', messageToDelete)
-    }
-
     return (
       <div>
 
       <div ref={messageBoxRef} id="messageBox">
-
-      {/* Possibly pass message to a subcomponent via props and then set a state indicating
-      if it is being edited or not to display the message vs the form */}
-      {sortedConvos && sortedConvos.map(message => <p key={uuidv4()} className="indivMessage">{message.sender.userName}: {message.deleted !== true &&
-      (<span>{message.messageText} <button id={message.id} onClick={editMessageBox(message.messageText)}>edit</button>
-      <button onClick={deleteMessageBox(message.id, userId)}>delete</button></span>)} {message.deleted === true && (<i>message deleted</i>)}</p>)}
-      {editDisplay === true && (<form onSubmit={editMessageSubmit}>
-      {/* <ul>
-        {errors.map((error, idx) => (
-          <li key={idx}>{error}</li>
-        ))}
-      </ul> */}
-      {/* TODO: error message for no blank messages */}
-      <label>
-        Edit Message
-        <input
-          type="text"
-          value={editMessageText}
-          onChange={(e) => setEditMessageText(e.target.value)}
-          required
-        />
-      </label>
-      <button type="submit">Send</button>
-    </form>)}
-
+       {/* Behaves very strangely if not passed a key. */}
+      {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} />)}
       </div>
 
       {!sessionUser && (
         <p>Please log in to send messages.</p>
       )}
+
       {sessionUser !== undefined && (<form onSubmit={handleSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (

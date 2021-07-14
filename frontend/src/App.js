@@ -14,6 +14,7 @@ import JoinWaitList from "./components/JoinWaitList";
 import Navigation from "./components/Navigation";
 import Dashboard from "./components/Dashboard";
 import Account from "./components/Account";
+import Messages from "./components/Messages";
 import * as sessionActions from "./store/session";
 
 function App() {
@@ -40,8 +41,6 @@ function App() {
     history.push('/login');
   };
 
-
-
   return (
     <div className="App">
       {sessionUser&&(<div className="logout" onClick={logout}>Log Out</div>)}
@@ -51,6 +50,7 @@ function App() {
       {isLoaded &&(<Switch>
         <Route path="/login" component={Login}></Route>
         <Route path="/signup" component={SignUp}></Route>
+        <Route path="game/:gameId/gameroom/" component={Messages} exact={true}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
         <Route path="/conversations" component={Conversations} exact={true}></Route>
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
