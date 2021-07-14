@@ -50,7 +50,7 @@ function App() {
       {isLoaded &&(<Switch>
         <Route path="/login" component={Login}></Route>
         <Route path="/signup" component={SignUp}></Route>
-        <Route path="game/:gameId/gameroom/" component={Messages} exact={true}></Route>
+        <Route path="/game/:gameId/gameroom/" name="Messages" component={Messages} exact={true}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
         <Route path="/conversations" component={Conversations} exact={true}></Route>
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
