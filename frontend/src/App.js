@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
-import SignUp from "./components/Login";
+import SignUp from "./components/SignUp";
 import Game from "./components/Game";
 import SubmitGame from "./components/SubmitGame";
 import JoinWaitList from "./components/JoinWaitList";
@@ -28,13 +28,15 @@ function App() {
     dispatch(sessionActions.restoreUser()).then(() => setIsLoaded(true));
   }, [dispatch]);
 
-  useEffect(() => {
-    //check if loaded first, sometimes session can be a little later
-    //coming back before user gets pushed to login page.
-    if (isLoaded === true && !sessionUser) {
-      history.push('/login');
-    }
-  }, [isLoaded])
+
+  //Gotta rework this so they can still hit the Signup page
+  // useEffect(() => {
+  //   //check if loaded first, sometimes session can be a little later
+  //   //coming back before user gets pushed to login page.
+  //   if (isLoaded === true && !sessionUser) {
+  //     history.push('/login');
+  //   }
+  // }, [isLoaded])
 
   const logout = (e) => {
     e.preventDefault();
@@ -45,10 +47,10 @@ function App() {
   return (
     <div className="App">
       {sessionUser&&(<div className="logout" onClick={logout}>Log Out</div>)}
-      {!sessionUser&&<div><NavLink to="/signup">Sign Up</NavLink></div>}
-      {!sessionUser&&<div><NavLink to="/login">Log In</NavLink></div>}
+      {!sessionUser&&<div></div>}
+      {!sessionUser&&<div><NavLink to="/signup">Sign Up</NavLink><NavLink to="/login">Log In</NavLink></div>}
       <Navigation isLoaded={isLoaded} />
-      {isLoaded &&(<Switch>
+      {isLoaded && (<Switch>
         <Route path="/login" component={Login}></Route>
         <Route path="/signup" component={SignUp}></Route>
         <Route path="/game/:gameId/gameroom/" name="Messages" component={Messages} exact={true}></Route>

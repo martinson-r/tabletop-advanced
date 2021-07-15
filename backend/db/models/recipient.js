@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   Recipient.init({
     userId: DataTypes.INTEGER,
-    messageId: DataTypes.INTEGER,
+    //messageId: DataTypes.INTEGER,
     conversationId: DataTypes.INTEGER
   }, {
     sequelize,

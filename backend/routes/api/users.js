@@ -1,34 +1,27 @@
 const express = require('express');
 const { check } = require('express-validator');
 const asyncHandler = require('express-async-handler');
-const mongoose = require('mongoose');
 const { loginUser } = require('../../auth');
 const bcrypt = require('bcryptjs');
-
-//Import models
-const Account = require('../../models/account');
-var AccountSchema = require('mongoose').model('Account').schema
+const { User, AboutMe } = require('/db/models');
 
 const router = express.Router();
 
 router.post('/', asyncHandler(async(req, res, next) => {
-    const {email, password} = req.body;
+    const {email, userName, password, confirmPassword } = req.body;
 
     if (email &&
-        // userName &&
+        userName &&
         password
-        // && confirmPassword
     ){
         const hashedPassword = bcrypt.hashSync(password);
 
-        var userData = {
-          email,
-        //   userName,
-          hashedPassword,
-        }
-        //use schema.create to insert data into the db
         try {
-            Account.create(userData);
+            const newUser = User.create({ email, userName, hashedPassword });
+            const userId = newUser.id
+
+            //They also need a bio, even if there's nothing in it.
+            AboutMe.create({userId});
         }
          catch(err) {
             next(err)

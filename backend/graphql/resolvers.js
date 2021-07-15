@@ -142,6 +142,25 @@ const resolvers = {
             return conversation;
 
     },
+
+    startNewNonGameConversation: async(root,args) => {
+
+        const { userId, recipientId, messageText } = args;
+
+        //Create new Conversation, basically an empty container for tracking
+        //distinct collections of messages
+        const newConvo = await Conversation.create();
+        const conversationId = newConvo.id
+
+        //Add both recipients to list. Possibly rework this to add multiple
+        //new recipients.
+        await Recipient.create({userId, conversationId});
+        await Recipient.create({userId: recipientId, conversationId});
+
+        //Send back the new conversation so we can direct the user to it.
+        return newConvo;
+
+    },
         editMessage: async(root, args) => {
             const { messageId, editMessageText, userId } = args;
             console.log(args);

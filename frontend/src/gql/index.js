@@ -282,6 +282,14 @@ mutation SendNonGameNonSpecMessages($userId: ID!, $messageText: String!, $conver
 }
 `;
 
+const START_NEW_PRIVATE_CHAT = gql`
+mutation StartNewPrivateChat($userId: ID, $recipientId: ID) {
+    startNewNonGameConversation(userId: $userId, recipientId: $recipientId) {
+        id
+    }
+}
+`;
+
 //This is to fetch all of the messages in a conversation
 const GAME_MESSAGES_SUBSCRIPTION = gql`
 subscription OnMessageSent($gameId: ID, $conversationId: ID) {
@@ -336,6 +344,7 @@ export { GET_ACCOUNTS,
         GET_NON_GAME_NON_SPEC_MESSAGES,
         GET_USER_NON_GAME_CONVOS,
         SEND_NON_GAME_NON_SPEC_MESSAGES,
+        START_NEW_PRIVATE_CHAT,
         GAME_MESSAGES_SUBSCRIPTION,
         NON_GAME_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
