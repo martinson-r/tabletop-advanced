@@ -13,6 +13,7 @@ function Bio() {
 const sessionUser = useSelector((state) => state.session.user);
 const currentUserId = sessionUser.id;
 const { userId } = useParams();
+console.log('id', userId)
 
 const { data, error, loading } = useQuery(GET_ABOUT, { variables: { userId }})
 

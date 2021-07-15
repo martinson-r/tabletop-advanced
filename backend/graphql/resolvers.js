@@ -54,8 +54,9 @@ const resolvers = {
             return Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
         },
         about: (obj, args, context, info) => {
-            const { userId } = args;
-            return AboutMe.findAll({where: userId, include: User })
+            const { id } = args;
+            console.log(args)
+            return AboutMe.findAll({where: {userId: id}, include: User})
         },
         //Get all non game conversations for a specific user
         getNonGameConvos: (obj, args, context, info) => {

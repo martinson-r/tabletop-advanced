@@ -81,7 +81,7 @@ function MessageBox(props) {
 
     return (
         <div>
-     <p key={uuidv4()} className="indivMessage">{message.sender.userName}: {message.deleted !== true &&
+     <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{message.sender.userName}</Link>: {message.deleted !== true &&
             (<span>{message.messageText} {userId !== null && message.sender.id === userId.toString() && (<><button id={message.id} onClick={editMessageBox(message.messageText)}>edit</button>
             <button onClick={deleteMessageBox(message.id, userId)}>delete</button></>)}</span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>
             )

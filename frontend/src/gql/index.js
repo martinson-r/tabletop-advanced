@@ -21,7 +21,7 @@ const GET_USER = gql`
     }`;
 
     const GET_ABOUT = gql`
-    query GetCurrentAccount($userId: ID!) {
+    query GetAccount($userId: ID!) {
         about(id: $userId){
             firstName
             pronouns
