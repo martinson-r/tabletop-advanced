@@ -79,8 +79,8 @@ const resolvers = {
         },
         //TODO: GetSingleNonGameConversation
         getNonGameMessages: (obj, args, context, info) => {
-            const { conversationId } = args;
-            return Message.findAll({conversationId});
+            const { conversationId, offset } = args;
+            return Message.findAndCountAll({where: {conversationId}, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit: 20, offset: offset,});
         },
 
         checkWaitList: async (obj, args, context, info) => {

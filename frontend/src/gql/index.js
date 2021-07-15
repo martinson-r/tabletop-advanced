@@ -124,12 +124,18 @@ query GetNonGameConvos($userId: ID!) {
 const GET_NON_GAME_NON_SPEC_MESSAGES = gql`
 query GetNonGameNonSpecConvos($conversationId: ID, $offset: Int) {
     getNonGameMessages(conversationId: $conversationId, offset: $offset){
-        recipients {
-            email
-        }
-        message {
+        count
+        rows {
+            id
+            sender {
+                id
+                userName
+            }
+            id
             messageText
-        }
+            createdAt
+            deleted
+       }
     }
 }
 `;

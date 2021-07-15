@@ -11,7 +11,7 @@ const typeDefs = gql`
     messages: [Message]
     convos(gameId: ID, offset: Int): CountAll
     getNonGameConvos(userId: ID!): [User]
-    getNonGameMessages(conversationId: ID): [Message]
+    getNonGameMessages(conversationId: ID, offset: Int): CountAll
     checkWaitList(id: ID, userId: ID!): [Game]
     getGameCreationInfo: GameCreationInfo
   }

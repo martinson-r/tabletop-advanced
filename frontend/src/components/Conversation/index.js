@@ -16,7 +16,7 @@ function Conversation() {
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
 
-    const conversationId = useParams();
+    const {conversationId} = useParams();
 
     //grab non-game non-spectator convos
     const { loading: loadConvos, error: nonGameConvosError, data: nonGameConvosData } = useQuery(GET_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId } } );
@@ -33,6 +33,7 @@ function Conversation() {
 
     //const { loading: convosLoading, error: convosError, data: convosData } = useQuery(GET_NON_GAME_NON_SPEC_CONVO, { variables: { conversationId } });
 
+    console.log('ConversationId', conversationId, 'Offset', offset)
     let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
       //add offset
       GET_NON_GAME_NON_SPEC_MESSAGES,
@@ -78,10 +79,10 @@ function Conversation() {
         //having a hard time with that and want to get this
         //working.
 
-        if (data.convos.rows.length) {
+        if (data.getNonGameMessages.rows.length) {
 
           //Basic dedupe.
-          const toDedupe = new Set([...sortedConvos,...data.convos.rows]);
+          const toDedupe = new Set([...sortedConvos,...data.getNonGameMessages.rows]);
 
           //Sort it. Sets are unsorted. Must turn it into an array first.
           const convosToSort = [...toDedupe];
