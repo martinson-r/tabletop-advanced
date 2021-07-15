@@ -10,8 +10,8 @@ const typeDefs = gql`
     game(id: ID!): Game
     messages: [Message]
     convos(gameId: ID, offset: Int): CountAll
-    getNonGameMessages(userId: ID!): [Message]
-    getSingleNonGameConversation(id: ID!): [Message]
+    getNonGameConvos(userId: ID!): [User]
+    getNonGameMessages(conversationId: ID): [Message]
     checkWaitList(id: ID, userId: ID!): [Game]
     getGameCreationInfo: GameCreationInfo
   }
@@ -55,7 +55,21 @@ const typeDefs = gql`
     postalCode: String,
     stateOrProvince: StateProvince,
     country: Country,
-    timeZone: TimeZone
+    timeZone: TimeZone,
+    Conversation: [Conversation]
+    recipient: [User]
+  }
+  type Conversation {
+    id: ID
+    recipient: [Recipient]
+  }
+  type Recipient {
+    id: ID,
+    userId: ID,
+    conversationId: ID,
+    messageId: ID,
+    Message: [Message]
+    recipient: User
   }
   type AboutMe {
     bio: String,

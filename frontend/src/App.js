@@ -8,7 +8,6 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import SignUp from "./components/Login";
 import Game from "./components/Game";
-import Conversations from "./components/Conversations";
 import SubmitGame from "./components/SubmitGame";
 import JoinWaitList from "./components/JoinWaitList";
 import Navigation from "./components/Navigation";
@@ -16,6 +15,7 @@ import Dashboard from "./components/Dashboard";
 import Account from "./components/Account";
 import Messages from "./components/Messages";
 import Bio from "./components/Bio";
+import Conversation from "./components/Conversation";
 import * as sessionActions from "./store/session";
 
 function App() {
@@ -53,11 +53,11 @@ function App() {
         <Route path="/signup" component={SignUp}></Route>
         <Route path="/game/:gameId/gameroom/" name="Messages" component={Messages} exact={true}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
-        <Route path="/conversations" component={Conversations} exact={true}></Route>
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
         <Route path="/dashboard" component={Dashboard} exact={true}></Route>
         <Route path="/account" component={Account} exact={true}></Route>
         <Route path="/:userId/bio" component={Bio} exact={true}></Route>
+        <Route path="/conversation/:conversationId" component={Conversation} exact={true}></Route>
         <Route path="/waitlist/:gameId" component={JoinWaitList} exact={true}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}

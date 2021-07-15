@@ -12,7 +12,7 @@ function Navigation({ isLoaded }){
   const [userId, setUserId] = useState(null)
 
   useEffect(() => {
-    if (sessionUser !== null ) {
+    if (sessionUser !== null && sessionUser !== undefined ) {
       setUserId(sessionUser.id);
     }
 

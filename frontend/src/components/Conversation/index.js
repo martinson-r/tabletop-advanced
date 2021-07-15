@@ -1,27 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import Messages from "../Messages";
+import MessageBox from "../MessageBox";
+import { v4 as uuidv4 } from 'uuid';
 
 import {
-    useQuery,
+    useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { GET_NON_GAME_NON_SPEC_CONVOS, MESSAGES_SUBSCRIPTION } from "../../gql"
+import { GET_NON_GAME_NON_SPEC_MESSAGES, NON_GAME_MESSAGES_SUBSCRIPTION, SEND_NON_GAME_NON_SPEC_CONVOS } from "../../gql"
 
 function Conversation() {
     const sessionUser = useSelector((state) => state.session.user);
-    const [userId, setUserId] = useState("60e4d2241a7955e9e179501b");
 
     const [accounts, setAccount] = useState([]);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
 
+    const conversationId = useParams();
+
     //grab non-game non-spectator convos
-    const { loading: loadConvos, error: nonGameConvosError, data: nonGameConvosData } = useQuery(GET_NON_GAME_NON_SPEC_CONVOS, { variables: { userId } } );
+    const { loading: loadConvos, error: nonGameConvosError, data: nonGameConvosData } = useQuery(GET_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId } } );
 
-
-
-    const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
     const [messageText, setMessage] = useState("");
     const [newMessage, setNewMessage] = useState(null);
@@ -32,15 +31,17 @@ function Conversation() {
 
     const messageBoxRef = useRef(null);
 
-    const { conversationId } = useParams();
-
     //const { loading: convosLoading, error: convosError, data: convosData } = useQuery(GET_NON_GAME_NON_SPEC_CONVO, { variables: { conversationId } });
 
     let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
       //add offset
-      GET_NON_GAME_CONVOS,
+      GET_NON_GAME_NON_SPEC_MESSAGES,
       { variables: { conversationId, offset } }
     );
+
+    console.log(data);
+
+    const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_CONVOS, { variables: { conversationId, userId, messageText } } );
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -61,17 +62,6 @@ function Conversation() {
         }
     }, []);
 
-    if (loadConvos) return <p>Loading...</p>;
-  if (nonGameConvosError) return <p>Error :( {nonGameConvosError} </p>;
-
-    if (!nonGameConvosData) {
-        return (
-        <p>No conversations found.</p>
-        )
-    }
-
-
-    const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText } } );
 
     useEffect(() => {
 
@@ -129,8 +119,11 @@ function Conversation() {
 
     useEffect(() => {
       if ( offset !== undefined && offset === 0 ) {
-        messageBoxRef.current.scrollTop = 580;
+        if (messageBoxRef.current !== null) {
+          messageBoxRef.current.scrollTop = 580;
       }
+        }
+
     },[sortedConvos])
 
     //Subscription for messages
@@ -138,8 +131,8 @@ function Conversation() {
     useEffect(() => {
       if (data !== undefined) {
       subscribeToMore({
-        document: GAME_MESSAGES_SUBSCRIPTION,
-        variables: { gameId },
+        document: NON_GAME_MESSAGES_SUBSCRIPTION,
+        variables: { conversationId },
         updateQuery: (prev, { subscriptionData }) => {
           if (!subscriptionData.data) return prev;
           console.log(subscriptionData.data)
@@ -169,60 +162,63 @@ function Conversation() {
       }
     },[sessionUser])
 
-    useEffect(() => {
-      //Listen for scroll and provide more chat
-        messageBoxRef.current.addEventListener('wheel', function scrolled() {
-          setIsScrolling(true);
+  useEffect(() => {
+    //Listen for scroll and provide more chat
+    if (messageBoxRef.current !== null ) {
+      messageBoxRef.current.addEventListener('wheel', function scrolled() {
+        setIsScrolling(true);
 
-          //This could be DRYed up.
-          if (messageBoxRef.current.scrollTop === 0) {
-            //setTimeout so we don't flood the server with requests.
-            setTimeout(() => {
-              if (sortedConvos && data !== undefined) {
-                if (sortedConvos.length < data.convos.count) {
-                  setOffset(offset + 20)
-                  fetchMore({
-                    variables: {
-                      gameId,
-                      offset
-                    }
-                  });
-             }
-          }
-        },300);
-        if (sortedConvos && data !== undefined) {
-          messageBoxRef.current.scroll({ top: 0, left: 0, behavior: 'smooth'});
-
-          //clean up event listener and getter after repositioning the scrollbar.
-          messageBoxRef.current.removeEventListener("wheel", scrolled, false);
-          setIsScrolling(false);
-          }
-      }
-    }, {passive: true});
-
-    //Alternatively, users may just drag the scrollbar up to the top...
-    //If we don't check if they're scrolling instead of using the wheel,
-    //the server goes nuts.
-    messageBoxRef.current.addEventListener('scroll', () => {
-      if (isScrolling === false && messageBoxRef.current !== null) {
-        //Checking for 0 for now. Eventually check for a higher value
-        //and maybe use setTimeout
+        //This could be DRYed up.
         if (messageBoxRef.current.scrollTop === 0) {
-        if (sortedConvos && data !== undefined) {
-            if (sortedConvos.length < data.convos.count) {
-              setOffset(offset + 20)
-              fetchMore({
-                variables: {
-                  gameId,
-                  offset
-                }
-              });
-            }
-         }
+          //setTimeout so we don't flood the server with requests.
+          setTimeout(() => {
+            if (sortedConvos && data !== undefined) {
+              if (sortedConvos.length < data.convos.count) {
+                setOffset(offset + 20)
+                fetchMore({
+                  variables: {
+                    conversationId,
+                    offset
+                  }
+                });
+           }
         }
+      },300);
+      if (sortedConvos && data !== undefined) {
+        messageBoxRef.current.scroll({ top: 0, left: 0, behavior: 'smooth'});
+
+        //clean up event listener and getter after repositioning the scrollbar.
+        messageBoxRef.current.removeEventListener("wheel", scrolled, false);
+        setIsScrolling(false);
+        }
+    }
+  }, {passive: true});
+
+  //Alternatively, users may just drag the scrollbar up to the top...
+  //If we don't check if they're scrolling instead of using the wheel,
+  //the server goes nuts.
+  messageBoxRef.current.addEventListener('scroll', () => {
+    if (isScrolling === false && messageBoxRef.current !== null) {
+      //Checking for 0 for now. Eventually check for a higher value
+      //and maybe use setTimeout
+      if (messageBoxRef.current.scrollTop === 0) {
+      if (sortedConvos && data !== undefined) {
+          if (sortedConvos.length < data.convos.count) {
+            setOffset(offset + 20)
+            fetchMore({
+              variables: {
+                conversationId,
+                offset
+              }
+            });
+          }
+       }
       }
-    });
-  },[sortedConvos])
+    }
+  });
+    }
+
+},[sortedConvos])
 
     useEffect(()=> {
 
@@ -231,7 +227,10 @@ function Conversation() {
       //info loads, but we DO need all of sortedConvos to load before we set
       //scrollTop.
       if (offset === 0) {
-        messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+        if (messageBoxRef.current !== null) {
+          messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+        }
+
       }
 
       //This is weird, but it works.
@@ -249,16 +248,28 @@ function Conversation() {
       setErrors([]);
 
         //Offset is fine at this point. No need to do anything with it.
-        updateMessages(gameId, userId, messageText);
+        sendNonGameMessage(conversationId, userId, messageText);
         setSubmittedMessage(true);
     }
+
+
+
+    if (loadConvos) return <p>Loading...</p>;
+    if (nonGameConvosError) return <p>Error :( </p>;
+
+    if (!nonGameConvosData) {
+        return (
+        <p>No conversations found.</p>
+        )
+    }
+
 
     return (
       <div>
 
       <div ref={messageBoxRef} id="messageBox">
        {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} convosData={convosData}/>)}
+      {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} conversationId={conversationId} convosData={nonGameConvosData}/>)}
       </div>
 
       {!sessionUser && (
@@ -266,12 +277,6 @@ function Conversation() {
       )}
 
       {sessionUser !== undefined && (<form onSubmit={handleSubmit}>
-         {/* <ul>
-           {errors.map((error, idx) => (
-             <li key={idx}>{error}</li>
-           ))}
-         </ul> */}
-         {/* TODO: error message for no blank messages */}
          <label>
            Send Message
            <input

@@ -1,8 +1,9 @@
-const { Message, User, Game, Application, Language, Ruleset, GameType, AboutMe } = require('../db/models');
+const { Message, Recipient, Conversation, User, Game, Application, Language, Ruleset, GameType, AboutMe } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcryptjs');
+const user = require('../db/models/user');
 
 const pubsub = new PubSub();
 
@@ -56,14 +57,30 @@ const resolvers = {
             const { userId } = args;
             return AboutMe.findAll({where: userId, include: User })
         },
-        getNonGameMessages: async(obj, args, context, info) => {
-            const { conversationId } = args;
-            return Message.findAll({where: conversationId, include: [User]})
+        //Get all non game conversations for a specific user
+        getNonGameConvos: (obj, args, context, info) => {
+            const { userId } = args;
+
+            console.log('ID', userId)
+
+            //find all individual conversations involving this user somehow
+
+            //Conversations exist because some recipients may have multiple
+            //private chats with the same people, and we want to keep
+            //them separate.
+
+            //a user is in many conversations
+            //a conversation has many users
+            // const user = await Conversation.findAll({include: {model: User, where: {id: userId}}});
+
+            //finding convos where user is a recipient, then finding the other recipients of those convos.
+            return User.findAll ({where: {id: userId}, include: {model: Conversation, as: "recipient", include: {model: User, as: "recipient"}}})
+
         },
         //TODO: GetSingleNonGameConversation
-        getSingleNonGameConversation: (obj, args, context, info) => {
-            const { id } = args;
-            return Message.findAll({id});
+        getNonGameMessages: (obj, args, context, info) => {
+            const { conversationId } = args;
+            return Message.findAll({conversationId});
         },
 
         checkWaitList: async (obj, args, context, info) => {
@@ -108,7 +125,6 @@ const resolvers = {
                 pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
             } else if (numbers === null) {
                 const senderId = userId;
-            console.log(args)
             await Message.create({gameId,messageText,senderId});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});

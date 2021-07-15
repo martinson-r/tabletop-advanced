@@ -11,11 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Application.belongsToMany(models.Game, {through: 'Waitlist', foreignKey: 'applicationId', otherKey: 'gameId' });
-      //Application.belongsTo(models.User, {foreignKey: "userId"});
+      Application.belongsTo(models.User, {as: "applicant", foreignKey: "userId"});
+      Application.belongsTo(models.User, {as: "host", foreignKey: "hostId"});
     }
   };
   Application.init({
     userId: DataTypes.INTEGER,
+    hostId: DataTypes.INTEGER,
     gameId: DataTypes.INTEGER,
     whyJoin: DataTypes.TEXT,
     charName: DataTypes.STRING,

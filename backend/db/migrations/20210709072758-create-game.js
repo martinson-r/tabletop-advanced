@@ -65,8 +65,13 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: true,
       },
+      deleted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       waitListOpen: {
         type: Sequelize.BOOLEAN,
+        defaultValue: true,
       },
       allowPlayerEdits: {
         type: Sequelize.BOOLEAN,

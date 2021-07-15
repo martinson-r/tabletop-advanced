@@ -47,6 +47,10 @@ module.exports = {
       {
         metaGameMessageType: "initiative roll"
       //players roll initiative. Marked so it can be tracked.
+      },
+      {
+        metaGameMessageType: "system"
+      //System message.
       }
     ], {});
   },

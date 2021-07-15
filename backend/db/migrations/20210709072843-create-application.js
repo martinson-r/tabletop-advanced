@@ -8,7 +8,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      //Will have to alias these.
       userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: { model: "Users", key: "id" },
+      },
+      hostId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "Users", key: "id" },

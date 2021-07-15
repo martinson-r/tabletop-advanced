@@ -106,9 +106,24 @@ const GET_GAME_CONVOS = gql`
 }
 `;
 
-const GET_NON_GAME_NON_SPEC_CONVOS = gql`
-query GetNonGameNonSpecConvos($userId: ID) {
-    getNonGameMessages(userId: $userId){
+//Get non-game conversations associated with user
+const GET_USER_NON_GAME_CONVOS = gql`
+query GetNonGameConvos($userId: ID!) {
+    getNonGameConvos(userId: $userId){
+        id
+    recipient {
+        recipient {
+            userName
+        }
+    }
+}
+}
+`;
+
+//Get messages associated with non-game conversation
+const GET_NON_GAME_NON_SPEC_MESSAGES = gql`
+query GetNonGameNonSpecConvos($conversationId: ID, $offset: Int) {
+    getNonGameMessages(conversationId: $conversationId, offset: $offset){
         recipients {
             email
         }
@@ -242,9 +257,10 @@ const SUBMIT_WAITLIST_APP = gql`
 }
 `;
 
+//This is to send a non-game message to a conversation
 const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
-mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
-    sendNonGameMessage(userId: $userId, messageText: $messageText, id: $messageId){
+mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $conversationId: ID) {
+    sendNonGameMessage(userId: $userId, messageText: $messageText, conversationId: $conversationId){
         message {
            id
            User {
@@ -257,9 +273,29 @@ mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId:
 }
 `;
 
+//This is to fetch all of the messages in a conversation
 const GAME_MESSAGES_SUBSCRIPTION = gql`
 subscription OnMessageSent($gameId: ID!) {
     messageSent(gameId: $gameId) {
+        count
+        rows {
+            id
+            sender {
+                id
+                userName
+            }
+            id
+            messageText
+            createdAt
+            deleted
+       }
+    }
+  }
+`;
+
+const NON_GAME_MESSAGES_SUBSCRIPTION = gql`
+subscription OnMessageSent($conversationId: ID!) {
+    messageSent(conversationId: $conversationId) {
         count
         rows {
             id
@@ -288,9 +324,11 @@ export { GET_ACCOUNTS,
         SEND_MESSAGE_TO_GAME,
         EDIT_MESSAGE,
         DELETE_MESSAGE,
-        GET_NON_GAME_NON_SPEC_CONVOS,
+        GET_NON_GAME_NON_SPEC_MESSAGES,
+        GET_USER_NON_GAME_CONVOS,
         SEND_NON_GAME_NON_SPEC_CONVOS,
         GAME_MESSAGES_SUBSCRIPTION,
+        NON_GAME_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
         SUBMIT_WAITLIST_APP,
         GET_WAITLIST_STATUS,

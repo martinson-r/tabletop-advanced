@@ -12,9 +12,16 @@ export const pubsub = new PubSub();
 function Game() {
     // Grab our session user
     const sessionUser = useSelector((state) => state.session.user);
+    const [userId, setUserId] = useState(null);
     // Grab our game ID
     const { gameId } = useParams();
-    const userId = sessionUser.id;
+    useEffect(() => {
+      if (sessionUser !== null && sessionUser !== undefined ) {
+        setUserId(sessionUser.id);
+      }
+
+    },[sessionUser])
+
 
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } });
 

@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import {
     useQuery,
   } from "@apollo/client";
 import { GET_CURRENT_ACCOUNT } from "../../gql"
-import { GET_GAMES } from "../../gql"
+import { GET_GAMES, GET_USER_NON_GAME_CONVOS } from "../../gql"
+import "./dashboard.css";
 
 function Home() {
 
 
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
-    const [userId, setUserId] = useState("");
+    const [userId, setUserId] = useState(null);
+    const history = useHistory();
 
     //grab our account
     // const { loading, error, data } = useQuery(GET_CURRENT_ACCOUNT, { variables: { userId } }, );
@@ -20,16 +22,18 @@ function Home() {
     //grab all games
     //TODO: Replace with query to grab games only relating to the user
     const { loading, error, data } = useQuery(GET_GAMES);
+    console.log('ID NOW', userId)
+
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
 
     useEffect(() => {
         //Make sure we have ALL of our data
 
-        if (loading) {
+        if (loading || nonGameLoading) {
             setLoading(loading);
         }
-        if (error) {
+        if (error || nonGameError) {
             setError(error);
         }
         if (sessionUser) {
@@ -37,6 +41,7 @@ function Home() {
         }
     }, []);
 
+  const { loading: nonGameLoading, error: nonGameError, data: nonGameData } = useQuery(GET_USER_NON_GAME_CONVOS, { variables: { userId }});
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :( </p>;
 
@@ -61,6 +66,7 @@ function Home() {
                 {/* TODO: icon/highlight when games user is hosting have waitlist apps */}
                 {/* TODO: icon/highlight when games user is playing in have new activity */}
                 <p>Private Conversations:</p>
+                {nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversation => <div className="private-convo" id={conversation.id} onClick={() => history.push(`/conversation/${conversation.id}`) }>{conversation.recipient[0].recipient.map(user => user.userName + ', ')}</div>))}
                 <p>Active Games:</p>
                 {gameData.map(game => <p key={game.id}><Link to={`/game/${game.id}`}>{game.title}</Link> - {game.description}, Hosted by {game.host.userName}</p>)}
             </div>
