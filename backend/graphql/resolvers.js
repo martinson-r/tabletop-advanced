@@ -69,10 +69,6 @@ const resolvers = {
             //private chats with the same people, and we want to keep
             //them separate.
 
-            //a user is in many conversations
-            //a conversation has many users
-            // const user = await Conversation.findAll({include: {model: User, where: {id: userId}}});
-
             //finding convos where user is a recipient, then finding the other recipients of those convos.
             return User.findAll ({where: {id: userId}, include: {model: Conversation, as: "recipient", include: {model: User, as: "recipient"}}})
 
@@ -124,17 +120,27 @@ const resolvers = {
 
                 pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
             } else if (numbers === null) {
-                const senderId = userId;
+            const senderId = userId;
             await Message.create({gameId,messageText,senderId});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
-                }
+        }
+    },
 
+    sendNonGameMessages: async(root,args) => {
 
+        const { conversationId, messageText, userId, offset } = args;
+        const senderId = userId;
+            await Message.create({conversationId,messageText,senderId});
 
-        },
+            const conversation = await Message.findAndCountAll({ where: { conversationId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
+            //console.log('CONVO', conversation.rows[0].conversationId)
+            pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
+            return conversation;
+
+    },
         editMessage: async(root, args) => {
             const { messageId, editMessageText, userId } = args;
             console.log(args);
@@ -211,10 +217,18 @@ const resolvers = {
     },
     Subscription: {
             messageSent: {
-                //Filter so we only broadcast/update game this applies to
+                //Filter so we only broadcast/update game or conversation this applies to
                 subscribe: withFilter(() => pubsub.asyncIterator('NEW_MESSAGE'), (payload, variables) => {
-                    //Yes, you have to cast it to a string...
-                    return payload.messageSent.rows[0].gameId.toString() === variables.gameId;
+                    console.log('VARS', variables)
+                    //Structure is the same for both games and non-games; no need for a second subscription.
+                    //We'll see if this is a game or conversation, first.
+                    //If it has a gameId at all, it's a game.
+                    if (variables.gameId !== null && variables.gameId !== undefined) {
+                        //Yes, you have to cast it to a string...
+                        return payload.messageSent.rows[0].gameId.toString() === variables.gameId;
+                    }
+                        console.log('PAYLOAD', payload, 'VARS', variables)
+                        return payload.messageSent.rows[0].conversationId.toString() === variables.conversationId;
                 }),
             },
         },

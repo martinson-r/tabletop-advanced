@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { GET_NON_GAME_NON_SPEC_MESSAGES, NON_GAME_MESSAGES_SUBSCRIPTION, SEND_NON_GAME_NON_SPEC_CONVOS } from "../../gql"
+import { GET_NON_GAME_NON_SPEC_MESSAGES, GAME_MESSAGES_SUBSCRIPTION, SEND_NON_GAME_NON_SPEC_MESSAGES } from "../../gql"
 
 function Conversation() {
     const sessionUser = useSelector((state) => state.session.user);
@@ -42,7 +42,7 @@ function Conversation() {
 
     console.log(data);
 
-    const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_CONVOS, { variables: { conversationId, userId, messageText } } );
+    const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText } } );
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -132,7 +132,7 @@ function Conversation() {
     useEffect(() => {
       if (data !== undefined) {
       subscribeToMore({
-        document: NON_GAME_MESSAGES_SUBSCRIPTION,
+        document: GAME_MESSAGES_SUBSCRIPTION,
         variables: { conversationId },
         updateQuery: (prev, { subscriptionData }) => {
           if (!subscriptionData.data) return prev;
@@ -149,7 +149,7 @@ function Conversation() {
           //This part is broken.
           //This really should be done in cache.
             return Object.assign({}, prev, {
-              convos: {...prev.rows, ...newFeedItem}
+              getNonGameMessages: {...prev.rows, ...newFeedItem}
             });
           }
       })
@@ -174,7 +174,7 @@ function Conversation() {
           //setTimeout so we don't flood the server with requests.
           setTimeout(() => {
             if (sortedConvos && data !== undefined) {
-              if (sortedConvos.length < data.convos.count) {
+              if (sortedConvos.length < data.getNonGameMessages.count) {
                 setOffset(offset + 20)
                 fetchMore({
                   variables: {
@@ -204,7 +204,7 @@ function Conversation() {
       //and maybe use setTimeout
       if (messageBoxRef.current.scrollTop === 0) {
       if (sortedConvos && data !== undefined) {
-          if (sortedConvos.length < data.convos.count) {
+          if (sortedConvos.length < data.getNonGameMessages.count) {
             setOffset(offset + 20)
             fetchMore({
               variables: {

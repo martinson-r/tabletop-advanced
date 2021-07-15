@@ -264,25 +264,28 @@ const SUBMIT_WAITLIST_APP = gql`
 `;
 
 //This is to send a non-game message to a conversation
-const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
-mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $conversationId: ID) {
-    sendNonGameMessage(userId: $userId, messageText: $messageText, conversationId: $conversationId){
-        message {
-           id
-           User {
-               id
-               email
-           }
-        messageText
-        }
+const SEND_NON_GAME_NON_SPEC_MESSAGES = gql`
+mutation SendNonGameNonSpecMessages($userId: ID!, $messageText: String!, $conversationId: ID) {
+    sendNonGameMessages(userId: $userId, messageText: $messageText, conversationId: $conversationId){
+        count
+        rows {
+            sender {
+                id
+                userName
+            }
+            id
+            messageText
+            createdAt
+            deleted
+       }
     }
 }
 `;
 
 //This is to fetch all of the messages in a conversation
 const GAME_MESSAGES_SUBSCRIPTION = gql`
-subscription OnMessageSent($gameId: ID!) {
-    messageSent(gameId: $gameId) {
+subscription OnMessageSent($gameId: ID, $conversationId: ID) {
+    messageSent(gameId: $gameId, conversationId: $conversationId) {
         count
         rows {
             id
@@ -332,7 +335,7 @@ export { GET_ACCOUNTS,
         DELETE_MESSAGE,
         GET_NON_GAME_NON_SPEC_MESSAGES,
         GET_USER_NON_GAME_CONVOS,
-        SEND_NON_GAME_NON_SPEC_CONVOS,
+        SEND_NON_GAME_NON_SPEC_MESSAGES,
         GAME_MESSAGES_SUBSCRIPTION,
         NON_GAME_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,

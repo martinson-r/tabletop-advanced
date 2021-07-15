@@ -187,7 +187,7 @@ const typeDefs = gql`
     sendMessageToGame(gameId: ID, userId: ID, messageText: String): CountAll
     editMessage(messageId: ID, userId: ID, editMessageText: String):CountAll
     deleteMessage(messageId: ID, userId: ID): CountAll
-    sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): [Message]
+    sendNonGameMessages(userId: ID!, messageText: String!, conversationId: ID): CountAll
     submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
@@ -195,7 +195,7 @@ const typeDefs = gql`
     joinWaitlist(userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
   }
   type Subscription {
-    messageSent(gameId: ID!): CountAll,
+    messageSent(gameId: ID, conversationId: ID): CountAll,
   }
   schema {
     query: Query
