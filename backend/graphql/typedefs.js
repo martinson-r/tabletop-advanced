@@ -5,14 +5,18 @@ const typeDefs = gql`
   type Query {
     users: [User]
     user(id: ID!): User
+    about(id: ID): [AboutMe]
     games: [Game]
-    game(id: ID!): Game
+    game(gameId: ID!): Game
     messages: [Message]
     convos(gameId: ID, offset: Int): CountAll
-    getNonGameMessages(userId: ID!): [Message]
-    getSingleNonGameConversation(id: ID!): [Message]
+    getNonGameConvos(userId: ID!): [User]
+    getNonGameMessages(conversationId: ID, offset: Int): CountAll
     checkWaitList(id: ID, userId: ID!): [Game]
     getGameCreationInfo: GameCreationInfo
+    getGamesHosting(userId: ID): [Game]
+    getApplication(gameId: ID, applicantId: ID): [User]
+    getPlayingWaitingGames(userId: ID): [User]
   }
   type GameCreationInfo {
     languages: [Language],
@@ -54,7 +58,32 @@ const typeDefs = gql`
     postalCode: String,
     stateOrProvince: StateProvince,
     country: Country,
-    timeZone: TimeZone
+    timeZone: TimeZone,
+    Conversation: [Conversation]
+    recipient: [User]
+    Game: Game
+    applicant: [Game]
+    player: [Game]
+  }
+  type Conversation {
+    id: ID
+    recipient: [Recipient]
+  }
+  type Recipient {
+    id: ID,
+    userId: ID,
+    conversationId: ID,
+    messageId: ID,
+    Message: [Message]
+    recipient: User
+  }
+  type AboutMe {
+    bio: String,
+    userId: ID,
+    User: User,
+    pronouns: String,
+    firstName: String,
+    imageUrl: String
   }
   type Language {
       language: String
@@ -115,14 +144,34 @@ const typeDefs = gql`
     remote: Boolean,
     host: User,
     players: [User],
-    spectators: [User]
-    waitlist: [Waitlist]
-    ruleSetId: ID
-    languageId: ID
-    gameTypeId: ID
-    Ruleset: Ruleset
-    Language: Language
-    GameType: GameType
+    spectators: [User],
+    waitlist: [Waitlist],
+    ruleSetId: ID,
+    languageId: ID,
+    gameTypeId: ID,
+    Ruleset: Ruleset,
+    Language: Language,
+    GameType: GameType,
+    allowPlayerEdits: Boolean,
+    allowPlayerDeletes: Boolean,
+    active: Boolean,
+    Applications: [Application]
+  }
+  type Application {
+    id: ID
+    userId: ID
+    gameId: ID
+    whyJoin: String
+    charConcept: String
+    charName: String
+    experience: String
+    ignored: Boolean
+    accepted: Boolean
+    Users: [User]
+    applicant: User
+    applicationOwner: [User]
+    createdAt: String
+    Game: Game
   }
   type Message {
     id: ID,
@@ -139,6 +188,10 @@ const typeDefs = gql`
   type MetaGameMessageType {
       metaGameMessageType: String
   }
+  type Player {
+    userId: ID,
+    player: [User]
+  }
   type Waitlist {
       id: ID,
       userId: User,
@@ -150,16 +203,20 @@ const typeDefs = gql`
   type Mutation {
     blockUser(emailToBlock: String!, blockerEmail: String!): User
     sendMessageToGame(gameId: ID, userId: ID, messageText: String): CountAll
-    editMessage(messageId: ID, userId: ID, editMessageText: String): Message
-    deleteMessage(messageId: ID, userId: ID): Message
-    sendNonGameMessage(userId: ID!, messageText: String!, id: ID!): [Message]
+    editMessage(messageId: ID, userId: ID, editMessageText: String):CountAll
+    deleteMessage(messageId: ID, userId: ID): CountAll
+    sendNonGameMessages(userId: ID!, messageText: String!, conversationId: ID): CountAll
     submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
+    joinWaitlist(userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
+    startNewNonGameConversation(currentUserId: ID, recipientId: ID): Conversation
+    approveApplication(applicationId: ID): [Application]
+    ignoreApplication(applicationId: ID): [Application]
   }
   type Subscription {
-    messageSent(gameId: ID!): CountAll,
+    messageSent(gameId: ID, conversationId: ID): CountAll,
   }
   schema {
     query: Query

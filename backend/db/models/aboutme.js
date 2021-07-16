@@ -11,16 +11,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      //AboutMe.hasOne(models.User, {foreignKey: "userId"});
+      AboutMe.belongsTo(models.User, {foreignKey: "userId"});
       AboutMe.belongsTo(models.Location, {foreignKey: "locationId"});
     }
   };
   AboutMe.init({
     userId: DataTypes.INTEGER,
-    firstName: DataTypes.INTEGER,
+    firstName: DataTypes.STRING,
     bio: DataTypes.TEXT,
     avatarUrl: DataTypes.STRING,
     homebrew: DataTypes.BOOLEAN,
+    houserules: DataTypes.BOOLEAN,
     profanity: DataTypes.BOOLEAN,
     locationId: DataTypes.INTEGER,
     pronouns: DataTypes.STRING

@@ -11,7 +11,7 @@ const GET_ACCOUNTS = gql`query GetAccounts {
       }
 }`;
 
-const GET_CURRENT_USER = gql`
+const GET_USER = gql`
     query GetCurrentAccount($userId: ID!) {
         user(id: $userId){
             id
@@ -20,11 +20,24 @@ const GET_CURRENT_USER = gql`
         }
     }`;
 
+    const GET_ABOUT = gql`
+    query GetAccount($userId: ID!) {
+        about(id: $userId){
+            firstName
+            pronouns
+            bio
+            User {
+                userName
+            }
+        }
+    }`;
+
 const GET_GAMES = gql`
     query GetAllGames {
        games {
         id
         title
+        active
         description
         host {
             userName
@@ -33,17 +46,73 @@ const GET_GAMES = gql`
     }
 `;
 
+const GET_PLAYING_WAITING_GAMES = gql`
+    query GetPlayingWaitingGames($userId: ID) {
+        getPlayingWaitingGames(userId: $userId) {
+            id
+            player {
+              id
+              title
+              host {
+                  userName
+              }
+            }
+            applicant {
+              id
+              title
+              host {
+                userName
+              }
+              Applications {
+                id
+                accepted
+              }
+            }
+        }
+    }
+`
+
 const GET_GAME = gql`
     query GetSingleGame($gameId: ID!) {
-       game(id: $gameId){
-        id
+        game(gameId: $gameId) {
+            id
         title
         description
+        active,
+        allowPlayerEdits,
+        allowPlayerDeletes,
+        active,
         host {
             userName
+            id
         }
-       }
+        Applications {
+            ignored
+            accepted
+            createdAt
+            applicationOwner {
+                id
+                 userName
+               }
     }
+        }
+    }
+`;
+
+//Get games a player is hosting
+//Grab waitlist info as well so they can see new apps
+const GET_HOSTED_GAMES = gql`
+query MyGames($userId: ID) {
+    getGamesHosting(userId: $userId) {
+        id
+  title
+  Applications {
+    id
+    ignored
+    accepted
+    }
+}
+}
 `;
 
 const GET_WAITLIST_STATUS = gql`
@@ -55,6 +124,30 @@ const GET_WAITLIST_STATUS = gql`
         }
     }
 `;
+
+const GET_APPLICATION = gql`
+query GetApplication($gameId: ID, $applicantId: ID) {
+    getApplication(gameId: $gameId, applicantId: $applicantId) {
+        id
+        applicant {
+          id
+          title
+          Applications {
+            id
+            whyJoin
+            charConcept
+            charName
+            experience
+            accepted
+            ignored
+            applicationOwner {
+              userName
+            }
+          }
+        }
+    }
+}
+`
 
 const GET_GAME_CONVOS = gql`
     query GetGameConvos($gameId: ID, $offset: Int) {
@@ -69,20 +162,42 @@ const GET_GAME_CONVOS = gql`
             id
             messageText
             createdAt
+            deleted
        }
     }
 }
 `;
 
-const GET_NON_GAME_NON_SPEC_CONVOS = gql`
-query GetNonGameNonSpecConvos($userId: ID) {
-    getNonGameMessages(userId: $userId){
-        recipients {
-            email
+//Get non-game conversations associated with user
+const GET_USER_NON_GAME_CONVOS = gql`
+query GetNonGameConvos($userId: ID!) {
+    getNonGameConvos(userId: $userId){
+        recipient {
+            id
+            recipient {
+                userName
+            }
         }
-        message {
+    }
+}
+`;
+
+//Get messages associated with non-game conversation
+const GET_NON_GAME_NON_SPEC_MESSAGES = gql`
+query GetNonGameNonSpecConvos($conversationId: ID, $offset: Int) {
+    getNonGameMessages(conversationId: $conversationId, offset: $offset){
+        count
+        rows {
+            id
+            sender {
+                id
+                userName
+            }
+            id
             messageText
-        }
+            createdAt
+            deleted
+       }
     }
 }
 `;
@@ -125,6 +240,7 @@ const SEND_MESSAGE_TO_GAME = gql`
             id
             messageText
             createdAt
+            deleted
        }
         }
       }
@@ -133,29 +249,36 @@ const SEND_MESSAGE_TO_GAME = gql`
 const EDIT_MESSAGE = gql`
 mutation EditMessage($messageId: ID, $userId: ID, $editMessageText: String) {
 editMessage(messageId: $messageId, userId: $userId, editMessageText: $editMessageText) {
-    sender {
-        id
-        userName
+    count
+        rows {
+            sender {
+                id
+                userName
+            }
+            id
+            messageText
+            createdAt
+            deleted
+       }
     }
-    id
-    messageText
-    createdAt
-}
 }
 `
 
 const DELETE_MESSAGE = gql`
 mutation DeleteMessage($messageId: ID, $userId: ID) {
 deleteMessage(messageId: $messageId, userId: $userId) {
-    sender {
+    count
+    rows {
+        sender {
+            id
+            userName
+        }
         id
-        userName
-    }
-    id
-    messageText
-    createdAt
-    deleted
-}
+        messageText
+        createdAt
+        deleted
+   }
+ }
 }
 `
 
@@ -179,6 +302,27 @@ mutation ChangePassword($userId: ID!, $newPassword: String!, $oldPassword: Strin
 }
 `
 
+const APPROVE_APPLICATION = gql`
+mutation ApproveApplication($applicationId: ID) {
+    approveApplication(applicationId: $applicationId) {
+        id
+        accepted
+        ignored
+    }
+}
+`
+
+const IGNORE_APPLICATION = gql`
+mutation IgnoreApplication($applicationId: ID) {
+    ignoreApplication(applicationId: $applicationId) {
+        id
+        accepted
+        ignored
+    }
+}
+`
+
+
 //IDs are required on backend but if I don't mark them required on frontend,
 //we get a 404...
 //Took me forever to troubleshoot this.
@@ -195,35 +339,44 @@ const SUBMIT_GAME = gql`
 
 const SUBMIT_WAITLIST_APP = gql`
   mutation SubmitWaitlistApp($userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
-    submitWaitlistApp(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
+    joinWaitlist(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
                 id
-                title
-                description
-                host {
-                    email
-                }
+
     }
 }
 `;
 
-const SEND_NON_GAME_NON_SPEC_CONVOS = gql`
-mutation SendNonGameNonSpecConvos($userId: ID, $messageText: String, $messageId: ID) {
-    sendNonGameMessage(userId: $userId, messageText: $messageText, id: $messageId){
-        message {
-           id
-           User {
-               id
-               email
-           }
-        messageText
-        }
+//This is to send a non-game message to a conversation
+const SEND_NON_GAME_NON_SPEC_MESSAGES = gql`
+mutation SendNonGameNonSpecMessages($userId: ID!, $messageText: String!, $conversationId: ID) {
+    sendNonGameMessages(userId: $userId, messageText: $messageText, conversationId: $conversationId){
+        count
+        rows {
+            sender {
+                id
+                userName
+            }
+            id
+            messageText
+            createdAt
+            deleted
+       }
     }
 }
 `;
 
+const START_NEW_PRIVATE_CHAT = gql`
+mutation StartNewPrivateChat($currentUserId: ID, $recipientId: ID) {
+    startNewNonGameConversation(currentUserId: $currentUserId, recipientId: $recipientId) {
+        id
+    }
+}
+`;
+
+//This is to fetch all of the messages in a conversation
 const GAME_MESSAGES_SUBSCRIPTION = gql`
-subscription OnMessageSent($gameId: ID!) {
-    messageSent(gameId: $gameId) {
+subscription OnMessageSent($gameId: ID, $conversationId: ID) {
+    messageSent(gameId: $gameId, conversationId: $conversationId) {
         count
         rows {
             id
@@ -234,29 +387,58 @@ subscription OnMessageSent($gameId: ID!) {
             id
             messageText
             createdAt
+            deleted
        }
-        }
+    }
+  }
+`;
+
+const NON_GAME_MESSAGES_SUBSCRIPTION = gql`
+subscription OnMessageSent($conversationId: ID!) {
+    messageSent(conversationId: $conversationId) {
+        count
+        rows {
+            id
+            sender {
+                id
+                userName
+            }
+            id
+            messageText
+            createdAt
+            deleted
+       }
+    }
   }
 `;
 
 
 
 export { GET_ACCOUNTS,
-        GET_CURRENT_USER,
+        GET_USER,
+        GET_ABOUT,
         ADD_BLOCKED_USER,
         GET_GAMES,
         GET_GAME,
+        GET_PLAYING_WAITING_GAMES,
+        GET_APPLICATION,
+        APPROVE_APPLICATION,
+        IGNORE_APPLICATION,
+        GET_HOSTED_GAMES,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,
         EDIT_MESSAGE,
         DELETE_MESSAGE,
-        GET_NON_GAME_NON_SPEC_CONVOS,
-        SEND_NON_GAME_NON_SPEC_CONVOS,
+        GET_NON_GAME_NON_SPEC_MESSAGES,
+        GET_USER_NON_GAME_CONVOS,
+        SEND_NON_GAME_NON_SPEC_MESSAGES,
+        START_NEW_PRIVATE_CHAT,
         GAME_MESSAGES_SUBSCRIPTION,
+        NON_GAME_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
         SUBMIT_WAITLIST_APP,
         GET_WAITLIST_STATUS,
         GET_GAME_CREATION_INFO,
         CHANGE_EMAIL,
-        CHANGE_PASSWORD
+        CHANGE_PASSWORD,
      };

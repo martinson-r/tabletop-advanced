@@ -58,7 +58,28 @@ module.exports = {
         defaultValue: true
       },
       profanityOk: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      active: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      deleted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      waitListOpen: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      allowPlayerEdits: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      allowPlayerDeletes: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
       },
       gameCleanlinessId: {
         type: Sequelize.INTEGER,

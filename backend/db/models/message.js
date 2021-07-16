@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Message.belongsToMany(models.User, { as: "recipient", through: "Recipient", foreignKey: "messageId", otherKey: "userId"});
-      Message.belongsTo(models.User, { as: "sender", foreignKey: "senderId"});
+      Message.belongsTo(models.Conversation, { foreignKey: "conversationId" });
+      Message.belongsTo(models.User, { as: "sender", foreignKey: "senderId" });
       //Message.belongsTo(models.User, { as: "sender", foreignKey: "senderId"});
     }
   };
@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     messageText: DataTypes.STRING,
     metaGameMessageTypeId: DataTypes.INTEGER,
     conversationTypeId: DataTypes.INTEGER,
+    conversationId: DataTypes.INTEGER,
     gameId: DataTypes.INTEGER,
     senderId: DataTypes.INTEGER,
     deleted: DataTypes.BOOLEAN,

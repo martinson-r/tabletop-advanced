@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       //Game.belongsToMany(models.User, {as: "UserModerator", through: 'Moderator', foreignKey: 'gameId', otherKey: 'userId' });
-      // Game.belongsToMany(models.Application, {through: 'Waitlist', foreignKey: 'gameId', otherKey: 'applicationId' });
+      Game.belongsToMany(models.Application, {through: "Waitlists", foreignKey: 'gameId', otherKey: 'applicationId'});
       Game.belongsTo(models.GameType, {foreignKey: "gameTypeId"});
       // Game.belongsTo(models.GameSize, {foreignKey: "gameSizeId"});
       // Game.belongsTo(models.GameFrequency, {foreignKey: "gameFrequencyId"});
@@ -28,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
       // Game.belongsTo(models.GameSize, {foreignKey: "gameSizeId"});
       // Game.belongsToMany(models.Book, {through: 'BookList', foreignKey: 'gameId', otherKey: 'bookId' });
       // Game.belongsToMany(models.GameDay, {through: 'GameDaysJoins', foreignKey: 'gameId', otherKey: 'gameDayId' });
-      // Game.belongsToMany(models.User, {through: "GamePlayersJoin", foreignKey: "gameId", otherKey: "playerId"});
+      Game.belongsToMany(models.User, { through: "PlayerJoins", as: "player", foreignKey: "gameId", otherKey: "userId"});
+      Game.belongsToMany(models.User, { through: "Waitlists", as: "applicant", foreignKey: "gameId", otherKey: "userId"})
     }
   };
   Game.init({
@@ -43,6 +44,11 @@ module.exports = (sequelize, DataTypes) => {
     remote: DataTypes.BOOLEAN,
     public: DataTypes.BOOLEAN,
     premium: DataTypes.BOOLEAN,
+    active: DataTypes.BOOLEAN,
+    deleted: DataTypes.BOOLEAN,
+    waitListOpen: DataTypes.BOOLEAN,
+    allowPlayerEdits: DataTypes.BOOLEAN,
+    allowPlayerDeletes: DataTypes.BOOLEAN,
     locationId: DataTypes.INTEGER,
     gameSizeId: DataTypes.INTEGER,
     gameTypeId: DataTypes.INTEGER,

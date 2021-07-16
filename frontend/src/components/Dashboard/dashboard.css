@@ -1,0 +1,20 @@
+.private-convo {
+    border: 1px solid rgb(53, 0, 128);
+    padding: 5px;
+}
+
+.private-convo:hover {
+    background-color: lightblue;
+}
+
+.appliedTo {
+    border: 1px solid royalblue;
+}
+
+.playingIn {
+    border: 1px solid salmon;
+}
+
+.hosting {
+    border: 2px solid olivedrab;
+}

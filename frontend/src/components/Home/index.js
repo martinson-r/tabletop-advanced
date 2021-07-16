@@ -6,6 +6,7 @@ import {
   } from "@apollo/client";
 import { GET_CURRENT_ACCOUNT } from "../../gql"
 import { GET_GAMES } from "../../gql"
+import { v4 as uuidv4 } from 'uuid';
 
 function Home() {
 
@@ -21,6 +22,13 @@ function Home() {
     const { loading, error, data } = useQuery(GET_GAMES);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
+
+    //This needs to be more complicated than simple toggles since
+    //multiple conditions can exist
+    const [displayInactive, setDisplayInactive] = useState(false);
+    const [displayClosedWaitlist, setDisplayClosedWaitlist] = useState(false);
+    //TOGGLE: homebrew
+    //TOGGLE: houserules
 
 
     useEffect(() => {
@@ -40,6 +48,15 @@ function Home() {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :( </p>;
 
+    const changeDisplayInactive = () => {
+        setDisplayInactive(!displayInactive)
+    }
+
+    const changeDisplayClosedWaitlist = () => {
+        setDisplayClosedWaitlist(!displayClosedWaitlist)
+    }
+
+
     if (!data) {
         return (
         <p>No games found. :(</p>
@@ -51,13 +68,29 @@ function Home() {
         //Just turning data.games into something easier to work with
         const gameData = data.games;
 
-        return (
-            <div>
-                <p>Active Games:</p>
-                {gameData.map(game => <p key={game.id}><Link to={`/game/${game.id}`}>{game.title}</Link> - {game.description}, Hosted by {game.host.userName}</p>)}
-            </div>
-        )
+     return (
+
+         <div>
+             <div>
+            <label>Show inactive games</label>
+            <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
+            <label>Show waitlist closed</label>
+            <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
+        </div>
+
+        <p>Active Games:</p>
+        {gameData.map((game) =>
+        (game.active === true && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
+        )}
+
+        {/* Show inactive games conditionally */}
+        {displayInactive === true && (<span><p>Inactive Games:</p>
+        {gameData.map((game) =>
+        (game.active === false && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
+        )}</span>)}
+        </div>
+     )
+     }
     }
-}
 
 export default Home;

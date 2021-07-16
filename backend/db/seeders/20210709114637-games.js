@@ -53,6 +53,27 @@ module.exports = {
       hostId: 1,
       languageId: 1,
       ruleSetId: 1
+    },
+    {
+
+      title: "Grab your calculator",
+      description: "Math is fun!",
+      remote: true,
+      public: true,
+      premium: false,
+      locationId: 1,
+      gameSizeId: 3,
+      gameTypeId: 2,
+      gameTimeId: 1,
+      gameFrequencyId: 3,
+      homebrew: true,
+      houserules: true,
+      profanityOk: true,
+      gameCleanlinessId: 3,
+      guestHostId: null,
+      hostId: 3,
+      languageId: 1,
+      ruleSetId: 1
     }], {});
   },
 

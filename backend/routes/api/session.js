@@ -84,65 +84,30 @@ const handleValidationErrors = (req, res, next) => {
 
 const router = express.Router();
 
-// router.post('/', asyncHandler(async(req, res, next) => {
-//     try {
-//         const { email, password } = req.body;
-//         if (email && password) {
-//             const foundUser = await Account.findOne({ email });
-
-//             try {
-//                 if (foundUser && foundUser.comparePasswords(password)) {
-//                     const user = await loginUser(req, res, foundUser);
-//                     res.json({user})
-//                 }
-//             } catch(e) {
-//                     console.log(e);
-//                 }
-//         } else {
-//             res.json('invalid credentials')
-//         }
-//         // await Joi.validate({ email, password }, signIn);
-//     } catch(e) {
-//         console.error(e);
-//     }
-// }));
-
-// router.delete('/', (req, res, next) => {
-//     logoutUser(req, res);
-//     return res.json({ message: 'success' });
-// });
-
-// // Restore session user
-// router.get(
-//     '/',
-//     restoreUser,
-//     (req, res, next) => {
-//       const { user } = res.locals;
-//       if (user) {
-//         return res.json({
-//           user
-//         });
-//       } else return res.json({message: 'no user found'});
-//     }
-//   );
-
   // Sign Up Users POST
   router.post(
     "/signup",
     // csrfProtection, <== add later
     userValidators,
     asyncHandler(async (req, res) => {
-      const { userName, email, password } = req.body;
+      const { userName, email, password, confirmPassword } = req.body;
+      console.log(userName);
       const user = User.build({ userName, email });
       const validatorErrors = validationResult(req);
+      console.log('ERRORS', validatorErrors)
       if (validatorErrors.isEmpty()) {
         const hashedPassword = await bcrypt.hash(password, 10);
         user.hashedPassword = hashedPassword;
         await user.save();
+        console.log('USER', user)
+
+        //Log new user in.
+        loginUser(req, res, user);
 
         //We really don't want to send more than this back.
         res.json({user: {userName: user.userName, email: user.email, id: user.id}});
       } else {
+        console.log('hit errors')
         const errors = validatorErrors.array().map((error) => error.msg);
         res.json({errors})
     }
@@ -200,36 +165,5 @@ const router = express.Router();
           } else return res.json({message: 'no user found'});
         }
       );
-
-
-
-      //users.js
-//       const router = express.Router();
-
-// router.post('/', asyncHandler(async(req, res, next) => {
-//     const {email, password} = req.body;
-
-//     if (email &&
-//         // userName &&
-//         password
-//         // && confirmPassword
-//     ){
-//         const hashedPassword = bcrypt.hashSync(password);
-
-//         var userData = {
-//           email,
-//         //   userName,
-//           hashedPassword,
-//         }
-//         //use schema.create to insert data into the db
-//         try {
-//             Account.create(userData);
-//         }
-//          catch(err) {
-//             next(err)
-//           }
-//            res.redirect('/');
-//       }
-// }));
 
 module.exports = router;

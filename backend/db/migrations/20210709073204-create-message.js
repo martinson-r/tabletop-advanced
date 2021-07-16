@@ -30,6 +30,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         references: { model: "Games", key: "id" },
       },
+      conversationId: {
+        type: Sequelize.INTEGER,
+        references: { model: "Conversations", key: "id" },
+      },
       metaGameMessageTypeId: {
         type: Sequelize.INTEGER,
       },

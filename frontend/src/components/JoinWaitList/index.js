@@ -35,12 +35,13 @@ function JoinWaitList({...props}) {
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
+      console.log(userId, charName, charConcept, experience, whyJoin)
       submitWaitlistApp(userId, charName, charConcept, experience, whyJoin)
     };
 
     useEffect(() => {
         if (sessionUser) {
-            setUserId(sessionUser._id);
+            setUserId(sessionUser.id);
         }
     }, [sessionUser]);
 
@@ -52,12 +53,18 @@ function JoinWaitList({...props}) {
 
     return (
       <div>
-    <p>Derp.</p>
-
+    {!userId && (
+      //TODO: login link with history push back to initial game page they were
+      //looking at
+      <p>Please log in to apply for this game.</p>
+    )}
     {/* TODO: Conditionally display form or "You are on the waitlist" or "You are a player in this game" or "You are this game's host" */}
+    {gameData && gameData.game.host.id === userId.toString() && (
+      <p>You are currently hosting this game.</p>
+    )}
     {/* Game Data query should return info on if this user has applied */}
 
-        <form onSubmit={handleSubmit}>
+        {gameData && gameData.game.host.id !== userId.toString() && (<form onSubmit={handleSubmit}>
          <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>
@@ -100,7 +107,7 @@ function JoinWaitList({...props}) {
            />
          </label>
          <button type="submit">Send</button>
-       </form>
+       </form>)}
        </div>
     )
 }

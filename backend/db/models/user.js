@@ -11,13 +11,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       //Aliased, to make life easier
-      // User.belongsToMany(models.Game, {as: "Player", through: 'PlayerJoins', foreignKey: 'userId', otherKey: 'gameId' });
+      User.belongsToMany(models.Game, { through: 'PlayerJoins', as: "player", foreignKey: 'userId', otherKey: 'gameId' });
       // User.belongsToMany(models.Game, {as: "GameModerator", through: 'Moderator', foreignKey: 'userId', otherKey: 'gameId' });
       // User.belongsToMany(models.Game, {as: "GameSpectator", through: 'Spectator', foreignKey: 'userId', otherKey: 'gameId' });
       User.hasMany(models.Game, { as: "host", foreignKey: 'hostId' });
       User.hasMany(models.Message, { as: "sender", foreignKey: "senderId" });
-      //User.hasMany(models.Message, { foreignKey: "senderId" })
-      //User.hasOne(models.AboutMe, { foreignKey: "userId"});
+      //User.hasMany(models.Application, {as: "applicant", foreignKey: "userId"});
+
+      //Can't associate to applications again.
+      User.belongsToMany(models.Application, { through: "Waitlists", as: "applicationOwner", foreignKey: "userId", otherKey: "applicationId"});
+      User.belongsToMany(models.Game, { through: "Waitlists", as: "applicant", foreignKey: "userId", otherKey: "gameId"});
+      User.hasMany(models.AboutMe, { foreignKey: "userId"});
+      User.belongsToMany(models.Conversation, {through: "Recipients", as: "recipient", foreignKey: "userId", otherKey: "conversationId"});
 
       //TODO Refactor: Blocked Users in Games should go on a joins table
 

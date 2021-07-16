@@ -16,6 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   Character.init({
     userId: DataTypes.INTEGER,
     gameId: DataTypes.INTEGER,
+    //TODO:
+    // characterSheetId: DataTypes.INTEGER,
     name: DataTypes.STRING,
     bio: DataTypes.TEXT,
     imageUrl: DataTypes.STRING
