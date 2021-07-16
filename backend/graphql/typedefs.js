@@ -212,6 +212,8 @@ const typeDefs = gql`
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
     joinWaitlist(userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
     startNewNonGameConversation(currentUserId: ID, recipientId: ID): Conversation
+    approveApplication(applicationId: ID): [Application]
+    ignoreApplication(applicationId: ID): [Application]
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,

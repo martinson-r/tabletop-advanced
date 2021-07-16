@@ -128,13 +128,22 @@ const GET_WAITLIST_STATUS = gql`
 const GET_APPLICATION = gql`
 query GetApplication($gameId: ID, $applicantId: ID) {
     getApplication(gameId: $gameId, applicantId: $applicantId) {
-         id
-        whyJoin
-        charName
-        charConcept
-        experience
+        id
         applicant {
-            userName
+          id
+          title
+          Applications {
+            id
+            whyJoin
+            charConcept
+            charName
+            experience
+            accepted
+            ignored
+            applicationOwner {
+              userName
+            }
+          }
         }
     }
 }
@@ -293,6 +302,27 @@ mutation ChangePassword($userId: ID!, $newPassword: String!, $oldPassword: Strin
 }
 `
 
+const APPROVE_APPLICATION = gql`
+mutation ApproveApplication($applicationId: ID) {
+    approveApplication(applicationId: $applicationId) {
+        id
+        accepted
+        ignored
+    }
+}
+`
+
+const IGNORE_APPLICATION = gql`
+mutation IgnoreApplication($applicationId: ID) {
+    ignoreApplication(applicationId: $applicationId) {
+        id
+        accepted
+        ignored
+    }
+}
+`
+
+
 //IDs are required on backend but if I don't mark them required on frontend,
 //we get a 404...
 //Took me forever to troubleshoot this.
@@ -392,6 +422,8 @@ export { GET_ACCOUNTS,
         GET_GAME,
         GET_PLAYING_WAITING_GAMES,
         GET_APPLICATION,
+        APPROVE_APPLICATION,
+        IGNORE_APPLICATION,
         GET_HOSTED_GAMES,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,

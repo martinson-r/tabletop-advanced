@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
       // Game.belongsToMany(models.Book, {through: 'BookList', foreignKey: 'gameId', otherKey: 'bookId' });
       // Game.belongsToMany(models.GameDay, {through: 'GameDaysJoins', foreignKey: 'gameId', otherKey: 'gameDayId' });
       Game.belongsToMany(models.User, { through: "PlayerJoins", as: "player", foreignKey: "gameId", otherKey: "userId"});
-      Game.belongsToMany(models.User, { through: "Waitlists", as: "applicationOwner", foreignKey: "gameId", otherKey: "userId"})
+      Game.belongsToMany(models.User, { through: "Waitlists", as: "applicant", foreignKey: "gameId", otherKey: "userId"})
     }
   };
   Game.init({

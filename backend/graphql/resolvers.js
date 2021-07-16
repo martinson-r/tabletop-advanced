@@ -88,7 +88,7 @@ const resolvers = {
         getApplication: (obj, args, context, info) => {
             //Get all applications for this specific game associated with this specific user.
             const { gameId, applicantId } = args;
-            return User.findAll({where: {id: applicantId}, include: {model: Game, as: "applicant", where: { id: gameId }, include: {model: Application}}});
+            return User.findAll({where: {id: applicantId}, include: {model: Game, through: "Waitlists", as: "applicant", where: { id: gameId }, include: {model: Application, through: "Waitlists", include: {model: User, as: "applicationOwner"}}}});
         },
 
         getPlayingWaitingGames: async (obj, args, context, info) => {
@@ -249,11 +249,24 @@ const resolvers = {
         },
         joinWaitlist: async(root, args) => {
             //If userId is hostId, do not allow.
-            console.log(args);
             const { userId, gameId, whyJoin, charConcept, charName, experience } = args;
             const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
             return newApp;
-        }
+        },
+
+        approveApplication: async(root, args) => {
+            const { applicationId } = args;
+            const findAndUpdateAppToApprove = await Application.update({accepted: true}, {where: { id: applicationId}});
+            const returnApp = await Application.findAll({where: {id: applicationId}})
+            return returnApp;
+        },
+
+        ignoreApplication: async(root, args) => {
+            const { applicationId } = args;
+            const findAndUpdateAppToApprove = await Application.update({ignored: true}, {where: { id: applicationId}});
+            const returnApp = await Application.findAll({where: {id: applicationId}})
+            return returnApp;
+        },
     },
     Subscription: {
             messageSent: {
