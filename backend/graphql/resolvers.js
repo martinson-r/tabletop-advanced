@@ -43,9 +43,8 @@ const resolvers = {
 
         },
         game: (obj, args, context, info) => {
-            const id = args.id;
-           return Game.findByPk(id, {include: [{model: User, as: "host"}, {model: Application, include: [{model: User, as: "applicant"}]}]});
-            console.log(game)
+           const {gameId} = args
+           return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
         },
         messages: (obj, args, context, info) => {
             return Message.findAll();
@@ -86,25 +85,17 @@ const resolvers = {
             return Game.findAll({ where: { hostId: userId }, include: [{ model: Application }] })
         },
 
-        //May have to rethink this one. It's messing up trying to use Application as a joins table.
-        getApplication: async(obj, args, context, info) => {
+        getApplication: (obj, args, context, info) => {
+            //Get all applications for this specific game associated with this specific user.
             const { gameId, applicantId } = args;
-            console.log('ARGS', args)
-            //return Application.findAll({where: {userId: applicantId, gameId}, include: {model: User, as: "applicant"}});
-
-            //NOTE:
-            //I see now why I need a joins table. Application cannot function as a joins table itself. It needs to
-            //hold just the app data. The userId etc needs to be on its own joins table.
-            //otherwise, this gets messy.
-            const apps = await User.findAll({where: {id: applicantId}, include: [{model: Game, as: "applicant", where: {userId: applicantId, gameId}}]})
-            console.log(apps);
-            //user findall where userid, include application where gameId
+            return User.findAll({where: {id: applicantId}, include: {model: Game, as: "applicant", where: { id: gameId }, include: {model: Application}}});
         },
 
         getPlayingWaitingGames: async (obj, args, context, info) => {
+            //Get games where the user is a player, or on the waitlist.
+            //Have to include application itself in order to get app status.
             const { userId } = args;
-            const game = await Game.findAll({include: [{ model: User, as: "player", where: { id: userId }}, {model: User, as: "gameApplicant", where: { id: userId } }]});
-            console.log(game);
+            return User.findAll({where: {id: userId}, include: [{model: Game, as: "player", include: {model: User, as: "host"}}, {model: Game, as: "applicant",  include: [{model: User, as: "host"}, {model: Application}]}]});
         },
 
         checkWaitList: async (obj, args, context, info) => {

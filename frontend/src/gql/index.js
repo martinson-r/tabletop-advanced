@@ -49,14 +49,24 @@ const GET_GAMES = gql`
 const GET_PLAYING_WAITING_GAMES = gql`
     query GetPlayingWaitingGames($userId: ID) {
         getPlayingWaitingGames(userId: $userId) {
-            games {
+            id
+            player {
+              id
+              title
+              host {
+                  userName
+              }
+            }
+            applicant {
+              id
+              title
+              host {
+                userName
+              }
+              Applications {
                 id
-                title
-                active
-                description
-                host {
-                    userName
-                }
+                accepted
+              }
             }
         }
     }
@@ -64,8 +74,8 @@ const GET_PLAYING_WAITING_GAMES = gql`
 
 const GET_GAME = gql`
     query GetSingleGame($gameId: ID!) {
-       game(id: $gameId){
-        id
+        game(gameId: $gameId) {
+            id
         title
         description
         active,
@@ -80,12 +90,12 @@ const GET_GAME = gql`
             ignored
             accepted
             createdAt
-            applicant {
-            id
-            userName
-          }
-        }
+            applicationOwner {
+                id
+                 userName
+               }
     }
+        }
     }
 `;
 

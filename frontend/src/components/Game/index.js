@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
     useQuery, useSubscription, InMemoryCache
   } from "@apollo/client";
-import { GET_GAME, GET_GAME_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql"
+import { GET_GAME } from "../../gql"
 import { DateTime } from "../../utils/luxon";
 
 export const pubsub = new PubSub();
@@ -45,7 +45,7 @@ function Game() {
           <p>Open Applications:</p>
           {/* TODO: make date format not garbage. Luxon? */}
 
-          {data.game.Applications.map(application => <p key={uuidv4()}><Link to={`/applications/${gameId}/applicants/${application.applicant.id}`}>{application.applicant.userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p>)}
+          {data.game.Applications.map(application => <div><p key={uuidv4()}><Link to={`/applications/${gameId}/applicants/${application.applicationOwner[0].id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>)}
           <p>Accepted Applications:</p>
           <p>Ignored Applications:</p>
           </>

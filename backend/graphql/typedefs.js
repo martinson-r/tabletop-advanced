@@ -7,7 +7,7 @@ const typeDefs = gql`
     user(id: ID!): User
     about(id: ID): [AboutMe]
     games: [Game]
-    game(id: ID!): Game
+    game(gameId: ID!): Game
     messages: [Message]
     convos(gameId: ID, offset: Int): CountAll
     getNonGameConvos(userId: ID!): [User]
@@ -16,7 +16,7 @@ const typeDefs = gql`
     getGameCreationInfo: GameCreationInfo
     getGamesHosting(userId: ID): [Game]
     getApplication(gameId: ID, applicantId: ID): [User]
-    getPlayingWaitingGames(userId: ID): [Game]
+    getPlayingWaitingGames(userId: ID): [User]
   }
   type GameCreationInfo {
     languages: [Language],
@@ -61,6 +61,9 @@ const typeDefs = gql`
     timeZone: TimeZone,
     Conversation: [Conversation]
     recipient: [User]
+    Game: Game
+    applicant: [Game]
+    player: [Game]
   }
   type Conversation {
     id: ID
@@ -166,7 +169,9 @@ const typeDefs = gql`
     accepted: Boolean
     Users: [User]
     applicant: User
+    applicationOwner: [User]
     createdAt: String
+    Game: Game
   }
   type Message {
     id: ID,

@@ -6,3 +6,15 @@
 .private-convo:hover {
     background-color: lightblue;
 }
+
+.appliedTo {
+    border: 1px solid royalblue;
+}
+
+.playingIn {
+    border: 1px solid salmon;
+}
+
+.hosting {
+    border: 2px solid olivedrab;
+}
