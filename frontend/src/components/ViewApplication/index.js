@@ -19,9 +19,9 @@ function ViewApplication() {
 
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
-    const { applicantId } = useParams();
+    const { applicationId } = useParams();
     const { gameId } = useParams();
-    const [applicationId, setApplicationId] = useState(null);
+    const [applicantId, setApplicantId] = useState(null);
     const [application, setApplication] = useState({});
     const [editApplication, setEditApplication] = useState(false);
     const [charName, setCharName] = useState("");
@@ -35,26 +35,29 @@ function ViewApplication() {
     const [ignoreApplication, {data:ignoreData}] = useMutation(IGNORE_APPLICATION);
     const [editWaitlistApp, {data: editWaitlistData}] = useMutation(EDIT_WAITLIST_APP, { variables: { applicationId, userId, charName, charConcept, experience, whyJoin, gameId } } );
 
-
-    //TODO: Update on approval or ignore, whyyyy doesn't anything I try work
-    //It's coming back false even though it is true in Postgres
-
     useEffect(() => {
-        getApplication({ variables: {gameId, applicantId}})
+        getApplication({ variables: {gameId, applicationId}})
     },[]);
+
+    console.log('app', data)
 
     useEffect(() => {
         if (sessionUser !== undefined && sessionUser !== null) {
             setUserId(sessionUser.id)
         }
-    },[sessionUser])
+    },[sessionUser]);
+
+    console.log(application)
 
     useEffect(() => {
         if (data !== undefined) {
-            setApplication(data.getApplication[0].applicant[0].Applications[0]);
-            setApplicationId(data.getApplication[0].applicant[0].Applications[0].id);
-            if (userId === null || (userId.toString() !== applicantId.toString() && userId.toString() !== data.getApplication[0].applicant[0].Applications[0].hostId.toString())) {
+            setApplication(data.getApplication[0]);
+            // Check if application object is not null, then check if user is host or applicant
+            // If not, push them to main page.
+            if (Object.keys(application).length !== 0 && applicantId !== undefined && applicantId !== null) {
+              if (userId === null || (userId.toString() !== applicantId.toString() && userId.toString() !== application.hostId.toString())) {
                 history.push('/')
+            }
             }
         }
     },[data]);
@@ -86,8 +89,6 @@ function ViewApplication() {
         editWaitlistApp(applicationId, userId, charName, charConcept, experience, whyJoin);
         setEditApplication(false);
       };
-
-      console.log('edit data', editWaitlistData)
 
     return (
         <>

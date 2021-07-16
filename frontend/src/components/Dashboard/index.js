@@ -53,8 +53,8 @@ function Home() {
 
     useEffect(() => {
         if (dataPlayingWaiting !== undefined) {
-            setPlayingIn(dataPlayingWaiting.getPlayingWaitingGames[0].player);
-            setAppliedTo(dataPlayingWaiting.getPlayingWaitingGames[0].applicant);
+            setPlayingIn(dataPlayingWaiting.getPlayingWaitingGames);
+            setAppliedTo(dataPlayingWaiting.getPlayingWaitingGames);
         }
     },[dataPlayingWaiting])
 
@@ -95,8 +95,9 @@ function Home() {
                 </div>
                 <div className="playingIn">
                 <p>Games I'm Playing In:</p>
-                {dataPlayingWaiting !== undefined && playingIn !== undefined && (
-                    playingIn.map(gamePlayingIn => <p key={uuidv4()}>{gamePlayingIn.title}</p>)
+                {console.log('playing in', playingIn)}
+                {dataPlayingWaiting !== undefined && playingIn.player !== undefined && (
+                    playingIn.player.map(player => player.map(gamePlayingIn => <p key={uuidv4()}>{gamePlayingIn.title}</p>))
                     )}
                     {dataPlayingWaiting !== undefined && playingIn.length === 0 && (
                         <p>You are not currently playing in any games.</p>
@@ -104,9 +105,11 @@ function Home() {
                     </div>
                     <div className="appliedTo">
                 <p>Games I've Applied To:</p>
-                {dataPlayingWaiting !== undefined && appliedTo !== undefined && (
-                    appliedTo.map(appliedToGame => <p key={uuidv4()}><Link to={`/game/${appliedToGame.id}`}>{appliedToGame.title}</Link>, hosted by {appliedToGame.host.userName} - {appliedToGame.Applications[0].accepted.toString() === 'true' && (<span>application approved</span>)}{appliedToGame.Applications[0].accepted.toString() === 'false' && (<span>on waitlist</span>)}</p>)
-                )}
+                {appliedTo[0] !== undefined && (console.log('applicant', appliedTo[0].applicant))}
+                {/* {console.log('applicant', appliedTo.applicant[0].Applications)} */}
+                {dataPlayingWaiting !== undefined && appliedTo[0] !== undefined && (
+                    // <p key={uuidv4()}><Link to={`/game/${appliedToGame.id}`}>{appliedToGame.title}</Link>, hosted by {appliedToGame.host.userName} - <Link to={`applications/${appliedToGame.id}/applicants/${userId}`}>View/Edit Application</Link> - {appliedToGame.Applications[0].accepted.toString() === 'true' && (<span>application approved</span>)}{appliedToGame.Applications[0].accepted.toString() === 'false' && (<span>on waitlist</span>)}</p>
+                    appliedTo[0].applicant.map(gameApplied => <div><p><Link to={`/game/${gameApplied.id}`}>{gameApplied.title}</Link>, hosted by {gameApplied.host.userName}:</p> <p>{gameApplied.Applications.length} applications: {gameApplied.Applications.map(application => <span>{console.log(application.id)}<Link to={`/game/${gameApplied.id}/application/${application.id}`}>{application.charName}</Link>, </span>)}</p></div>))}
                 </div>
                 <div className="following">
                 <p>Games I'm Following:</p>

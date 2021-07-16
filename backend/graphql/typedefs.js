@@ -15,7 +15,7 @@ const typeDefs = gql`
     checkWaitList(id: ID, userId: ID!): [Game]
     getGameCreationInfo: GameCreationInfo
     getGamesHosting(userId: ID): [Game]
-    getApplication(gameId: ID, applicantId: ID): [User]
+    getApplication(gameId: ID, applicationId: ID): [Application]
     getPlayingWaitingGames(userId: ID): [User]
   }
   type GameCreationInfo {

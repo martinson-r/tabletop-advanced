@@ -52,7 +52,7 @@ function App() {
         <Route path="/:userId/bio" component={Bio} exact={true}></Route>
         <Route path="/conversation/:conversationId" component={Conversation} exact={true}></Route>
         <Route path="/waitlist/:gameId" component={JoinWaitList} exact={true}></Route>
-        <Route path="/applications/:gameId/applicants/:applicantId" component={ViewApplication} exact={true}></Route>
+        <Route path="/game/:gameId/application/:applicationId" component={ViewApplication} exact={true}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

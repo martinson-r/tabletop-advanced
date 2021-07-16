@@ -45,7 +45,7 @@ function Game() {
           <p>Open Applications:</p>
           {/* TODO: make date format not garbage. Luxon? */}
 
-          {data.game.Applications.map(application => <div><p key={uuidv4()}><Link to={`/applications/${gameId}/applicants/${application.applicationOwner[0].id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>)}
+          {data.game.Applications.map(application => <div><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>)}
           <p>Accepted Applications:</p>
           <p>Ignored Applications:</p>
           </>

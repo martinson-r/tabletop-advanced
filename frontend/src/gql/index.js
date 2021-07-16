@@ -66,6 +66,7 @@ const GET_PLAYING_WAITING_GAMES = gql`
               Applications {
                 id
                 accepted
+                charName
               }
             }
         }
@@ -87,6 +88,7 @@ const GET_GAME = gql`
             id
         }
         Applications {
+            id
             ignored
             accepted
             createdAt
@@ -126,13 +128,8 @@ const GET_WAITLIST_STATUS = gql`
 `;
 
 const GET_APPLICATION = gql`
-query GetApplication($gameId: ID, $applicantId: ID) {
-    getApplication(gameId: $gameId, applicantId: $applicantId) {
-        id
-        applicant {
-          id
-          title
-          Applications {
+query GetApplication($gameId: ID, $applicationId: ID) {
+    getApplication(gameId: $gameId, applicationId: $applicationId) {
             id
             hostId
             whyJoin
@@ -142,11 +139,10 @@ query GetApplication($gameId: ID, $applicantId: ID) {
             accepted
             ignored
             applicationOwner {
+              id
               userName
             }
           }
-        }
-    }
 }
 `
 
