@@ -254,6 +254,13 @@ const resolvers = {
             return newApp;
         },
 
+        editWaitlistApp: async(root, args) => {
+            const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
+            await Application.update({gameId, whyJoin, charConcept, charName, experience}, {where: { userId }});
+            const returnApp = await Application.findByPk(applicationId);
+            return returnApp;
+        },
+
         approveApplication: async(root, args) => {
             const { applicationId } = args;
             const findAndUpdateAppToApprove = await Application.update({accepted: true}, {where: { id: applicationId}});

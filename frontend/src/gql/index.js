@@ -347,6 +347,19 @@ const SUBMIT_WAITLIST_APP = gql`
 }
 `;
 
+const EDIT_WAITLIST_APP = gql`
+  mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
+    editWaitlistApp(applicationId: $applicationId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
+                id
+                whyJoin
+                charConcept
+                charName
+                experience
+
+    }
+}
+`;
+
 //This is to send a non-game message to a conversation
 const SEND_NON_GAME_NON_SPEC_MESSAGES = gql`
 mutation SendNonGameNonSpecMessages($userId: ID!, $messageText: String!, $conversationId: ID) {
@@ -438,6 +451,7 @@ export { GET_ACCOUNTS,
         NON_GAME_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
         SUBMIT_WAITLIST_APP,
+        EDIT_WAITLIST_APP,
         GET_WAITLIST_STATUS,
         GET_GAME_CREATION_INFO,
         CHANGE_EMAIL,

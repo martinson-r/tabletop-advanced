@@ -20,7 +20,6 @@ function JoinWaitList({...props}) {
     const [experience, setExperience] = useState("");
 
     const { gameId } = useParams();
-    console.log('USERID', userId)
 
     //TODO: Add ability to pass in userId to get back info on if this user has already applied for this game
     const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { userId, gameId }})

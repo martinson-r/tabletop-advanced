@@ -215,6 +215,7 @@ const typeDefs = gql`
     startNewNonGameConversation(currentUserId: ID, recipientId: ID): Conversation
     approveApplication(applicationId: ID): [Application]
     ignoreApplication(applicationId: ID): [Application]
+    editWaitlistApp(applicationId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,
