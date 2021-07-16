@@ -40,7 +40,7 @@ function Conversation() {
       { variables: { conversationId, offset } }
     );
 
-    console.log(data);
+    console.log('DATA', data);
 
     const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText } } );
 
@@ -130,8 +130,10 @@ function Conversation() {
     //Subscription for messages
     //This hopefully covers all, edits and deletions included
     useEffect(() => {
-      if (data !== undefined) {
+
       subscribeToMore({
+        //Name's now confusing - this subscribes to ALL new messages matching
+        //filter criteria on backend.
         document: GAME_MESSAGES_SUBSCRIPTION,
         variables: { conversationId },
         updateQuery: (prev, { subscriptionData }) => {
@@ -140,21 +142,13 @@ function Conversation() {
           const newFeedItem = subscriptionData.data.messageSent;
           setNewMessage(newFeedItem)
 
-          console.log('SUB', subscriptionData)
-
-          console.log('NEW', newFeedItem)
-
-          console.log('PREV', prev);
-
-          //This part is broken.
           //This really should be done in cache.
             return Object.assign({}, prev, {
               getNonGameMessages: {...prev.rows, ...newFeedItem}
             });
           }
       })
-    }
-    },[sortedConvos]);
+    },[]);
 
     const [errors, setErrors] = useState([]);
     useEffect(() => {

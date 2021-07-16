@@ -44,7 +44,8 @@ const resolvers = {
         },
         game: (obj, args, context, info) => {
             const id = args.id;
-            return Game.findByPk(id, {include: {model: User, as: "host"}});
+           return Game.findByPk(id, {include: [{model: User, as: "host"}, {model: Application, include: [{model: User, as: "applicant"}]}]});
+            console.log(game)
         },
         messages: (obj, args, context, info) => {
             return Message.findAll();
@@ -78,6 +79,11 @@ const resolvers = {
         getNonGameMessages: (obj, args, context, info) => {
             const { conversationId, offset } = args;
             return Message.findAndCountAll({where: {conversationId}, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit: 20, offset: offset,});
+        },
+
+        getGamesHosting: (obj, args, context, info) => {
+            const { userId } = args;
+            return Game.findAll({ where: { hostId: userId }, include: [{ model: Application }] })
         },
 
         checkWaitList: async (obj, args, context, info) => {
@@ -145,7 +151,9 @@ const resolvers = {
 
     startNewNonGameConversation: async(root,args) => {
 
-        const { userId, recipientId, messageText } = args;
+        const { currentUserId, recipientId, messageText } = args;
+
+        console.log(args);
 
         //Create new Conversation, basically an empty container for tracking
         //distinct collections of messages
@@ -154,7 +162,7 @@ const resolvers = {
 
         //Add both recipients to list. Possibly rework this to add multiple
         //new recipients.
-        await Recipient.create({userId, conversationId});
+        await Recipient.create({userId: currentUserId, conversationId});
         await Recipient.create({userId: recipientId, conversationId});
 
         //Send back the new conversation so we can direct the user to it.

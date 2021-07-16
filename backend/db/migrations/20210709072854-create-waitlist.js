@@ -35,10 +35,10 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-      requestDate: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('now'),
-      },
+      // requestDate: {
+      //   type: Sequelize.DATE,
+      //   defaultValue: Sequelize.fn('now'),
+      // },
       hostId: {
         type: Sequelize.INTEGER,
         allowNull: false,

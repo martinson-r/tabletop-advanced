@@ -4,7 +4,7 @@ import { useParams, Link, useHistory } from "react-router-dom";
 import Messages from "../Messages";
 import { PubSub } from 'graphql-subscriptions';
 import {
-    useQuery, useMutation, useSubscription, InMemoryCache
+    useLazyQuery, useMutation, useSubscription, InMemoryCache
   } from "@apollo/client";
 import { GET_USER, GET_ABOUT,START_NEW_PRIVATE_CHAT } from "../../gql"
 
@@ -14,30 +14,41 @@ const sessionUser = useSelector((state) => state.session.user);
 const currentUserId = sessionUser.id;
 const { userId } = useParams();
 const recipientId = userId;
-console.log('id', userId);
+console.log(recipientId);
+console.log(currentUserId);
 
 const history = useHistory();
 
-const { data, error, loading } = useQuery(GET_ABOUT, { variables: { userId }})
+const [getAbout, { data, error, loading }] = useLazyQuery(GET_ABOUT);
 
-const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { userId, recipientId }, onCompleted: startNewNonGameConversation => { history.pushState(`/conversation/${startNewNonGameConversation.id}`)} } );
+const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipientId }, onCompleted: startNewNonGameConversation => { history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)} } );
 
 const sendNewMessage = () => {
-startNewNonGameConversation({recipientId, userId: currentUserId});
+startNewNonGameConversation({recipientId, currentUserId});
 }
 
 console.log('data', data)
 
+useEffect(() => {
+
+    if (userId !== null && userId !== undefined) {
+        console.log('id', userId)
+        console.log('get data')
+        getAbout({ variables: { userId }})
+    }
+},[userId]);
+
 
 return (
     <div>
-    {data !== undefined && data.about.length && (<div><p>About {data.about[0].User.userName}:</p>
+    {data !== undefined && data.about.length &&
+    (<div><p>About {data.about[0].User.userName}:</p>
     {/* Conditional edit buttons based on whether user or not */}
     {/* Edit form fields directly */}
     {/* Toggle public display of information */}
     <p>{data.about[0].bio}</p>
     </div>)}
-    <p >Send this user a private message</p>
+    <button onClick={sendNewMessage}>Send this user a private message</button>
     </div>
 )
 

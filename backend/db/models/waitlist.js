@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     reviewed: DataTypes.BOOLEAN,
     ignored: DataTypes.BOOLEAN,
     isPlayer: DataTypes.BOOLEAN,
-    requestDate: DataTypes.DATE,
+    // requestDate: DataTypes.DATE,
     hostId: DataTypes.INTEGER
   }, {
     sequelize,

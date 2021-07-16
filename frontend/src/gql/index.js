@@ -52,6 +52,7 @@ const GET_GAME = gql`
         id
         title
         description
+        active,
         allowPlayerEdits,
         allowPlayerDeletes,
         active,
@@ -59,21 +60,31 @@ const GET_GAME = gql`
             userName
             id
         }
-       }
+        Applications {
+            ignored
+            accepted
+            createdAt
+            applicant {
+            userName
+          }
+        }
+    }
     }
 `;
 
-//Maybe just grab waitlists and games they are a player in at the same time
-//Possibly add hostId to Application so I can see
-//If they are hosting as well
-const MY_GAMES = gql`
+//Get games a player is hosting
+//Grab waitlist info as well so they can see new apps
+const GET_HOSTED_GAMES = gql`
 query MyGames($userId: ID) {
-    getMyGames(userId: $userId) {
+    getGamesHosting(userId: $userId) {
         id
-        title
-        accepted
-        isPlayer
+  title
+  Applications {
+    id
+    ignored
+    accepted
     }
+}
 }
 `;
 
@@ -110,13 +121,13 @@ const GET_GAME_CONVOS = gql`
 const GET_USER_NON_GAME_CONVOS = gql`
 query GetNonGameConvos($userId: ID!) {
     getNonGameConvos(userId: $userId){
-        id
-    recipient {
         recipient {
-            userName
+            id
+            recipient {
+                userName
+            }
         }
     }
-}
 }
 `;
 
@@ -283,8 +294,8 @@ mutation SendNonGameNonSpecMessages($userId: ID!, $messageText: String!, $conver
 `;
 
 const START_NEW_PRIVATE_CHAT = gql`
-mutation StartNewPrivateChat($userId: ID, $recipientId: ID) {
-    startNewNonGameConversation(userId: $userId, recipientId: $recipientId) {
+mutation StartNewPrivateChat($currentUserId: ID, $recipientId: ID) {
+    startNewNonGameConversation(currentUserId: $currentUserId, recipientId: $recipientId) {
         id
     }
 }
@@ -337,6 +348,7 @@ export { GET_ACCOUNTS,
         ADD_BLOCKED_USER,
         GET_GAMES,
         GET_GAME,
+        GET_HOSTED_GAMES,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,
         EDIT_MESSAGE,

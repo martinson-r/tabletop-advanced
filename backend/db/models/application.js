@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Application.belongsToMany(models.Game, {through: 'Waitlist', foreignKey: 'applicationId', otherKey: 'gameId' });
+      Application.belongsTo(models.Game, {foreignKey: 'gameId' });
       Application.belongsTo(models.User, {as: "applicant", foreignKey: "userId"});
       Application.belongsTo(models.User, {as: "host", foreignKey: "hostId"});
     }
@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     ignored: DataTypes.BOOLEAN,
     accepted: DataTypes.BOOLEAN,
     isPlayer: DataTypes.BOOLEAN,
-    requestDate: DataTypes.DATE,
+    // requestDate: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Application',

@@ -26,7 +26,6 @@ function SignUp() {
             history.push('/')
           }
         });
-
   }
 
     return (

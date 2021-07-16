@@ -14,6 +14,7 @@ const typeDefs = gql`
     getNonGameMessages(conversationId: ID, offset: Int): CountAll
     checkWaitList(id: ID, userId: ID!): [Game]
     getGameCreationInfo: GameCreationInfo
+    getGamesHosting(userId: ID): [Game]
   }
   type GameCreationInfo {
     languages: [Language],
@@ -148,7 +149,8 @@ const typeDefs = gql`
     GameType: GameType,
     allowPlayerEdits: Boolean,
     allowPlayerDeletes: Boolean,
-    active: Boolean
+    active: Boolean,
+    Applications: [Application]
   }
   type Application {
     id: ID
@@ -158,6 +160,11 @@ const typeDefs = gql`
     charConcept: String
     charName: String
     experience: String
+    ignored: Boolean
+    accepted: Boolean
+    Users: [User]
+    applicant: User
+    createdAt: String
   }
   type Message {
     id: ID,
@@ -193,7 +200,7 @@ const typeDefs = gql`
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
     joinWaitlist(userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
-    startNewNonGameConversation(userId: ID, recipientId: ID): Conversation
+    startNewNonGameConversation(currentUserId: ID, recipientId: ID): Conversation
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,

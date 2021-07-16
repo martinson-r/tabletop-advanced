@@ -13,7 +13,7 @@ import JoinWaitList from "./components/JoinWaitList";
 import Navigation from "./components/Navigation";
 import Dashboard from "./components/Dashboard";
 import Account from "./components/Account";
-import Messages from "./components/Messages";
+import GameMessages from "./components/GameMessages";
 import Bio from "./components/Bio";
 import Conversation from "./components/Conversation";
 import * as sessionActions from "./store/session";
@@ -27,16 +27,6 @@ function App() {
   useEffect(() => {
     dispatch(sessionActions.restoreUser()).then(() => setIsLoaded(true));
   }, [dispatch]);
-
-
-  //Gotta rework this so they can still hit the Signup page
-  // useEffect(() => {
-  //   //check if loaded first, sometimes session can be a little later
-  //   //coming back before user gets pushed to login page.
-  //   if (isLoaded === true && !sessionUser) {
-  //     history.push('/login');
-  //   }
-  // }, [isLoaded])
 
   const logout = (e) => {
     e.preventDefault();
@@ -53,7 +43,7 @@ function App() {
       {isLoaded && (<Switch>
         <Route path="/login" component={Login}></Route>
         <Route path="/signup" component={SignUp}></Route>
-        <Route path="/game/:gameId/gameroom/" name="Messages" component={Messages} exact={true}></Route>
+        <Route path="/game/:gameId/gameroom/" name="GameMessages" component={GameMessages} exact={true}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
         <Route path="/dashboard" component={Dashboard} exact={true}></Route>

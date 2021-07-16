@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       //Game.belongsToMany(models.User, {as: "UserModerator", through: 'Moderator', foreignKey: 'gameId', otherKey: 'userId' });
-      // Game.belongsToMany(models.Application, {through: 'Waitlist', foreignKey: 'gameId', otherKey: 'applicationId' });
+      Game.hasMany(models.Application, {foreignKey: 'gameId'});
       Game.belongsTo(models.GameType, {foreignKey: "gameTypeId"});
       // Game.belongsTo(models.GameSize, {foreignKey: "gameSizeId"});
       // Game.belongsTo(models.GameFrequency, {foreignKey: "gameFrequencyId"});

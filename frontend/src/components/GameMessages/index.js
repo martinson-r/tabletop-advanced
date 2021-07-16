@@ -12,7 +12,7 @@ import {
   } from "@apollo/client";
 import { GET_GAME, EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
 
-function Messages() {
+function GameMessages() {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
     const [messageText, setMessage] = useState("");
@@ -100,7 +100,7 @@ function Messages() {
     //Subscription for messages
     //This hopefully covers all, edits and deletions included
     useEffect(() => {
-      if (data !== undefined) {
+
       subscribeToMore({
         document: GAME_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
@@ -123,8 +123,8 @@ function Messages() {
             });
           }
       })
-    }
-    },[sortedConvos]);
+
+    },[]);
 
     const [errors, setErrors] = useState([]);
     useEffect(() => {
@@ -229,7 +229,7 @@ function Messages() {
         <p>Please log in to send messages.</p>
       )}
 
-      {sessionUser !== undefined && (<form onSubmit={handleSubmit}>
+      {sessionUser !== undefined && gameData !== undefined && gameData.game.active === true && (<form onSubmit={handleSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>
@@ -247,8 +247,11 @@ function Messages() {
          </label>
          <button type="submit">Send</button>
        </form>)}
+       {gameData !== undefined && gameData.game.active !== true && (
+         <p>This game is no longer active.</p>
+       )}
        </div>
     )
 }
 
-export default Messages;
+export default GameMessages;
