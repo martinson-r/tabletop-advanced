@@ -4,7 +4,7 @@ import { Link, useHistory } from "react-router-dom";
 import {
     useQuery, useLazyQuery
   } from "@apollo/client";
-import { GET_GAMES, GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES } from "../../gql"
+import { GET_GAMES, GET_USER_NON_GAME_CONVOS, GET_PLAYING_WAITING_GAMES, GET_HOSTED_GAMES } from "../../gql"
 import "./dashboard.css";
 import { v4 as uuidv4 } from 'uuid';
 import { assertWrappingType } from "graphql";
@@ -21,7 +21,7 @@ function Home() {
     //TODO: Replace with query to grab games only relating to the user
     const { loading, error, data } = useQuery(GET_GAMES);
     const [getHosting, { loading: loadingHosted, error: errorHosted, data: dataHosted}] = useLazyQuery(GET_HOSTED_GAMES);
-    console.log('ID NOW', userId)
+    const [getPlayingWaiting, { loading: loadingPlayingWaiting, error: errorPlayingWaiting, data: dataPlayingWaiting}] = useLazyQuery(GET_PLAYING_WAITING_GAMES);
 
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);

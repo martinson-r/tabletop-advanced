@@ -46,6 +46,22 @@ const GET_GAMES = gql`
     }
 `;
 
+const GET_PLAYING_WAITING_GAMES = gql`
+    query GetPlayingWaitingGames($userId: ID) {
+        getPlayingWaitingGames(userId: $userId) {
+            games {
+                id
+                title
+                active
+                description
+                host {
+                    userName
+                }
+            }
+        }
+    }
+`
+
 const GET_GAME = gql`
     query GetSingleGame($gameId: ID!) {
        game(id: $gameId){
@@ -364,6 +380,7 @@ export { GET_ACCOUNTS,
         ADD_BLOCKED_USER,
         GET_GAMES,
         GET_GAME,
+        GET_PLAYING_WAITING_GAMES,
         GET_APPLICATION,
         GET_HOSTED_GAMES,
         GET_GAME_CONVOS,

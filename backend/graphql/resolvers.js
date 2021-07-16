@@ -86,10 +86,25 @@ const resolvers = {
             return Game.findAll({ where: { hostId: userId }, include: [{ model: Application }] })
         },
 
-        getApplication: (obj, args, context, info) => {
+        //May have to rethink this one. It's messing up trying to use Application as a joins table.
+        getApplication: async(obj, args, context, info) => {
             const { gameId, applicantId } = args;
             console.log('ARGS', args)
-            return Application.findAll({where: {userId: applicantId, gameId}, include: {model: User, as: "applicant"}});
+            //return Application.findAll({where: {userId: applicantId, gameId}, include: {model: User, as: "applicant"}});
+
+            //NOTE:
+            //I see now why I need a joins table. Application cannot function as a joins table itself. It needs to
+            //hold just the app data. The userId etc needs to be on its own joins table.
+            //otherwise, this gets messy.
+            const apps = await User.findAll({where: {id: applicantId}, include: [{model: Game, as: "applicant", where: {userId: applicantId, gameId}}]})
+            console.log(apps);
+            //user findall where userid, include application where gameId
+        },
+
+        getPlayingWaitingGames: async (obj, args, context, info) => {
+            const { userId } = args;
+            const game = await Game.findAll({include: [{ model: User, as: "player", where: { id: userId }}, {model: User, as: "gameApplicant", where: { id: userId } }]});
+            console.log(game);
         },
 
         checkWaitList: async (obj, args, context, info) => {
