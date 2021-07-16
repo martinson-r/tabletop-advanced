@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import * as sessionActions from "../../store/session";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from 'react-router-dom';
 
 
@@ -15,6 +15,10 @@ import { GET_APPLICATION, APPROVE_APPLICATION, IGNORE_APPLICATION  } from "../..
 
 function ViewApplication() {
 
+    const history = useHistory();
+
+    const sessionUser = useSelector(state => state.session.user);
+    const [userId, setUserId] = useState(null);
     const { applicantId } = useParams();
     const { gameId } = useParams();
     const [applicationId, setApplicationId] = useState(null);
@@ -34,9 +38,21 @@ function ViewApplication() {
     },[]);
 
     useEffect(() => {
+        if (sessionUser !== undefined && sessionUser !== null) {
+            setUserId(sessionUser.id)
+        }
+    },[sessionUser])
+
+    useEffect(() => {
         if (data !== undefined) {
             setApplication(data.getApplication[0].applicant[0].Applications[0])
             setApplicationId(data.getApplication[0].applicant[0].Applications[0].id)
+            console.log(userId)
+            console.log(data.getApplication[0].applicant[0].Applications[0].hostId)
+            if (userId === null || (userId.toString() !== applicantId.toString() && userId.toString() !== data.getApplication[0].applicant[0].Applications[0].hostId.toString())) {
+                console.log('boop')
+                history.push('/')
+            }
         }
     },[data]);
 
@@ -51,7 +67,6 @@ function ViewApplication() {
         setApplicationHandled(true)
         console.log(applicationHandled)
     }
-
 
     console.log(data)
     console.log(approveData)

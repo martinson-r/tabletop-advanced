@@ -134,6 +134,7 @@ query GetApplication($gameId: ID, $applicantId: ID) {
           title
           Applications {
             id
+            hostId
             whyJoin
             charConcept
             charName

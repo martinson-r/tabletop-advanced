@@ -162,6 +162,7 @@ const typeDefs = gql`
     userId: ID
     gameId: ID
     whyJoin: String
+    hostId: ID
     charConcept: String
     charName: String
     experience: String
