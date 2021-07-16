@@ -65,6 +65,7 @@ const GET_GAME = gql`
             accepted
             createdAt
             applicant {
+            id
             userName
           }
         }
@@ -97,6 +98,21 @@ const GET_WAITLIST_STATUS = gql`
         }
     }
 `;
+
+const GET_APPLICATION = gql`
+query GetApplication($gameId: ID, $applicantId: ID) {
+    getApplication(gameId: $gameId, applicantId: $applicantId) {
+         id
+        whyJoin
+        charName
+        charConcept
+        experience
+        applicant {
+            userName
+        }
+    }
+}
+`
 
 const GET_GAME_CONVOS = gql`
     query GetGameConvos($gameId: ID, $offset: Int) {
@@ -348,6 +364,7 @@ export { GET_ACCOUNTS,
         ADD_BLOCKED_USER,
         GET_GAMES,
         GET_GAME,
+        GET_APPLICATION,
         GET_HOSTED_GAMES,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,

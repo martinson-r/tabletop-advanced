@@ -16,6 +16,7 @@ import Account from "./components/Account";
 import GameMessages from "./components/GameMessages";
 import Bio from "./components/Bio";
 import Conversation from "./components/Conversation";
+import ViewApplication from "./components/ViewApplication";
 import * as sessionActions from "./store/session";
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
         <Route path="/:userId/bio" component={Bio} exact={true}></Route>
         <Route path="/conversation/:conversationId" component={Conversation} exact={true}></Route>
         <Route path="/waitlist/:gameId" component={JoinWaitList} exact={true}></Route>
+        <Route path="/applications/:gameId/applicants/:applicantId" component={ViewApplication} exact={true}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

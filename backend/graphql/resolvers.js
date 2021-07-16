@@ -86,6 +86,12 @@ const resolvers = {
             return Game.findAll({ where: { hostId: userId }, include: [{ model: Application }] })
         },
 
+        getApplication: (obj, args, context, info) => {
+            const { gameId, applicantId } = args;
+            console.log('ARGS', args)
+            return Application.findAll({where: {userId: applicantId, gameId}, include: {model: User, as: "applicant"}});
+        },
+
         checkWaitList: async (obj, args, context, info) => {
             const { id, userId } = args;
 

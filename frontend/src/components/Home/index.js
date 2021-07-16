@@ -6,6 +6,7 @@ import {
   } from "@apollo/client";
 import { GET_CURRENT_ACCOUNT } from "../../gql"
 import { GET_GAMES } from "../../gql"
+import { v4 as uuidv4 } from 'uuid';
 
 function Home() {
 
@@ -79,13 +80,13 @@ function Home() {
 
         <p>Active Games:</p>
         {gameData.map((game) =>
-        (game.active === true && (<p><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
+        (game.active === true && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
         )}
 
         {/* Show inactive games conditionally */}
         {displayInactive === true && (<span><p>Inactive Games:</p>
         {gameData.map((game) =>
-        (game.active === false && (<p><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
+        (game.active === false && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
         )}</span>)}
         </div>
      )

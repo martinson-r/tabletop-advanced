@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import Messages from "../Messages";
 import { PubSub } from 'graphql-subscriptions';
+import { v4 as uuidv4 } from 'uuid';
 import {
     useQuery, useSubscription, InMemoryCache
   } from "@apollo/client";
@@ -44,7 +45,7 @@ function Game() {
           <p>Open Applications:</p>
           {/* TODO: make date format not garbage. Luxon? */}
 
-          {data.game.Applications.map(application => <p>{application.applicant.userName}, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p>)}
+          {data.game.Applications.map(application => <p key={uuidv4()}><Link to={`/applications/${gameId}/applicants/${application.applicant.id}`}>{application.applicant.userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p>)}
           <p>Accepted Applications:</p>
           <p>Ignored Applications:</p>
           </>
