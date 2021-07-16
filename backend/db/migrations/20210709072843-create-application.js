@@ -24,6 +24,9 @@ module.exports = {
         allowNull: false,
         references: { model: "Games", key: "id" },
       },
+      offerAccepted: {
+        type: Sequelize.BOOLEAN
+      },
       whyJoin: {
         type: Sequelize.TEXT,
         allowNull: false,

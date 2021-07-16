@@ -19,6 +19,8 @@ function Game() {
     const [userId, setUserId] = useState(null);
     // Grab our game ID
     const { gameId } = useParams();
+    const [displayIgnored, setDisplayIgnored] = useState(false);
+
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
         setUserId(sessionUser.id);
@@ -27,7 +29,9 @@ function Game() {
     },[sessionUser])
 
 
-
+    const changeDisplayIgnored = () => {
+      setDisplayIgnored(!displayIgnored)
+  }
 
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } });
 
@@ -42,12 +46,14 @@ function Game() {
         {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (
           <>
           <p>Applications:</p>
+          <label>Show ignored</label>
+            <input type="checkbox" checked={displayIgnored} onChange={changeDisplayIgnored}/>
           <p>Open Applications:</p>
-          {/* TODO: make date format not garbage. Luxon? */}
-
-          {data.game.Applications.map(application => <div><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>)}
+          {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() !== 'true' && (<div><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}
           <p>Accepted Applications:</p>
-          <p>Ignored Applications:</p>
+          {data.game.Applications.map(application => application.accepted.toString() === 'true' && (<div><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}
+          {displayIgnored.toString() === 'true' &&(<div><p>Ignored Applications:</p>
+          {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
           </>
         )}
       </div>

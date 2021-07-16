@@ -88,7 +88,8 @@ const resolvers = {
         getApplication: async (obj, args, context, info) => {
             //Get all applications for this specific game associated with this specific user.
             const { gameId, applicationId } = args;
-            const app = await Application.findAll({where: {id: applicationId}, include: {model: User, through: "Waitlists", as: "applicationOwner"}});
+            const app = await Application.findAll({where: {id: applicationId}, include: [{model: User, through: "Waitlists", as: "applicationOwner"}, {model: Game, through: "Waitlists"}]});
+            console.log(app)
             return app;
             //return User.findAll({where: {id: applicantId}, include: {model: Game, through: "Waitlists", as: "applicant", where: { id: gameId }, include: {model: Application, through: "Waitlists", include: {model: User, as: "applicationOwner"}}}});
         },

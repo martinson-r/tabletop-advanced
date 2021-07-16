@@ -172,7 +172,7 @@ const typeDefs = gql`
     applicant: User
     applicationOwner: [User]
     createdAt: String
-    Game: Game
+    Games: [Game]
   }
   type Message {
     id: ID,

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, Link } from 'react-router-dom';
 
 
 //Query to get app.
@@ -69,7 +69,7 @@ function ViewApplication() {
             setWhyJoin(application.whyJoin);
             setExperience(application.experience);
         }
-    },[application])
+    },[application]);
 
     const handleApproveApplication = (e) => {
         approveApplication({ variables: { applicationId }});
@@ -92,9 +92,10 @@ function ViewApplication() {
 
     return (
         <>
+        {data !== undefined && Object.keys(application).length !== 0 && (<div><p><Link to={`/game/${application.Games[0].id}`}>Back to Game: {application.Games[0].title}</Link></p>
         <p>Application</p>
         {/* TODO: Make this less ugly */}
-        {data !== undefined && Object.keys(application).length !== 0 && (<div><p>User name: {application.applicationOwner[0].userName}</p>
+        <p>User name: {application.applicationOwner[0].userName}</p>
         {application.accepted.toString() === 'true' && (<p><i>This application has been approved.</i></p>)}
         {application.ignored.toString() === 'true' && application.accepted.toString() !== 'true' && (<p><i>This application has been ignored.</i></p>)}
         {/* Display text or form depending on if the applicant wishes to edit the application. */}
@@ -103,7 +104,7 @@ function ViewApplication() {
         <p>Experience: {application.experience}</p>
         <p>Character Name: {application.charName}</p>
         <p>Character Concept: {application.charConcept}</p>
-        <button onClick={editApplicationButton}>Edit Application</button>
+        {application.applicationOwner[0].id === userId && (<button onClick={editApplicationButton}>Edit Application</button>)}
         </div>)}
         {editApplication.toString() === 'true' && (
             <form onSubmit={handleSubmit}>

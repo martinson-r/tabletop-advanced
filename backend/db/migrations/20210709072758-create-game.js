@@ -73,6 +73,10 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: true,
       },
+      multipleApplications: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       allowPlayerEdits: {
         type: Sequelize.BOOLEAN,
         defaultValue: true,

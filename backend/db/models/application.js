@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     charName: DataTypes.STRING,
     charConcept: DataTypes.TEXT,
     experience: DataTypes.TEXT,
+    offerAccepted: DataTypes.BOOLEAN,
     ignored: DataTypes.BOOLEAN,
     accepted: DataTypes.BOOLEAN,
     isPlayer: DataTypes.BOOLEAN,
