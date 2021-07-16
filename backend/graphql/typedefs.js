@@ -173,6 +173,7 @@ const typeDefs = gql`
     applicationOwner: [User]
     createdAt: String
     Games: [Game]
+    offerAccepted: Boolean
   }
   type Message {
     id: ID,
@@ -215,6 +216,8 @@ const typeDefs = gql`
     startNewNonGameConversation(currentUserId: ID, recipientId: ID): Conversation
     approveApplication(applicationId: ID): [Application]
     ignoreApplication(applicationId: ID): [Application]
+    declineOffer(applicationId: ID): Application
+    acceptOffer(applicationId: ID, gameId: ID, userId: ID): Application
     editWaitlistApp(applicationId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
   }
   type Subscription {

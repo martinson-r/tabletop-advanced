@@ -95,6 +95,7 @@ function ViewApplication() {
         {data !== undefined && Object.keys(application).length !== 0 && (<div><p><Link to={`/game/${application.Games[0].id}`}>Back to Game: {application.Games[0].title}</Link></p>
         <p>Application</p>
         {/* TODO: Make this less ugly */}
+        {console.log('id', application.applicationOwner[0].id)}
         <p>User name: {application.applicationOwner[0].userName}</p>
         {application.accepted.toString() === 'true' && (<p><i>This application has been approved.</i></p>)}
         {application.ignored.toString() === 'true' && application.accepted.toString() !== 'true' && (<p><i>This application has been ignored.</i></p>)}
@@ -104,7 +105,8 @@ function ViewApplication() {
         <p>Experience: {application.experience}</p>
         <p>Character Name: {application.charName}</p>
         <p>Character Concept: {application.charConcept}</p>
-        {application.applicationOwner[0].id === userId && (<button onClick={editApplicationButton}>Edit Application</button>)}
+        {console.log('id', application.applicationOwner[0].id)}
+        {application !== undefined && application.applicationOwner[0].id.toString() === userId.toString() && (<button onClick={editApplicationButton}>Edit Application</button>)}
         </div>)}
         {editApplication.toString() === 'true' && (
             <form onSubmit={handleSubmit}>

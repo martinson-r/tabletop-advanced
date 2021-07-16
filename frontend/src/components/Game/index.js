@@ -40,7 +40,10 @@ function Game() {
       return (
         <div>
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p>
-        <p>{data.game.description}</p></>)}
+        <p>{data.game.description}</p>
+
+        {/* List players */}
+        </>)}
         {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && (<><Link to={`/waitlist/${gameId}`}>Join Waitlist</Link><br /></>)}
         {data !== undefined && (<Link to={`/game/${gameId}/gameroom`}>Enter game room</Link>)}
         {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (

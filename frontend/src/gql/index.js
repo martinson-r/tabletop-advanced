@@ -67,6 +67,7 @@ const GET_PLAYING_WAITING_GAMES = gql`
                 id
                 accepted
                 charName
+                offerAccepted
               }
             }
         }
@@ -323,6 +324,23 @@ mutation IgnoreApplication($applicationId: ID) {
 }
 `
 
+const ACCEPT_OFFER = gql`
+mutation AcceptOffer($applicationId: ID, $userId: ID, $gameId: ID) {
+    acceptOffer(applicationId: $applicationId, userId: $userId, gameId: $gameId) {
+        id
+        offerAccepted
+    }
+}
+`
+
+const DECLINE_OFFER = gql`
+mutation DeclineOffer($applicationId: ID) {
+    declineOffer(applicationId: $applicationId) {
+        id
+        offerAccepted
+    }
+}
+`
 
 //IDs are required on backend but if I don't mark them required on frontend,
 //we get a 404...
@@ -438,6 +456,8 @@ export { GET_ACCOUNTS,
         GET_APPLICATION,
         APPROVE_APPLICATION,
         IGNORE_APPLICATION,
+        ACCEPT_OFFER,
+        DECLINE_OFFER,
         GET_HOSTED_GAMES,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,

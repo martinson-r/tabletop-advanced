@@ -1,4 +1,4 @@
-const { Message, Recipient, Conversation, User, Game, Application, Language, Ruleset, GameType, AboutMe } = require('../db/models');
+const { Message, Recipient, PlayerJoin, Conversation, User, Game, Application, Language, Ruleset, GameType, AboutMe } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -277,6 +277,21 @@ const resolvers = {
             const returnApp = await Application.findAll({where: {id: applicationId}})
             return returnApp;
         },
+
+        acceptOffer: async(root, args) => {
+            const { applicationId, userId, gameId } = args;
+            await Application.update({offerAccepted: 'true'}, {where: { id: applicationId}});
+            const addPlayerToGame = await PlayerJoin.create({userId, gameId});
+            return addPlayerToGame;
+        },
+
+        declineOffer: async(root, args) => {
+            const { applicationId } = args;
+            //For some reason, false must be a string in order for this to work.
+            await Application.update({offerAccepted: 'false'}, {where: { id: applicationId}});
+            const returnApplication = Application.findAll({where: { id: applicationId }})
+            return returnApplication;
+        }
     },
     Subscription: {
             messageSent: {
