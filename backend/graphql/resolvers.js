@@ -110,6 +110,19 @@ const resolvers = {
             return game;
         },
 
+        getWaitlistGames: (obj, args, context, info) => {
+            const { userId } = args;
+
+            return Game.findAll({include: [{model: User, as: "host"}, {model: Application, where: { userId}, include: { model: User, as: "applicationOwner"}}]})
+
+        },
+
+        getGamesPlayingIn: (obj, args, context, info) => {
+            const { userId } = args;
+
+            return Game.findAll({include: [{model: User, as: "player", where: { id: userId }}, {model: User, as: "host"}] });
+        },
+
         getGameCreationInfo: async(obj, args, context, info) => {
             //We can return an object formatted however I want, as long as
             //our Typedefs are set up correctly!
@@ -127,8 +140,6 @@ const resolvers = {
             //Check to see if this is a dice roll.
             //Fun with regex
             const numbers = messageText.match(/(\d+)[Dd](\d+)/);
-
-            //console.log('NUMBERS', numbers)
 
             if (numbers !== null) {
                 const result = rolldice(numbers[1], numbers[2]);

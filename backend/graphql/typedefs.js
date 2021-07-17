@@ -17,6 +17,8 @@ const typeDefs = gql`
     getGamesHosting(userId: ID): [Game]
     getApplication(gameId: ID, applicationId: ID): [Application]
     getPlayingWaitingGames(userId: ID): [User]
+    getWaitlistGames(userId: ID): [Game]
+    getGamesPlayingIn(userId: ID): [Game]
   }
   type GameCreationInfo {
     languages: [Language],

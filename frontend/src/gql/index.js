@@ -74,6 +74,40 @@ const GET_PLAYING_WAITING_GAMES = gql`
     }
 `
 
+const GET_WAITING_LIST_GAMES = gql`
+query GetWaitlistGames($userId: ID) {
+    getWaitlistGames(userId: $userId) {
+        id
+        title
+        host {
+            userName
+        }
+Applications {
+id
+accepted
+offerAccepted
+charName
+    applicationOwner {
+    userName
+  }
+}
+}
+}
+`
+
+//TODO: add player character data and characterId to Player Joins and pull in that info
+const GET_GAMES_PLAYING_IN = gql`
+query GetGamesPlayingIn($userId: ID) {
+    getGamesPlayingIn(userId: $userId) {
+        id
+        title
+        host {
+            userName
+        }
+    }
+}
+`;
+
 const GET_GAME = gql`
     query GetSingleGame($gameId: ID!) {
         game(gameId: $gameId) {
@@ -453,6 +487,8 @@ export { GET_ACCOUNTS,
         GET_GAMES,
         GET_GAME,
         GET_PLAYING_WAITING_GAMES,
+        GET_GAMES_PLAYING_IN,
+        GET_WAITING_LIST_GAMES,
         GET_APPLICATION,
         APPROVE_APPLICATION,
         IGNORE_APPLICATION,
