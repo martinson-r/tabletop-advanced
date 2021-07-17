@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link, useHistory } from "react-router-dom";
-import Messages from "../Messages";
 import { PubSub } from 'graphql-subscriptions';
 import {
     useQuery, useMutation, useLazyQuery, useSubscription, InMemoryCache

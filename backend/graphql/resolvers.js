@@ -88,7 +88,7 @@ const resolvers = {
         getApplication: async (obj, args, context, info) => {
             //Get all applications for this specific game associated with this specific user.
             const { gameId, applicationId } = args;
-            const app = await Application.findAll({where: {id: applicationId}, include: [{model: User, through: "Waitlists", as: "applicationOwner"}, {model: Game, through: "Waitlists"}]});
+            const app = await Application.findAll({where: {id: applicationId}, include: [{model: User, through: "Waitlists", as: "applicationOwner"}, {model: Game, through: "Waitlists", include: { model: User, as: "host"}}]});
             console.log(app)
             return app;
             //return User.findAll({where: {id: applicantId}, include: {model: Game, through: "Waitlists", as: "applicant", where: { id: gameId }, include: {model: Application, through: "Waitlists", include: {model: User, as: "applicationOwner"}}}});
@@ -110,11 +110,16 @@ const resolvers = {
             return game;
         },
 
-        getWaitlistGames: (obj, args, context, info) => {
+        getWaitlistGames: async (obj, args, context, info) => {
             const { userId } = args;
 
-            return Game.findAll({include: [{model: User, as: "host"}, {model: Application, where: { userId}, include: { model: User, as: "applicationOwner"}}]})
-
+            //does Application need gameId after all?
+            //This is returning all games, not just games the user is in.
+            const game = await Game.findAll({include: [{model: User, as: "host"},
+            {model: User, through: "Waitlists", as: "applicant", where: { id: userId },
+            include: { model: Application, through: "Waitlists", as: "applicationOwner" }}]})
+            console.log(game);
+            return game;
         },
 
         getGamesPlayingIn: (obj, args, context, info) => {

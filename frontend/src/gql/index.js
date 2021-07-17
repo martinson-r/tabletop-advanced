@@ -82,15 +82,16 @@ query GetWaitlistGames($userId: ID) {
         host {
             userName
         }
-Applications {
-id
-accepted
-offerAccepted
-charName
-    applicationOwner {
+  applicant {
+    id
     userName
+    applicationOwner {
+      id
+      accepted
+      offerAccepted
+      charName
+    }
   }
-}
 }
 }
 `
@@ -166,10 +167,12 @@ const GET_APPLICATION = gql`
 query GetApplication($gameId: ID, $applicationId: ID) {
     getApplication(gameId: $gameId, applicationId: $applicationId) {
             id
-            hostId
             Games {
                 id
                 title
+                host {
+                    id
+                }
             }
             whyJoin
             charConcept

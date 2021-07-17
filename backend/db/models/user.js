@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
 
       //Can't associate to applications again.
       User.belongsToMany(models.Application, { through: "Waitlists", as: "applicationOwner", foreignKey: "userId", otherKey: "applicationId"});
+      User.belongsToMany(models.Application, {as: "gameHost", through: "Waitlists", foreignKey: "userId", otherKey: "applicationId"});
       User.belongsToMany(models.Game, { through: "Waitlists", as: "applicant", foreignKey: "userId", otherKey: "gameId"});
       User.hasMany(models.AboutMe, { foreignKey: "userId"});
       User.belongsToMany(models.Conversation, {through: "Recipients", as: "recipient", foreignKey: "userId", otherKey: "conversationId"});

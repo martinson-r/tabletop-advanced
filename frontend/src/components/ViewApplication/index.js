@@ -39,15 +39,11 @@ function ViewApplication() {
         getApplication({ variables: {gameId, applicationId}})
     },[]);
 
-    console.log('app', data)
-
     useEffect(() => {
         if (sessionUser !== undefined && sessionUser !== null) {
             setUserId(sessionUser.id)
         }
     },[sessionUser]);
-
-    console.log(application)
 
     useEffect(() => {
         if (data !== undefined) {
@@ -55,7 +51,7 @@ function ViewApplication() {
             // Check if application object is not null, then check if user is host or applicant
             // If not, push them to main page.
             if (Object.keys(application).length !== 0 && applicantId !== undefined && applicantId !== null) {
-              if (userId === null || (userId.toString() !== applicantId.toString() && userId.toString() !== application.hostId.toString())) {
+              if (userId === null || (userId.toString() !== applicantId.toString() && userId.toString() !== application.Games[0].host.id.toString())) {
                 history.push('/')
             }
             }
@@ -68,6 +64,7 @@ function ViewApplication() {
             setCharConcept(application.charConcept);
             setWhyJoin(application.whyJoin);
             setExperience(application.experience);
+            setApplicantId(application.applicationOwner[0].id);
         }
     },[application]);
 
@@ -92,6 +89,7 @@ function ViewApplication() {
 
     return (
         <>
+        {console.log('app', application)}
         {data !== undefined && Object.keys(application).length !== 0 && (<div><p><Link to={`/game/${application.Games[0].id}`}>Back to Game: {application.Games[0].title}</Link></p>
         <p>Application</p>
         {/* TODO: Make this less ugly */}
@@ -105,7 +103,7 @@ function ViewApplication() {
         <p>Experience: {application.experience}</p>
         <p>Character Name: {application.charName}</p>
         <p>Character Concept: {application.charConcept}</p>
-        {console.log('id', application.applicationOwner[0].id)}
+        {console.log('owner', application.applicationOwner[0].id.toString(), userId)}
         {application !== undefined && application.applicationOwner[0].id.toString() === userId.toString() && (<button onClick={editApplicationButton}>Edit Application</button>)}
         </div>)}
         {editApplication.toString() === 'true' && (
@@ -156,7 +154,7 @@ function ViewApplication() {
         )
         }
         {/* Check if user is host before displaying approve/ignore buttons */}
-        {userId.toString() === application.hostId.toString() && (
+        {userId.toString() === application.Games[0].host.id.toString() && (
             <div>{application.accepted.toString() !== 'true' && (<button onClick={handleApproveApplication}>Approve</button>)}
             {application.ignored.toString() !== 'true' && application.accepted.toString() !== 'true' && (<button onClick={handleIgnoreApplication}>Ignore</button>)}</div>
         )}

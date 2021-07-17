@@ -66,6 +66,9 @@ const typeDefs = gql`
     Game: Game
     applicant: [Game]
     player: [Game]
+    Applications: [Application]
+    gameApplication: [Application]
+    applicationOwner: [Application]
   }
   type Conversation {
     id: ID
@@ -157,6 +160,7 @@ const typeDefs = gql`
     allowPlayerEdits: Boolean,
     allowPlayerDeletes: Boolean,
     active: Boolean,
+    applicant: [User],
     Applications: [Application]
   }
   type Application {
@@ -165,6 +169,7 @@ const typeDefs = gql`
     gameId: ID
     whyJoin: String
     hostId: ID
+    gameHost: [User]
     charConcept: String
     charName: String
     experience: String

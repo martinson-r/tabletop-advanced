@@ -73,8 +73,6 @@ function Home() {
       }
   },[dataHosted]);
 
-  console.log('waiting', dataWaiting)
-
   const [getCurrentNonGameConvos, { loading: nonGameLoading, error: nonGameError, data: nonGameData }] = useLazyQuery(GET_USER_NON_GAME_CONVOS);
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :( </p>;
@@ -106,13 +104,12 @@ function Home() {
                 </div>
                 <div className="appliedTo">
                 <p>Games I've Applied To:</p>
-                {/* TODO: filter out games where user is a player */}
                 {dataWaiting !== undefined && appliedTo !== undefined && (
                     <div>
                         {dataWaiting.getWaitlistGames.map(game => <p><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}:</p>)}
                         {/* If offerAccepted is null, they haven't acted on the app */}
                         {/* TODO: Get this to update dynamically */}
-                        {dataWaiting.getWaitlistGames.map(game => game.Applications.map(app => app.offerAccepted === null && (<div><p><Link to={`/game/${game.id}/application/${app.id}`}>{app.charName}</Link> - {app.accepted.toString() === 'true' && (<span>Accepted <button onClick={(e) => {acceptOffer({variables: {applicationId: app.id, gameId: game.id, userId} })}}>Confirm participation</button><button onClick={(e) => {declineOffer({variables: { applicationId: app.id}})}}>Decline participation</button></span>)}{app.accepted.toString() === 'false' && (<span>Pending</span>)}</p></div>)))}
+                        {dataWaiting.getWaitlistGames.map(game => game.applicant.map(apps => apps.applicationOwner.map(app => app.offerAccepted === null && (<div><p><Link to={`/game/${game.id}/application/${app.id}`}>{app.charName}</Link> - {app.accepted.toString() === 'true' && (<span>Accepted <button onClick={(e) => {acceptOffer({variables: {applicationId: app.id, gameId: game.id, userId} })}}>Confirm participation</button><button onClick={(e) => {declineOffer({variables: { applicationId: app.id}})}}>Decline participation</button></span>)}{app.accepted.toString() === 'false' && (<span>Pending</span>)}</p></div>))))}
                     </div>
                 )}
                 </div>

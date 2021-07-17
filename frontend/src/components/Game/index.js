@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
-import Messages from "../Messages";
 import { PubSub } from 'graphql-subscriptions';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -41,7 +40,6 @@ function Game() {
         <div>
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p>
         <p>{data.game.description}</p>
-
         {/* List players */}
         </>)}
         {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && (<><Link to={`/waitlist/${gameId}`}>Join Waitlist</Link><br /></>)}

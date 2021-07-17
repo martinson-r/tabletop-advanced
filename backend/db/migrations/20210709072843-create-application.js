@@ -9,21 +9,21 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       //Will have to alias these.
-      userId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: { model: "Users", key: "id" },
-      },
-      hostId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: { model: "Users", key: "id" },
-      },
-      gameId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: { model: "Games", key: "id" },
-      },
+      // userId: {
+      //   type: Sequelize.INTEGER,
+      //   allowNull: false,
+      //   references: { model: "Users", key: "id" },
+      // },
+      // hostId: {
+      //   type: Sequelize.INTEGER,
+      //   allowNull: false,
+      //   references: { model: "Users", key: "id" },
+      // },
+      // gameId: {
+      //   type: Sequelize.INTEGER,
+      //   allowNull: false,
+      //   references: { model: "Games", key: "id" },
+      // },
       offerAccepted: {
         type: Sequelize.BOOLEAN
       },
@@ -51,10 +51,10 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-      isPlayer: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
+      // isPlayer: {
+      //   type: Sequelize.BOOLEAN,
+      //   defaultValue: false,
+      // },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
