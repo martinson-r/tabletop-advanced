@@ -204,8 +204,6 @@ const resolvers = {
             let user = await User.findAll({where: { userName: {[Op.iLike]: recipient}
             }});
 
-            console.log('found user', user)
-
             await Recipient.create({userId: user[0].id, conversationId});
         })
 
@@ -213,6 +211,18 @@ const resolvers = {
         return newConvo;
 
     },
+
+    addRecipient: async(root, args) => {
+        const { recipientName, conversationId } = args;
+
+        //missing where parameter? Troubleshoot.
+        const recipientToAdd = await User.findAll({where: { userName: {[Op.iLike]: recipientName }}})
+        console.log('RECIPIENT', recipientToAdd)
+        await Recipient.create({userId: recipientToAdd[0].id, conversationId})
+        const sendBackRecipient = await Recipient.findByPk(recipientToAdd.id);
+        return sendBackRecipient;
+    },
+
         editMessage: async(root, args) => {
             const { messageId, editMessageText, userId } = args;
             console.log(args);

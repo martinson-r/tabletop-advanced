@@ -443,6 +443,15 @@ mutation StartNewPrivateChat($currentUserId: ID, $recipients: [String]) {
 }
 `;
 
+const ADD_RECIPIENT = gql`
+mutation AddRecipient($recipientName: String, $conversationId: ID) {
+    addRecipient(recipientName: $recipientName, conversationId: $conversationId) {
+        id
+        userName
+    }
+}
+`
+
 //This is to fetch all of the messages in a conversation
 const GAME_MESSAGES_SUBSCRIPTION = gql`
 subscription OnMessageSent($gameId: ID, $conversationId: ID) {
@@ -501,6 +510,7 @@ export { GET_ACCOUNTS,
         GET_HOSTED_GAMES,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,
+        ADD_RECIPIENT,
         EDIT_MESSAGE,
         DELETE_MESSAGE,
         GET_NON_GAME_NON_SPEC_MESSAGES,

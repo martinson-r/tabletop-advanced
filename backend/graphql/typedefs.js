@@ -222,6 +222,7 @@ const typeDefs = gql`
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
     joinWaitlist(hostId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
     startNewNonGameConversation(currentUserId: ID, recipients: [String]): Conversation
+    addRecipient(recipientName: String, conversationId: ID): Recipient
     approveApplication(applicationId: ID): [Application]
     ignoreApplication(applicationId: ID): [Application]
     declineOffer(applicationId: ID): Application

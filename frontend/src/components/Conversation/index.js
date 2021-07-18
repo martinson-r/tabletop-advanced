@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { GET_NON_GAME_NON_SPEC_MESSAGES, GAME_MESSAGES_SUBSCRIPTION, SEND_NON_GAME_NON_SPEC_MESSAGES } from "../../gql"
+import { ADD_RECIPIENT, GET_NON_GAME_NON_SPEC_MESSAGES, GAME_MESSAGES_SUBSCRIPTION, SEND_NON_GAME_NON_SPEC_MESSAGES } from "../../gql"
 
 function Conversation() {
     const sessionUser = useSelector((state) => state.session.user);
@@ -15,6 +15,7 @@ function Conversation() {
     const [accounts, setAccount] = useState([]);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
+    const [recipientName, setRecipientName] = useState("");
 
     const {conversationId} = useParams();
 
@@ -33,16 +34,14 @@ function Conversation() {
 
     //const { loading: convosLoading, error: convosError, data: convosData } = useQuery(GET_NON_GAME_NON_SPEC_CONVO, { variables: { conversationId } });
 
-    console.log('ConversationId', conversationId, 'Offset', offset)
     let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
       //add offset
       GET_NON_GAME_NON_SPEC_MESSAGES,
       { variables: { conversationId, offset } }
     );
 
-    console.log('DATA', data);
-
     const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText } } );
+    const [addRecipient] = useMutation(ADD_RECIPIENT, { variables: { recipientName, conversationId }});
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -247,6 +246,11 @@ function Conversation() {
         setSubmittedMessage(true);
     }
 
+    const addRecipientName = (e) => {
+      e.preventDefault();
+      setErrors([]);
+      addRecipient(recipientName);
+    }
 
 
     if (loadConvos) return <p>Loading...</p>;
@@ -271,7 +275,9 @@ function Conversation() {
         <p>Please log in to send messages.</p>
       )}
 
-      {sessionUser !== undefined && (<form onSubmit={handleSubmit}>
+      {sessionUser !== undefined && (
+        <div>
+      <form onSubmit={handleSubmit}>
          <label>
            Send Message
            <input
@@ -282,7 +288,14 @@ function Conversation() {
            />
          </label>
          <button type="submit">Send</button>
-       </form>)}
+       </form>
+
+       <form onSubmit = {addRecipientName}>
+            <textarea name="recipient" value={recipientName} onChange={(e) => setRecipientName(e.target.value)}></textarea>
+            <button>Add recipient</button>
+            </form>
+        </div>
+       )}
        </div>
     )
 };
