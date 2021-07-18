@@ -27,6 +27,7 @@ const GET_USER = gql`
             pronouns
             bio
             User {
+                id
                 userName
             }
         }
