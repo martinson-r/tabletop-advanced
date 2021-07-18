@@ -188,7 +188,17 @@ const resolvers = {
         //distinct collections of messages
         //TODO: Cannot create a new conversation identical to an old one
         //TODO: Redirect user to existing conversation if identical one exists
-        const newConvo = await Conversation.create();
+
+        const newRecipientCheck = recipients.filter(async(recipient) => {
+            let user = await User.findAll( { where: { userName: { [Op.iLike]: recipient } } });
+            let recipientFound = await Recipient.findByPk(user.id);
+            recipientFound === undefined;
+        });
+
+        console.log(newRecipientCheck);
+
+        if (newRecipientCheck/length > 0) {
+            const newConvo = await Conversation.create();
         const conversationId = newConvo.id
 
         //Add both recipients to list. Possibly rework this to add multiple
@@ -209,15 +219,16 @@ const resolvers = {
 
         //Send back the new conversation so we can direct the user to it.
         return newConvo;
+        } else {
+            console.log("Conversation exists.");
+        }
 
     },
 
     addRecipient: async(root, args) => {
         const { recipientName, conversationId } = args;
 
-        //missing where parameter? Troubleshoot.
         const recipientToAdd = await User.findAll({where: { userName: {[Op.iLike]: recipientName }}})
-        console.log('RECIPIENT', recipientToAdd)
         await Recipient.create({userId: recipientToAdd[0].id, conversationId})
         const sendBackRecipient = await Recipient.findByPk(recipientToAdd.id);
         return sendBackRecipient;
