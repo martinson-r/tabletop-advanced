@@ -1,4 +1,4 @@
-const { Message, Recipient, PlayerJoin, Conversation, User, Game, Application, Language, Ruleset, GameType, AboutMe } = require('../db/models');
+const { Message, Recipient, PlayerJoin, Conversation, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -182,19 +182,32 @@ const resolvers = {
 
     startNewNonGameConversation: async(root,args) => {
 
-        const { currentUserId, recipientId, messageText } = args;
-
-        console.log(args);
+        const { currentUserId, recipients, messageText } = args;
 
         //Create new Conversation, basically an empty container for tracking
         //distinct collections of messages
+        //TODO: Cannot create a new conversation identical to an old one
+        //TODO: Redirect user to existing conversation if identical one exists
         const newConvo = await Conversation.create();
         const conversationId = newConvo.id
 
         //Add both recipients to list. Possibly rework this to add multiple
         //new recipients.
+
+        //Add current user to conversation
         await Recipient.create({userId: currentUserId, conversationId});
-        await Recipient.create({userId: recipientId, conversationId});
+
+        //REFACTOR: Recipients now an array of userNames rather than single ID
+        //Add each recipient to conversation
+        recipients.forEach(async(recipient) => {
+            //Op.iLike because we don't want to worry about case sensitivity
+            let user = await User.findAll({where: { userName: {[Op.iLike]: recipient}
+            }});
+
+            console.log('found user', user)
+
+            await Recipient.create({userId: user[0].id, conversationId});
+        })
 
         //Send back the new conversation so we can direct the user to it.
         return newConvo;
@@ -267,9 +280,14 @@ const resolvers = {
               return user;
         },
         joinWaitlist: async(root, args) => {
-            //If userId is hostId, do not allow.
-            const { userId, gameId, whyJoin, charConcept, charName, experience } = args;
+            //TODO: If userId is hostId, do not allow & throw error.
+
+            //create app
+            const { userId, gameId, whyJoin, charConcept, charName, experience, hostId } = args;
             const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
+
+            //Add app to waitlist
+            await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
             return newApp;
         },
 

@@ -77,6 +77,7 @@ const typeDefs = gql`
   type Recipient {
     id: ID,
     userId: ID,
+    userName: String,
     conversationId: ID,
     messageId: ID,
     Message: [Message]
@@ -219,8 +220,8 @@ const typeDefs = gql`
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
-    joinWaitlist(userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
-    startNewNonGameConversation(currentUserId: ID, recipientId: ID): Conversation
+    joinWaitlist(hostId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
+    startNewNonGameConversation(currentUserId: ID, recipients: [String]): Conversation
     approveApplication(applicationId: ID): [Application]
     ignoreApplication(applicationId: ID): [Application]
     declineOffer(applicationId: ID): Application

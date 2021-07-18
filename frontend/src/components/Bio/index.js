@@ -12,18 +12,18 @@ function Bio() {
 const sessionUser = useSelector((state) => state.session.user);
 const currentUserId = sessionUser.id;
 const { userId } = useParams();
-const recipientId = userId;
-console.log(recipientId);
-console.log(currentUserId);
+const [recipients, setRecipients] = useState([]);
 
 const history = useHistory();
 
 const [getAbout, { data, error, loading }] = useLazyQuery(GET_ABOUT);
 
-const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipientId }, onCompleted: startNewNonGameConversation => { history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)} } );
+const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipients }, onCompleted: startNewNonGameConversation => { history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)} } );
 
 const sendNewMessage = () => {
-startNewNonGameConversation({recipientId, currentUserId});
+    //TODO: Refactor for multiple recipients in an array. In this case, there won't be
+    //but this makes the resolver reusable for conversations with multiple recipients
+startNewNonGameConversation({recipients, currentUserId});
 }
 
 console.log('data', data)
@@ -31,11 +31,15 @@ console.log('data', data)
 useEffect(() => {
 
     if (userId !== null && userId !== undefined) {
-        console.log('id', userId)
-        console.log('get data')
         getAbout({ variables: { userId }})
     }
 },[userId]);
+
+useEffect(() => {
+ if (data !== undefined) {
+     setRecipients([data.about[0].User.userName]);
+ }
+},[data])
 
 
 return (

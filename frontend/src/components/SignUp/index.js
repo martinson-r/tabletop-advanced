@@ -18,6 +18,7 @@ function SignUp() {
       setErrors([]);
 
       //get errors to display
+      //TODO: Errors for feedback about userName having to be unique
       return dispatch(sessionActions.signup({ email, userName, password, confirmPassword }))
         .then(res => {
           if (res.data.errors) {

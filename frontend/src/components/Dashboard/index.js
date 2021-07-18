@@ -118,6 +118,7 @@ function Home() {
                 {/* TODO: ability to follow games */}
                 </div>
                 <p>Private Conversations:</p>
+                <p><Link to={'/newmessage'}>Start new conversation</Link></p>
                 {/* TODO: Add multiple users to private convos */}
                 {/* We need unique keys for mapped elements so React can keep track of what is what */}
                 {nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversations => <div key={uuidv4()} className="convos-box" >{conversations.recipient.map(conversation => (<p key={uuidv4()} className="private-convo" onClick={() => history.push(`/conversation/${conversation.id}`)}>{conversation.recipient.map(recipient => recipient.userName + ", ")}</p>))}</div>))}

@@ -18,6 +18,7 @@ function JoinWaitList({...props}) {
     const [charConcept, setCharConcept] = useState("");
     const [whyJoin, setWhyJoin] = useState("");
     const [experience, setExperience] = useState("");
+    const [hostId, setHostId] = useState(null);
 
     const { gameId } = useParams();
 
@@ -25,17 +26,23 @@ function JoinWaitList({...props}) {
     const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { userId, gameId }})
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_STATUS, { variables: { userId, _id: gameId }})
 
-    const [submitWaitlistApp] = useMutation(SUBMIT_WAITLIST_APP, { variables: { userId, charName, charConcept, experience, whyJoin, gameId } } );
+    const [submitWaitlistApp] = useMutation(SUBMIT_WAITLIST_APP, { variables: { userId, charName, charConcept, experience, whyJoin, gameId, hostId } } );
 
     const [errors, setErrors] = useState([]);
 
-    console.log('WAITLIST', waitlistStatus)
+    console.log('WAITLIST', waitlistStatus);
+
+    useEffect(() => {
+      if (gameData !== undefined) {
+        console.log('host', gameData.game.host.id)
+        setHostId(gameData.game.host.id);
+      }
+    },[gameData])
 
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      console.log(userId, charName, charConcept, experience, whyJoin)
-      submitWaitlistApp(userId, charName, charConcept, experience, whyJoin)
+      submitWaitlistApp(userId, charName, charConcept, experience, whyJoin, hostId)
     };
 
     useEffect(() => {

@@ -99,7 +99,6 @@ const router = express.Router();
         const hashedPassword = await bcrypt.hash(password, 10);
         user.hashedPassword = hashedPassword;
         await user.save();
-        console.log('USER', user)
 
         //Log new user in.
         loginUser(req, res, user);

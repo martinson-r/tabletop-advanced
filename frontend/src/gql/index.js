@@ -394,8 +394,8 @@ const SUBMIT_GAME = gql`
 `;
 
 const SUBMIT_WAITLIST_APP = gql`
-  mutation SubmitWaitlistApp($userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
-    joinWaitlist(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
+  mutation SubmitWaitlistApp($hostId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
+    joinWaitlist(hostId: $hostId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
                 id
 
     }
@@ -435,8 +435,8 @@ mutation SendNonGameNonSpecMessages($userId: ID!, $messageText: String!, $conver
 `;
 
 const START_NEW_PRIVATE_CHAT = gql`
-mutation StartNewPrivateChat($currentUserId: ID, $recipientId: ID) {
-    startNewNonGameConversation(currentUserId: $currentUserId, recipientId: $recipientId) {
+mutation StartNewPrivateChat($currentUserId: ID, $recipients: [String]) {
+    startNewNonGameConversation(currentUserId: $currentUserId, recipients: $recipients) {
         id
     }
 }
