@@ -286,10 +286,10 @@ const resolvers = {
                 }
             });
 
-            console.log('conversation objects', conversationObjects)
 
-            let conversationLookingForId;
             const includeSender = [...arrayOfUserIds, currentUserId];
+
+            const potentialDuplicates = [];
 
             //Next, find the conversation id where all recipients match
             for (let conversation in conversationObjects) {
@@ -301,20 +301,22 @@ const resolvers = {
                     //We know the conversation contains all recipients, but we want to make sure
                     //It doesn't contain MORE recipients
                     const potentialDuplication = await Conversation.findByPk(conversation, { include: { model: User, as: "recipient"}})
-
-                    console.log('duplication 2', potentialDuplication)
-
-                    if (potentialDuplication.recipient.length === includeSender.length) {
-                        newUser = false;
-                    }
-                } else {
-
-                    //Bug where if conversation contains less recipients than a prior one, a new conversation is created?
-                    newUser = true;
+                    potentialDuplicates.push(potentialDuplication)
+                    //This comes back true for things where it should not
+                    //because newUser is set to true whenever it just doesn't match
+                    // if (potentialDuplication.recipient.length === includeSender.length) {
+                    //     console.log('DUPLICATE')
+                    //     newUser = false;
+                    // }
                 }
-
             }
 
+            //Figure out if a conversation is a duplicate by seeing if ANY of them are the same length
+            const isDuplicate = potentialDuplicates.filter((conversation) => conversation.recipient.length === includeSender.length)
+
+            if (isDuplicate.length === 0) {
+                newUser = true;
+            }
         //If we have new recipients...
         if (newUser === true) {
             return await createNewConversation(recipients);

@@ -28,7 +28,30 @@ function StartNewMessage() {
 
         const addRecipient = (e) => {
             e.preventDefault();
-            setRecipients([...recipients, recipient]);
+            //comma with space
+           if (recipient.includes(', ')) {
+                const separatedRecipients = recipient.split(', ');
+                console.log('separated', separatedRecipients);
+                setRecipients([...recipients, ...separatedRecipients]);
+            }
+            //comma without space
+            else if (recipient.includes(',')) {
+                const separatedRecipients = recipient.split(',');
+                console.log('separated', separatedRecipients);
+                setRecipients([...recipients, ...separatedRecipients]);
+            }
+            //just in case they add a space afterward
+
+            else {
+                setRecipients([...recipients, recipient]);
+            }
+        }
+
+        const removeRecipient = (e) => {
+            console.log('target', e.target.id);
+            const recipientIndex = recipients.indexOf(e.target.id);
+            recipients.splice(recipientIndex, 1);
+            setRecipients([...recipients])
         }
 
     return (
@@ -41,7 +64,7 @@ function StartNewMessage() {
             {/* TODO: grab & display name */}
             {/* Choices: get name and look up ID by name or else just look up by name */}
             {/* Database constraints ensure userNames are unique */}
-            {recipients.map(recipient => <p>{recipient}</p>)}
+            {recipients.map(recipient => <p>{recipient} <span id={recipient} onClick={removeRecipient}>x</span></p>)}
             <form onSubmit = {addRecipient}>
             <textarea name="recipient" value={recipient} onChange={(e) => setRecipient(e.target.value)}></textarea>
             <button>Add recipient</button>
