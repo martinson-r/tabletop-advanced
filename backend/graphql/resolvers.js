@@ -1,4 +1,4 @@
-const { Message, Recipient, Conversation, User, Game, Application, Language, Ruleset, GameType, AboutMe } = require('../db/models');
+const { Message, Recipient, PlayerJoin, Conversation, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -85,10 +85,13 @@ const resolvers = {
             return Game.findAll({ where: { hostId: userId }, include: [{ model: Application }] })
         },
 
-        getApplication: (obj, args, context, info) => {
+        getApplication: async (obj, args, context, info) => {
             //Get all applications for this specific game associated with this specific user.
-            const { gameId, applicantId } = args;
-            return User.findAll({where: {id: applicantId}, include: {model: Game, through: "Waitlists", as: "applicant", where: { id: gameId }, include: {model: Application, through: "Waitlists", include: {model: User, as: "applicationOwner"}}}});
+            const { gameId, applicationId } = args;
+            const app = await Application.findAll({where: {id: applicationId}, include: [{model: User, through: "Waitlists", as: "applicationOwner"}, {model: Game, through: "Waitlists", include: { model: User, as: "host"}}]});
+            console.log(app)
+            return app;
+            //return User.findAll({where: {id: applicantId}, include: {model: Game, through: "Waitlists", as: "applicant", where: { id: gameId }, include: {model: Application, through: "Waitlists", include: {model: User, as: "applicationOwner"}}}});
         },
 
         getPlayingWaitingGames: async (obj, args, context, info) => {
@@ -105,6 +108,24 @@ const resolvers = {
             //userId in waitlist.
             const game = await Game.findAll({ where: {id}});
             return game;
+        },
+
+        getWaitlistGames: async (obj, args, context, info) => {
+            const { userId } = args;
+
+            //does Application need gameId after all?
+            //This is returning all games, not just games the user is in.
+            const game = await Game.findAll({include: [{model: User, as: "host"},
+            {model: User, through: "Waitlists", as: "applicant", where: { id: userId },
+            include: { model: Application, through: "Waitlists", as: "applicationOwner" }}]})
+            console.log(game);
+            return game;
+        },
+
+        getGamesPlayingIn: (obj, args, context, info) => {
+            const { userId } = args;
+
+            return Game.findAll({include: [{model: User, as: "player", where: { id: userId }}, {model: User, as: "host"}] });
         },
 
         getGameCreationInfo: async(obj, args, context, info) => {
@@ -124,8 +145,6 @@ const resolvers = {
             //Check to see if this is a dice roll.
             //Fun with regex
             const numbers = messageText.match(/(\d+)[Dd](\d+)/);
-
-            //console.log('NUMBERS', numbers)
 
             if (numbers !== null) {
                 const result = rolldice(numbers[1], numbers[2]);
@@ -163,24 +182,203 @@ const resolvers = {
 
     startNewNonGameConversation: async(root,args) => {
 
-        const { currentUserId, recipientId, messageText } = args;
+        const { currentUserId, recipients, messageText } = args;
+        const arrayOfConversations = [];
+        const arrayOfUsers = [];
+        let newUser = false;
 
-        console.log(args);
+        //This is silly, and I know it's silly.
+        //But it works right now.
+        //Refactor - maybe a findAll on Conversation where recipients include op.and recipients,
+        //Then select on that's the correct length.
 
-        //Create new Conversation, basically an empty container for tracking
-        //distinct collections of messages
-        const newConvo = await Conversation.create();
-        const conversationId = newConvo.id
+        console.log('RECIPIENTS ARG', recipients)
 
-        //Add both recipients to list. Possibly rework this to add multiple
-        //new recipients.
-        await Recipient.create({userId: currentUserId, conversationId});
-        await Recipient.create({userId: recipientId, conversationId});
+        const createNewConversation = async(recipients) => {
+            //Create new Conversation, basically an empty container for tracking
+            //distinct collections of messages
+            const newConvo = await Conversation.create();
+            const conversationId = newConvo.id
 
-        //Send back the new conversation so we can direct the user to it.
+            //Add current user
+            try {
+                await Recipient.create({userId: currentUserId, conversationId})
+            } catch(e) {
+                console.log('Error', e)
+            }
+
+            //Add each recipient in recipients array
+            recipients.forEach(async(recipient) => {
+            //Op.iLike because we don't want to worry about case sensitivity
+            try {
+                let user = await User.findAll({where: { userName: {[Op.iLike]: recipient}
+                }});
+                await Recipient.create({userId: user[0].id, conversationId});
+            } catch(e) {
+                console.log('Error', e);
+            }
+        });
+
+        //return the new conversation so we can grab the ID and redirect
+        console.log("new convo to return", newConvo);
         return newConvo;
 
+        }
+
+        //Check to see if we have a conversation with exactly all of these
+        //recipients. If findByPk comes back undefined, we have a completely new
+        //recipient without any prior conversations, and we can take a shortcut.
+
+        //...maybe?
+        //could make it buggy?
+        const findSenderConversations = await Recipient.findAll({ where: { userId: currentUserId }});
+        arrayOfConversations.push(...findSenderConversations);
+
+        //TODO: DEBUG
+        //Not working for multiple recipients
+        for await (let recipient of recipients) {
+            let users = await User.findAll( { where: { userName: { [Op.iLike]: recipient } } });
+            arrayOfUsers.push(...users);
+            console.log('Array of users', arrayOfUsers)
+
+            //Find all existing conversations with each user, push into array
+            console.log('USERID FOREACH', users[0].id)
+            const findConversations = await Recipient.findAll({ where: { userId: users[0].id }});
+
+            console.log('FINDCONVERSATIONS', findConversations)
+
+            arrayOfConversations.push(...findConversations);
+        }
+
+        console.log('ARRAYOFCONVERSATIONS', arrayOfConversations);
+
+        //Edge case: no Recipient with this userId exists at all.
+        //If that's the case, we know this IS a new conversation
+        //We still need the rest of the recipients, though...
+        console.log('ARRAYLENGTH', arrayOfConversations.length)
+        if (arrayOfConversations.length === 0) {
+            console.log('found no conversations')
+            return await createNewConversation(recipients);
+        } else {
+
+            //DRY this up
+            const arrayOfUserIds = arrayOfUsers.map(user => user.id.toString());
+
+            //Find existing Conversations with each of these users
+            const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, currentUserId]}}});
+
+
+            console.log('look for all', lookForAllRecipients)
+            //Now need to match up Recipients with conversationId somehow without making 50 database queries
+
+            const conversationObjects = {};
+
+            lookForAllRecipients.forEach((recipient) => {
+                //If the conversation id associated with the recipient doesn't exist yet, set it.
+                if (conversationObjects[recipient.conversationId.toString()] === undefined) {
+                    const conversationId = recipient.conversationId.toString();
+                    const recipientId = [recipient.userId.toString()];
+                    //variable must be in square brackets in order to be evaluated
+                    conversationObjects[conversationId] = recipientId;
+                } else {
+                    //If it does exist, add the new recipient value to that key.
+                    conversationObjects[recipient.conversationId.toString()].push(recipient.userId.toString())
+                }
+            });
+
+
+            const includeSender = [...arrayOfUserIds, currentUserId];
+
+            const potentialDuplicates = [];
+
+            //Next, find the conversation id where all recipients match
+            for (let conversation in conversationObjects) {
+                //Edge case - conversation exists with all recipients but includes more than
+                //just those recipients
+                //Solution - make sure the length is exactly the same as the length of recipients plus sender
+                if (conversationObjects[conversation].every(value => includeSender.includes(value)) && conversationObjects[conversation].length === includeSender.length) {
+
+                    //We know the conversation contains all recipients, but we want to make sure
+                    //It doesn't contain MORE recipients
+                    const potentialDuplication = await Conversation.findByPk(conversation, { include: { model: User, as: "recipient"}})
+                    potentialDuplicates.push(potentialDuplication)
+                    //This comes back true for things where it should not
+                    //because newUser is set to true whenever it just doesn't match
+                    // if (potentialDuplication.recipient.length === includeSender.length) {
+                    //     console.log('DUPLICATE')
+                    //     newUser = false;
+                    // }
+                }
+            }
+
+            //Figure out if a conversation is a duplicate by seeing if ANY of them are the same length
+            const isDuplicate = potentialDuplicates.filter((conversation) => conversation.recipient.length === includeSender.length)
+
+            if (isDuplicate.length === 0) {
+                newUser = true;
+            }
+        //If we have new recipients...
+        if (newUser === true) {
+            return await createNewConversation(recipients);
+
+        } else {
+
+            //Get array of just the userIds for all recipients
+            const arrayOfUserIds = arrayOfUsers.map(user => user.id.toString());
+
+            //Find existing Conversations with each of these users
+            const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, currentUserId]}}});
+
+            //Now need to match up Recipients with conversationId somehow without making 50 database queries
+
+            const conversationObjects = {};
+
+            lookForAllRecipients.forEach((recipient) => {
+                //If the conversation id associated with the recipient doesn't exist yet, set it.
+                if (conversationObjects[recipient.conversationId.toString()] === undefined) {
+                    const conversationId = recipient.conversationId.toString();
+                    const recipientId = [recipient.userId.toString()];
+                    //variable must be in square brackets in order to be evaluated
+                    conversationObjects[conversationId] = recipientId;
+                } else {
+                    //If it does exist, add the new recipient value to that key.
+                    conversationObjects[recipient.conversationId.toString()].push(recipient.userId.toString())
+                }
+            });
+
+            let conversationLookingForId;
+            const includeSender = [...arrayOfUserIds, currentUserId];
+
+            //Next, find the conversation id where all recipients match
+            for (let conversation in conversationObjects) {
+                //Edge case - conversation exists with all recipients but includes more than
+                //just those recipients
+                //Solution - make sure the length is exactly the same as the length of recipients plus sender
+                if (conversationObjects[conversation].every(value => includeSender.includes(value)) && conversationObjects[conversation].length === includeSender.length) {
+                    conversationLookingForId = conversation;
+                }
+            }
+
+            //Find the conversation and return it
+            const conversationToReturn = Conversation.findByPk(conversationLookingForId);
+            return conversationToReturn;
+
+
+        }
+
+        }
+
     },
+
+    addRecipient: async(root, args) => {
+        const { recipientName, conversationId } = args;
+
+        const recipientToAdd = await User.findAll({where: { userName: {[Op.iLike]: recipientName }}})
+        await Recipient.create({userId: recipientToAdd[0].id, conversationId})
+        const sendBackRecipient = await Recipient.findByPk(recipientToAdd.id);
+        return sendBackRecipient;
+    },
+
         editMessage: async(root, args) => {
             const { messageId, editMessageText, userId } = args;
             console.log(args);
@@ -248,10 +446,22 @@ const resolvers = {
               return user;
         },
         joinWaitlist: async(root, args) => {
-            //If userId is hostId, do not allow.
-            const { userId, gameId, whyJoin, charConcept, charName, experience } = args;
+            //TODO: If userId is hostId, do not allow & throw error.
+
+            //create app
+            const { userId, gameId, whyJoin, charConcept, charName, experience, hostId } = args;
             const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
+
+            //Add app to waitlist
+            await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
             return newApp;
+        },
+
+        editWaitlistApp: async(root, args) => {
+            const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
+            await Application.update({gameId, whyJoin, charConcept, charName, experience}, {where: { id: applicationId }});
+            const returnApp = await Application.findByPk(applicationId);
+            return returnApp;
         },
 
         approveApplication: async(root, args) => {
@@ -267,6 +477,21 @@ const resolvers = {
             const returnApp = await Application.findAll({where: {id: applicationId}})
             return returnApp;
         },
+
+        acceptOffer: async(root, args) => {
+            const { applicationId, userId, gameId } = args;
+            await Application.update({offerAccepted: 'true'}, {where: { id: applicationId}});
+            const addPlayerToGame = await PlayerJoin.create({userId, gameId});
+            return addPlayerToGame;
+        },
+
+        declineOffer: async(root, args) => {
+            const { applicationId } = args;
+            //For some reason, false must be a string in order for this to work.
+            await Application.update({offerAccepted: 'false'}, {where: { id: applicationId}});
+            const returnApplication = Application.findAll({where: { id: applicationId }})
+            return returnApplication;
+        }
     },
     Subscription: {
             messageSent: {

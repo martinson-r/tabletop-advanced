@@ -7,7 +7,7 @@ const { check, validationResult, body } = require("express-validator");
 
 //Import models
 const db = require("../../db/models");
-const { User } = db;
+const { User, AboutMe } = db;
 
 const csrfProtection = csrf({ cookie: true });
 
@@ -48,8 +48,18 @@ const handleValidationErrors = (req, res, next) => {
               "The provided Email Address is already in use by another account"
             );
           }
-        });
+        })
       }),
+    check("userName")
+    .custom((value) => {
+      return db.User.findOne({ where: { userName: value } }).then((user) => {
+        if (user) {
+          return Promise.reject(
+            "The provided Username is already in use by another account"
+          );
+        }
+      })
+    }),
     check("password")
       .exists({ checkFalsy: true })
       .withMessage("Please provide a password")
@@ -91,7 +101,6 @@ const router = express.Router();
     userValidators,
     asyncHandler(async (req, res) => {
       const { userName, email, password, confirmPassword } = req.body;
-      console.log(userName);
       const user = User.build({ userName, email });
       const validatorErrors = validationResult(req);
       console.log('ERRORS', validatorErrors)
@@ -99,8 +108,9 @@ const router = express.Router();
         const hashedPassword = await bcrypt.hash(password, 10);
         user.hashedPassword = hashedPassword;
         await user.save();
-        console.log('USER', user)
 
+        //Create an 'empty' bio with some prefilled booleans for houserules etc
+        await AboutMe.create({userId: user.id});
         //Log new user in.
         loginUser(req, res, user);
 

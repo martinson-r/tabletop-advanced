@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link, useHistory } from "react-router-dom";
-import Messages from "../Messages";
 import { PubSub } from 'graphql-subscriptions';
 import {
     useLazyQuery, useMutation, useSubscription, InMemoryCache
@@ -13,35 +12,44 @@ function Bio() {
 const sessionUser = useSelector((state) => state.session.user);
 const currentUserId = sessionUser.id;
 const { userId } = useParams();
-const recipientId = userId;
-console.log(recipientId);
-console.log(currentUserId);
+const [recipients, setRecipients] = useState([]);
 
 const history = useHistory();
 
 const [getAbout, { data, error, loading }] = useLazyQuery(GET_ABOUT);
 
-const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipientId }, onCompleted: startNewNonGameConversation => { history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)} } );
+const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipients }, onCompleted: startNewNonGameConversation => { history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)} } );
 
 const sendNewMessage = () => {
-startNewNonGameConversation({recipientId, currentUserId});
+    //TODO: Refactor for multiple recipients in an array. In this case, there won't be
+    //but this makes the resolver reusable for conversations with multiple recipients
+startNewNonGameConversation({recipients, currentUserId});
 }
 
-console.log('data', data)
+console.log(data);
+console.log(userId)
 
 useEffect(() => {
 
     if (userId !== null && userId !== undefined) {
-        console.log('id', userId)
-        console.log('get data')
         getAbout({ variables: { userId }})
     }
 },[userId]);
 
+useEffect(() => {
+ if (data !== undefined) {
+    if (userId !== null && userId !== undefined) {
+     setRecipients([data.about[0].User.userName]);
+    }
+ }
+},[data])
+
 
 return (
+    // Edge case: user has no bio
+    // Solution: user has an 'empty' bio created for them upon signup
     <div>
-    {data !== undefined && data.about.length &&
+    {data !== undefined && data.about !== undefined &&
     (<div><p>About {data.about[0].User.userName}:</p>
     {/* Conditional edit buttons based on whether user or not */}
     {/* Edit form fields directly */}

@@ -27,6 +27,7 @@ const GET_USER = gql`
             pronouns
             bio
             User {
+                id
                 userName
             }
         }
@@ -66,11 +67,48 @@ const GET_PLAYING_WAITING_GAMES = gql`
               Applications {
                 id
                 accepted
+                charName
+                offerAccepted
               }
             }
         }
     }
 `
+
+const GET_WAITING_LIST_GAMES = gql`
+query GetWaitlistGames($userId: ID) {
+    getWaitlistGames(userId: $userId) {
+        id
+        title
+        host {
+            userName
+        }
+  applicant {
+    id
+    userName
+    applicationOwner {
+      id
+      accepted
+      offerAccepted
+      charName
+    }
+  }
+}
+}
+`
+
+//TODO: add player character data and characterId to Player Joins and pull in that info
+const GET_GAMES_PLAYING_IN = gql`
+query GetGamesPlayingIn($userId: ID) {
+    getGamesPlayingIn(userId: $userId) {
+        id
+        title
+        host {
+            userName
+        }
+    }
+}
+`;
 
 const GET_GAME = gql`
     query GetSingleGame($gameId: ID!) {
@@ -87,6 +125,7 @@ const GET_GAME = gql`
             id
         }
         Applications {
+            id
             ignored
             accepted
             createdAt
@@ -126,14 +165,16 @@ const GET_WAITLIST_STATUS = gql`
 `;
 
 const GET_APPLICATION = gql`
-query GetApplication($gameId: ID, $applicantId: ID) {
-    getApplication(gameId: $gameId, applicantId: $applicantId) {
-        id
-        applicant {
-          id
-          title
-          Applications {
+query GetApplication($gameId: ID, $applicationId: ID) {
+    getApplication(gameId: $gameId, applicationId: $applicationId) {
             id
+            Games {
+                id
+                title
+                host {
+                    id
+                }
+            }
             whyJoin
             charConcept
             charName
@@ -141,11 +182,10 @@ query GetApplication($gameId: ID, $applicantId: ID) {
             accepted
             ignored
             applicationOwner {
+              id
               userName
             }
           }
-        }
-    }
 }
 `
 
@@ -322,6 +362,23 @@ mutation IgnoreApplication($applicationId: ID) {
 }
 `
 
+const ACCEPT_OFFER = gql`
+mutation AcceptOffer($applicationId: ID, $userId: ID, $gameId: ID) {
+    acceptOffer(applicationId: $applicationId, userId: $userId, gameId: $gameId) {
+        id
+        offerAccepted
+    }
+}
+`
+
+const DECLINE_OFFER = gql`
+mutation DeclineOffer($applicationId: ID) {
+    declineOffer(applicationId: $applicationId) {
+        id
+        offerAccepted
+    }
+}
+`
 
 //IDs are required on backend but if I don't mark them required on frontend,
 //we get a 404...
@@ -338,9 +395,22 @@ const SUBMIT_GAME = gql`
 `;
 
 const SUBMIT_WAITLIST_APP = gql`
-  mutation SubmitWaitlistApp($userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
-    joinWaitlist(userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
+  mutation SubmitWaitlistApp($hostId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
+    joinWaitlist(hostId: $hostId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
                 id
+
+    }
+}
+`;
+
+const EDIT_WAITLIST_APP = gql`
+  mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
+    editWaitlistApp(applicationId: $applicationId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
+                id
+                whyJoin
+                charConcept
+                charName
+                experience
 
     }
 }
@@ -366,12 +436,21 @@ mutation SendNonGameNonSpecMessages($userId: ID!, $messageText: String!, $conver
 `;
 
 const START_NEW_PRIVATE_CHAT = gql`
-mutation StartNewPrivateChat($currentUserId: ID, $recipientId: ID) {
-    startNewNonGameConversation(currentUserId: $currentUserId, recipientId: $recipientId) {
+mutation StartNewPrivateChat($currentUserId: ID, $recipients: [String]) {
+    startNewNonGameConversation(currentUserId: $currentUserId, recipients: $recipients) {
         id
     }
 }
 `;
+
+const ADD_RECIPIENT = gql`
+mutation AddRecipient($recipientName: String, $conversationId: ID) {
+    addRecipient(recipientName: $recipientName, conversationId: $conversationId) {
+        id
+        userName
+    }
+}
+`
 
 //This is to fetch all of the messages in a conversation
 const GAME_MESSAGES_SUBSCRIPTION = gql`
@@ -421,12 +500,17 @@ export { GET_ACCOUNTS,
         GET_GAMES,
         GET_GAME,
         GET_PLAYING_WAITING_GAMES,
+        GET_GAMES_PLAYING_IN,
+        GET_WAITING_LIST_GAMES,
         GET_APPLICATION,
         APPROVE_APPLICATION,
         IGNORE_APPLICATION,
+        ACCEPT_OFFER,
+        DECLINE_OFFER,
         GET_HOSTED_GAMES,
         GET_GAME_CONVOS,
         SEND_MESSAGE_TO_GAME,
+        ADD_RECIPIENT,
         EDIT_MESSAGE,
         DELETE_MESSAGE,
         GET_NON_GAME_NON_SPEC_MESSAGES,
@@ -437,6 +521,7 @@ export { GET_ACCOUNTS,
         NON_GAME_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
         SUBMIT_WAITLIST_APP,
+        EDIT_WAITLIST_APP,
         GET_WAITLIST_STATUS,
         GET_GAME_CREATION_INFO,
         CHANGE_EMAIL,

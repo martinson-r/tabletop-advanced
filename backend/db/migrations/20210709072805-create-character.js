@@ -8,14 +8,14 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      userId: {
-        type: Sequelize.INTEGER,
-        references: { model: "Users", key: "id" },
-      },
-      gameId: {
-        type: Sequelize.INTEGER,
-        references: { model: "Games", key: "id" },
-      },
+      // userId: {
+      //   type: Sequelize.INTEGER,
+      //   references: { model: "Users", key: "id" },
+      // },
+      // gameId: {
+      //   type: Sequelize.INTEGER,
+      //   references: { model: "Games", key: "id" },
+      // },
       //TODO:
       // characterSheetId: {
       //   type: Sequelize.INTEGER,

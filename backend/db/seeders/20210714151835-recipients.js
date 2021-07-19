@@ -5,12 +5,10 @@ module.exports = {
     await queryInterface.bulkInsert('Recipients', [{
       conversationId: 1,
       userId: 1,
-      messageId: 1
       },
       {
         conversationId: 1,
         userId: 2,
-        messageId: 3
         }], {});
   },
 

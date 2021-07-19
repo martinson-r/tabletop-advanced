@@ -15,8 +15,10 @@ const typeDefs = gql`
     checkWaitList(id: ID, userId: ID!): [Game]
     getGameCreationInfo: GameCreationInfo
     getGamesHosting(userId: ID): [Game]
-    getApplication(gameId: ID, applicantId: ID): [User]
+    getApplication(gameId: ID, applicationId: ID): [Application]
     getPlayingWaitingGames(userId: ID): [User]
+    getWaitlistGames(userId: ID): [Game]
+    getGamesPlayingIn(userId: ID): [Game]
   }
   type GameCreationInfo {
     languages: [Language],
@@ -64,6 +66,9 @@ const typeDefs = gql`
     Game: Game
     applicant: [Game]
     player: [Game]
+    Applications: [Application]
+    gameApplication: [Application]
+    applicationOwner: [Application]
   }
   type Conversation {
     id: ID
@@ -72,6 +77,7 @@ const typeDefs = gql`
   type Recipient {
     id: ID,
     userId: ID,
+    userName: String,
     conversationId: ID,
     messageId: ID,
     Message: [Message]
@@ -155,6 +161,7 @@ const typeDefs = gql`
     allowPlayerEdits: Boolean,
     allowPlayerDeletes: Boolean,
     active: Boolean,
+    applicant: [User],
     Applications: [Application]
   }
   type Application {
@@ -162,6 +169,8 @@ const typeDefs = gql`
     userId: ID
     gameId: ID
     whyJoin: String
+    hostId: ID
+    gameHost: [User]
     charConcept: String
     charName: String
     experience: String
@@ -171,7 +180,8 @@ const typeDefs = gql`
     applicant: User
     applicationOwner: [User]
     createdAt: String
-    Game: Game
+    Games: [Game]
+    offerAccepted: Boolean
   }
   type Message {
     id: ID,
@@ -210,10 +220,14 @@ const typeDefs = gql`
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
-    joinWaitlist(userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
-    startNewNonGameConversation(currentUserId: ID, recipientId: ID): Conversation
+    joinWaitlist(hostId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
+    startNewNonGameConversation(currentUserId: ID, recipients: [String]): Conversation
+    addRecipient(recipientName: String, conversationId: ID): Recipient
     approveApplication(applicationId: ID): [Application]
     ignoreApplication(applicationId: ID): [Application]
+    declineOffer(applicationId: ID): Application
+    acceptOffer(applicationId: ID, gameId: ID, userId: ID): Application
+    editWaitlistApp(applicationId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,

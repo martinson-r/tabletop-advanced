@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   PlayerJoin.init({
     userId: DataTypes.INTEGER,
-    gameId: DataTypes.INTEGER
+    gameId: DataTypes.INTEGER,
+    characterId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'PlayerJoin',

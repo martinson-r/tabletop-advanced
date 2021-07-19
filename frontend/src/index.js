@@ -28,20 +28,38 @@ const httpLink = new HttpLink({
   uri: '/graphql'
 });
 
+let wsLink;
 
-const wsLink = new WebSocketLink({
-  uri: "ws://localhost:5000/subscriptions",
-  options: {
+//websocket endpoint changes depending on development vs production
+if (process.env.NODE_ENV !== "production") {
+  wsLink = new WebSocketLink({
+    uri: "ws://localhost:5000/subscriptions",
     options: {
-      reconnect: true,
+      options: {
+        reconnect: true,
 
-      //tweak for session auth
-      // connectionParams: {
-      //   authToken: user.authToken,
-      // },
-    },
-  }
-});
+        //tweak for session auth
+        // connectionParams: {
+        //   authToken: user.authToken,
+        // },
+      },
+    }
+  });
+} else {
+  wsLink = new WebSocketLink({
+    uri: "wss://tabletop-advanced.herokuapp.com/subscriptions",
+    options: {
+      options: {
+        reconnect: true,
+
+        //tweak for session auth
+        // connectionParams: {
+        //   authToken: user.authToken,
+        // },
+      },
+    }
+  });
+}
 
 const splitLink = split(
   ({ query }) => {
