@@ -187,6 +187,11 @@ const resolvers = {
         const arrayOfUsers = [];
         let newUser = false;
 
+        //This is silly, and I know it's silly.
+        //But it works right now.
+        //Refactor - maybe a findAll on Conversation where recipients include op.and recipients,
+        //Then select on that's the correct length.
+
         console.log('RECIPIENTS ARG', recipients)
 
         const createNewConversation = async(recipients) => {
@@ -220,12 +225,9 @@ const resolvers = {
 
         }
 
-
-        //TODO: Cannot create a new conversation identical to an old one
-        //TODO: Redirect user to existing conversation if identical one exists
-
         //Check to see if we have a conversation with exactly all of these
-        //recipients. If findByPk comes back undefined, we have a new recipient.
+        //recipients. If findByPk comes back undefined, we have a completely new
+        //recipient without any prior conversations, and we can take a shortcut.
 
 
         //TODO: DEBUG
@@ -255,17 +257,6 @@ const resolvers = {
         } else {
 
         console.log('ARRAY OF USERS', arrayOfUsers)
-
-        //craps out here.
-        //I think this is the issue.
-        //This logic isn't sound. If the recipient has ANY conversation that matches, they get filtered out.
-        //May need to do similarly to what I did below & match up conversations with recipients
-        //and then if I can't find one that contains them all and is the right length, it's a new conversation.
-        // const newUser = arrayOfConversations.filter((conversation) => {
-        //     arrayOfUsers.filter((user) => {
-        //         conversation.userId !== user.id;
-        //     });
-        // });
 
 
 
