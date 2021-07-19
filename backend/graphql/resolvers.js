@@ -229,12 +229,17 @@ const resolvers = {
         //recipients. If findByPk comes back undefined, we have a completely new
         //recipient without any prior conversations, and we can take a shortcut.
 
+        //...maybe?
+        //could make it buggy?
+        const findSenderConversations = await Recipient.findAll({ where: { userId: currentUserId }});
+        arrayOfConversations.push(...findSenderConversations);
 
         //TODO: DEBUG
         //Not working for multiple recipients
         for await (let recipient of recipients) {
             let users = await User.findAll( { where: { userName: { [Op.iLike]: recipient } } });
             arrayOfUsers.push(...users);
+            console.log('Array of users', arrayOfUsers)
 
             //Find all existing conversations with each user, push into array
             console.log('USERID FOREACH', users[0].id)
@@ -256,20 +261,14 @@ const resolvers = {
             return await createNewConversation(recipients);
         } else {
 
-        console.log('ARRAY OF USERS', arrayOfUsers)
-
-
-
             //DRY this up
             const arrayOfUserIds = arrayOfUsers.map(user => user.id.toString());
-
-            console.log('array of user ids', arrayOfUserIds)
 
             //Find existing Conversations with each of these users
             const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, currentUserId]}}});
 
-            console.log('all recipients', lookForAllRecipients);
 
+            console.log('look for all', lookForAllRecipients)
             //Now need to match up Recipients with conversationId somehow without making 50 database queries
 
             const conversationObjects = {};
@@ -278,9 +277,7 @@ const resolvers = {
                 //If the conversation id associated with the recipient doesn't exist yet, set it.
                 if (conversationObjects[recipient.conversationId.toString()] === undefined) {
                     const conversationId = recipient.conversationId.toString();
-                    console.log('ID', conversationId)
                     const recipientId = [recipient.userId.toString()];
-                    console.log('RECIPIENTID', recipientId)
                     //variable must be in square brackets in order to be evaluated
                     conversationObjects[conversationId] = recipientId;
                 } else {
@@ -289,14 +286,13 @@ const resolvers = {
                 }
             });
 
+            console.log('conversation objects', conversationObjects)
+
             let conversationLookingForId;
             const includeSender = [...arrayOfUserIds, currentUserId];
 
             //Next, find the conversation id where all recipients match
             for (let conversation in conversationObjects) {
-                console.log('conversation length', conversationObjects[conversation].length)
-                console.log('conversation', conversation, conversationObjects[conversation] )
-                console.log('include sender length', includeSender.length)
                 //Edge case - conversation exists with all recipients but includes more than
                 //just those recipients
                 //Solution - make sure the length is exactly the same as the length of recipients plus sender
@@ -305,17 +301,19 @@ const resolvers = {
                     //We know the conversation contains all recipients, but we want to make sure
                     //It doesn't contain MORE recipients
                     const potentialDuplication = await Conversation.findByPk(conversation, { include: { model: User, as: "recipient"}})
-                    console.log('duplication', potentialDuplication.recipient.length);
-                    if (potentialDuplication.length === includeSender.length) {
+
+                    console.log('duplication 2', potentialDuplication)
+
+                    if (potentialDuplication.recipient.length === includeSender.length) {
                         newUser = false;
-                    } else {
-                        newUser = true;
                     }
                 } else {
+
+                    //Bug where if conversation contains less recipients than a prior one, a new conversation is created?
                     newUser = true;
                 }
-            }
 
+            }
 
         //If we have new recipients...
         if (newUser === true) {
