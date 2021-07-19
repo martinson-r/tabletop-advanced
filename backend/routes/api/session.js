@@ -147,7 +147,7 @@ const router = express.Router();
             res.json({user: {userName: user.userName, email: user.email, id: user.id}});
           }
         }
-        errors.push("Username and password do not match.");
+        errors.push("Invalid credentials. Please double check user name and password and try again.");
       } else {
         errors = validatorErrors.array().map((error) => error.msg);
         res.json({errors})
