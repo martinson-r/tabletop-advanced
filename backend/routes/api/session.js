@@ -32,8 +32,11 @@ const handleValidationErrors = (req, res, next) => {
     check("userName")
       .exists({ checkFalsy: true })
       .withMessage("Please provide a username")
+      .isLength({ min: 3 })
+      .withMessage("User name must be at least 3 characters long")
       .isLength({ max: 50 })
-      .withMessage("userName must not be longer than 50 characters"),
+      .withMessage("User name must not be longer than 50 characters")
+      .matches(/^[A-Za-z0-9]+[\-_]?[A-Za-z0-9]+$/).withMessage('Name must contain only letters, numbers, underscores, or dashes, and must start and end with a letter or number.'),
     check("email")
       .exists({ checkFalsy: true })
       .withMessage("Please provide an email")
