@@ -183,44 +183,155 @@ const resolvers = {
     startNewNonGameConversation: async(root,args) => {
 
         const { currentUserId, recipients, messageText } = args;
+        const arrayOfConversations = [];
+        const arrayOfUsers = [];
 
-        //Create new Conversation, basically an empty container for tracking
-        //distinct collections of messages
+        console.log('RECIPIENTS ARG', recipients)
+
+        const createNewConversation = async(recipients) => {
+            //Create new Conversation, basically an empty container for tracking
+            //distinct collections of messages
+            const newConvo = await Conversation.create();
+            const conversationId = newConvo.id
+
+            //Add current user
+            try {
+                await Recipient.create({userId: currentUserId, conversationId})
+            } catch(e) {
+                console.log('Error', e)
+            }
+
+            //Add each recipient in recipients array
+            recipients.forEach(async(recipient) => {
+            //Op.iLike because we don't want to worry about case sensitivity
+            try {
+                let user = await User.findAll({where: { userName: {[Op.iLike]: recipient}
+                }});
+                await Recipient.create({userId: user[0].id, conversationId});
+            } catch(e) {
+                console.log('Error', e);
+            }
+        });
+
+        //return the new conversation so we can grab the ID and redirect
+        console.log("new convo to return", newConvo);
+        return newConvo;
+
+        }
+
+
         //TODO: Cannot create a new conversation identical to an old one
         //TODO: Redirect user to existing conversation if identical one exists
 
-        const newRecipientCheck = recipients.filter(async(recipient) => {
-            let user = await User.findAll( { where: { userName: { [Op.iLike]: recipient } } });
-            let recipientFound = await Recipient.findByPk(user.id);
-            recipientFound === undefined;
+        //Check to see if we have a conversation with exactly all of these
+        //recipients. If findByPk comes back undefined, we have a new recipient.
+
+
+        //TODO: DEBUG
+        //Not working for multiple recipients
+        for await (let recipient of recipients) {
+            let users = await User.findAll( { where: { userName: { [Op.iLike]: recipient } } });
+            arrayOfUsers.push(...users);
+
+            //Find all existing conversations with each user, push into array
+            console.log('USERID FOREACH', users[0].id)
+            const findConversations = await Recipient.findAll({ where: { userId: users[0].id }});
+
+            console.log('FINDCONVERSATIONS', findConversations)
+
+            arrayOfConversations.push(...findConversations);
+        }
+
+        console.log('ARRAYOFCONVERSATIONS', arrayOfConversations);
+
+        //Edge case: no Recipient with this userId exists at all.
+        //If that's the case, we know this IS a new conversation
+        //We still need the rest of the recipients, though...
+        console.log('ARRAYLENGTH', arrayOfConversations.length)
+        if (arrayOfConversations.length === 0) {
+            console.log('found no conversations')
+            return await createNewConversation(recipients);
+        } else {
+
+        console.log('ARRAY OF USERS', arrayOfUsers)
+
+        //craps out here.
+        //I think this is the issue.
+        //This logic isn't sound. If the recipient has ANY conversation that matches, they get filtered out.
+        //May need to do similarly to what I did below & match up conversations with recipients
+        //and then if I can't find one that contains them all and is the right length, it's a new conversation.
+        const newUser = arrayOfConversations.filter((conversation) => {
+            arrayOfUsers.filter((user) => {
+                conversation.userId !== user.id;
+            });
         });
 
-        console.log(newRecipientCheck);
+        console.log('NEW USER', newUser)
+        console.log('NEW USER LENGTH', newUser.length);
 
-        if (newRecipientCheck/length > 0) {
-            const newConvo = await Conversation.create();
-        const conversationId = newConvo.id
+        //If we have new recipients...
+        if (newUser.length > 0) {
+            console.log('Length > 0')
+            console.log('NEW USER', newUser);
+            return await createNewConversation(recipients);
 
-        //Add both recipients to list. Possibly rework this to add multiple
-        //new recipients.
-
-        //Add current user to conversation
-        await Recipient.create({userId: currentUserId, conversationId});
-
-        //REFACTOR: Recipients now an array of userNames rather than single ID
-        //Add each recipient to conversation
-        recipients.forEach(async(recipient) => {
-            //Op.iLike because we don't want to worry about case sensitivity
-            let user = await User.findAll({where: { userName: {[Op.iLike]: recipient}
-            }});
-
-            await Recipient.create({userId: user[0].id, conversationId});
-        })
-
-        //Send back the new conversation so we can direct the user to it.
-        return newConvo;
         } else {
-            console.log("Conversation exists.");
+            //Why are we even hitting this?
+            console.log("Conversation exists:", newUser, newUser.length);
+
+            //Get array of just the userIds for all recipients
+            const arrayOfUserIds = arrayOfUsers.map(user => user.id.toString());
+
+            console.log('array of user ids', arrayOfUserIds)
+
+            //Find existing Conversations with each of these users
+            const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, currentUserId]}}});
+
+            console.log('all recipients', lookForAllRecipients);
+
+            //Now need to match up Recipients with conversationId somehow without making 50 database queries
+
+            const conversationObjects = {};
+
+            lookForAllRecipients.forEach((recipient) => {
+                //If the conversation id associated with the recipient doesn't exist yet, set it.
+                if (conversationObjects[recipient.conversationId.toString()] === undefined) {
+                    const conversationId = recipient.conversationId.toString();
+                    console.log('ID', conversationId)
+                    const recipientId = [recipient.userId.toString()];
+                    console.log('RECIPIENTID', recipientId)
+                    //variable must be in square brackets in order to be evaluated
+                    conversationObjects[conversationId] = recipientId;
+                } else {
+                    //If it does exist, add the new recipient value to that key.
+                    conversationObjects[recipient.conversationId.toString()].push(recipient.userId.toString())
+                }
+            });
+
+
+            console.log('CONVERSATIONOBJECTS', conversationObjects);
+
+            let conversationLookingForId;
+            const includeSender = [...arrayOfUserIds, currentUserId];
+            console.log('include sender', includeSender)
+
+            //Next, find the conversation id where all recipients match
+            for (let conversation in conversationObjects) {
+                //Edge case - conversation exists with all recipients but includes more than
+                //just those recipients
+                //Solution - make sure the length is exactly the same as the length of recipients plus sender
+                if (conversationObjects[conversation].every(value => includeSender.includes(value)) && conversationObjects[conversation].length === includeSender.length) {
+                    conversationLookingForId = conversation;
+                }
+            }
+
+            //Find the conversation and return it
+            const conversationToReturn = Conversation.findByPk(conversationLookingForId);
+            return conversationToReturn;
+
+
+        }
+
         }
 
     },
