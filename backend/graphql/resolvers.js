@@ -289,45 +289,45 @@ const resolvers = {
                 }
             });
 
-
-            console.log('CONVERSATIONOBJECTS', conversationObjects);
-
             let conversationLookingForId;
             const includeSender = [...arrayOfUserIds, currentUserId];
-            console.log('include sender', includeSender)
 
             //Next, find the conversation id where all recipients match
             for (let conversation in conversationObjects) {
+                console.log('conversation length', conversationObjects[conversation].length)
+                console.log('conversation', conversation, conversationObjects[conversation] )
+                console.log('include sender length', includeSender.length)
                 //Edge case - conversation exists with all recipients but includes more than
                 //just those recipients
                 //Solution - make sure the length is exactly the same as the length of recipients plus sender
                 if (conversationObjects[conversation].every(value => includeSender.includes(value)) && conversationObjects[conversation].length === includeSender.length) {
-                    newUser = false;
+
+                    //We know the conversation contains all recipients, but we want to make sure
+                    //It doesn't contain MORE recipients
+                    const potentialDuplication = await Conversation.findByPk(conversation, { include: { model: User, as: "recipient"}})
+                    console.log('duplication', potentialDuplication.recipient.length);
+                    if (potentialDuplication.length === includeSender.length) {
+                        newUser = false;
+                    } else {
+                        newUser = true;
+                    }
                 } else {
                     newUser = true;
-                    console.log('NEW USER')
                 }
             }
 
-        console.log('NEW USER', newUser)
 
         //If we have new recipients...
         if (newUser === true) {
             return await createNewConversation(recipients);
 
         } else {
-            //Why are we even hitting this?
-            console.log("Conversation exists:", newUser, newUser.length);
 
             //Get array of just the userIds for all recipients
             const arrayOfUserIds = arrayOfUsers.map(user => user.id.toString());
 
-            console.log('array of user ids', arrayOfUserIds)
-
             //Find existing Conversations with each of these users
             const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, currentUserId]}}});
-
-            console.log('all recipients', lookForAllRecipients);
 
             //Now need to match up Recipients with conversationId somehow without making 50 database queries
 
@@ -337,9 +337,7 @@ const resolvers = {
                 //If the conversation id associated with the recipient doesn't exist yet, set it.
                 if (conversationObjects[recipient.conversationId.toString()] === undefined) {
                     const conversationId = recipient.conversationId.toString();
-                    console.log('ID', conversationId)
                     const recipientId = [recipient.userId.toString()];
-                    console.log('RECIPIENTID', recipientId)
                     //variable must be in square brackets in order to be evaluated
                     conversationObjects[conversationId] = recipientId;
                 } else {
@@ -348,12 +346,8 @@ const resolvers = {
                 }
             });
 
-
-            console.log('CONVERSATIONOBJECTS', conversationObjects);
-
             let conversationLookingForId;
             const includeSender = [...arrayOfUserIds, currentUserId];
-            console.log('include sender', includeSender)
 
             //Next, find the conversation id where all recipients match
             for (let conversation in conversationObjects) {
