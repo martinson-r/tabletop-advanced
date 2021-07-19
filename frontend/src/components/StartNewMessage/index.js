@@ -61,9 +61,9 @@ function StartNewMessage() {
         </div>
         <div>
             <p>Recipients:</p>
-            {/* TODO: grab & display name */}
-            {/* Choices: get name and look up ID by name or else just look up by name */}
-            {/* Database constraints ensure userNames are unique */}
+            <p><i>Recipients can be separated by commas</i></p>
+            {/* TODO: autosuggest users from Contact List */}
+            {/* TODO: validation - userNames should not contain commas */}
             {recipients.map(recipient => <p>{recipient} <span id={recipient} onClick={removeRecipient}>x</span></p>)}
             <form onSubmit = {addRecipient}>
             <textarea name="recipient" value={recipient} onChange={(e) => setRecipient(e.target.value)}></textarea>
