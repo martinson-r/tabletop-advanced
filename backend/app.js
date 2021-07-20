@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const session = require("express-session");
 const cookieParser = require('cookie-parser');
+const csurf = require('csurf');
 const helmet = require('helmet');
 const routes = require('./routes');
 const { graphqlExpress, ApolloServer, makeExecutableSchema, gql } = require('apollo-server-express');
@@ -49,6 +50,17 @@ app.use(logger("dev"));
 // app.use(helmet({
 //     contentSecurityPolicy: false
 //   }));
+
+// Set the _csrf token and create req.csrfToken method
+app.use(
+  csurf({
+    cookie: {
+      secure: isProduction,
+      sameSite: isProduction && 'Lax',
+      httpOnly: true
+    }
+  })
+);
 
 // set up session middleware
 
