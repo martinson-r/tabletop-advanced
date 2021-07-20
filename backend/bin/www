@@ -3,7 +3,6 @@
 const { port } = require('../config');
 const db = require('../db/models');
 const app = require('../app');
-const mongoose = require('mongoose');
 const { createServer } = require('http');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
 const { execute, subscribe } = require('graphql');
