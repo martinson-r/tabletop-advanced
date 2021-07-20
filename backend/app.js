@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const { db, environment, port } = require('./config');
 const { uri }  = db;
 const bcrypt = require('bcryptjs');
@@ -8,7 +7,6 @@ const session = require("express-session");
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const routes = require('./routes');
-const MongoStore = require('connect-mongo');
 const { graphqlExpress, ApolloServer, makeExecutableSchema, gql } = require('apollo-server-express');
 const resolvers = require('./graphql/resolvers');
 const typeDefs = require('./graphql/typedefs');
