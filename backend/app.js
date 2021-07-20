@@ -1,6 +1,5 @@
 const express = require('express');
 const { db, environment, port } = require('./config');
-const { uri }  = db;
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const session = require("express-session");
