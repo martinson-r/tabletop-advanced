@@ -32,8 +32,21 @@ const handleValidationErrors = (req, res, next) => {
     check("userName")
       .exists({ checkFalsy: true })
       .withMessage("Please provide a username")
+      .isLength({ min: 3 })
+      .withMessage("User name must be at least 3 characters long")
       .isLength({ max: 50 })
-      .withMessage("userName must not be longer than 50 characters"),
+      .withMessage("User name must not be longer than 50 characters")
+      .matches(/^[A-Za-z0-9]+[\-_]?[A-Za-z0-9]+$/)
+      .withMessage('User name must contain only letters, numbers, underscores, or dashes, and must start and end with a letter or number.')
+      .custom((value) => {
+        return db.User.findOne({ where: { userName: value } }).then((user) => {
+          if (user) {
+            return Promise.reject(
+              "The provided Username is already in use by another account"
+            );
+          }
+        })
+      }),
     check("email")
       .exists({ checkFalsy: true })
       .withMessage("Please provide an email")
@@ -50,16 +63,6 @@ const handleValidationErrors = (req, res, next) => {
           }
         })
       }),
-    check("userName")
-    .custom((value) => {
-      return db.User.findOne({ where: { userName: value } }).then((user) => {
-        if (user) {
-          return Promise.reject(
-            "The provided Username is already in use by another account"
-          );
-        }
-      })
-    }),
     check("password")
       .exists({ checkFalsy: true })
       .withMessage("Please provide a password")
@@ -144,7 +147,7 @@ const router = express.Router();
             res.json({user: {userName: user.userName, email: user.email, id: user.id}});
           }
         }
-        errors.push("Username and password do not match.");
+        errors.push("Invalid credentials. Please double check user name and password and try again.");
       } else {
         errors = validatorErrors.array().map((error) => error.msg);
         res.json({errors})
