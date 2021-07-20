@@ -29,11 +29,6 @@ const app = express();
 if (!isProduction) {
     // enable cors only in development
     app.use(cors(
-    //     {
-    //     origin: 'http://localhost:3000',
-    //     methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
-    //     credentials: true,
-    // }
     ));
 }
 
@@ -94,44 +89,6 @@ app.use(session({
   store.sync();
 
 app.use(routes); // Connect all the routes
-
-app.get('/', asynchandler(async(req, res) => {
-    //Get all accounts. Must be awaited.
-    const messages = await Message.find({});
-
-    //Send back json of all accounts.
-    res.json({messages});
-}));
-
-// app.post('/game/create', asynchandler(async(req, res) => {
-//     const { title, description } = req.body;
-//     const game = await Game.create({
-//         title,
-//         description
-//     });
-//     res.json({game});
-// }));
-
-// app.post('/message/create', asynchandler(async(req, res) => {
-//     const { messageText, userId, isGame, gameId } = req.body;
-//     console.log("game ID", gameId);
-//     const message = await Message.create({
-//         isGame,
-//         gameId,
-//         messages:
-//         [{messageText, userId}]
-//     });
-//     res.json({message});
-// }));
-
-// // Catch unhandled requests and forward to error handler.
-// app.use((_req, _res, next) => {
-//     const err = new Error("The requested resource couldn't be found.");
-//     err.title = 'Resource Not Found';
-//     err.errors = ["The requested resource couldn't be found."];
-//     err.status = 404;
-//     next(err);
-//   });
 
 // Error formatter
 app.use((err, _req, res, _next) => {
