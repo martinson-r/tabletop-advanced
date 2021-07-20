@@ -4,6 +4,7 @@ const { port } = require('../config');
 const db = require('../db/models');
 const app = require('../app');
 const { createServer } = require('http');
+
 const { SubscriptionServer } = require('subscriptions-transport-ws');
 const { execute, subscribe } = require('graphql');
 const { makeExecutableSchema } = require('graphql-tools')
@@ -26,15 +27,6 @@ db.sequelize
       console.log('Database connection failure.');
       console.error(err);
 });
-
-//remove if this doesn't work
-app.use(
-  '/graphql',
-  graphqlHTTP({
-    schema: schema,
-    graphiql: { subscriptionEndpoint: `wss://tabletop-advanced.herokuapp.com/subscriptions` },
-  }),
-);
 
 const ws = createServer(app);
 ws.listen(port, () => {

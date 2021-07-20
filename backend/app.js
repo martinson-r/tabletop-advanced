@@ -47,15 +47,15 @@ app.use(logger("dev"));
 //   }));
 
 // Set the _csrf token and create req.csrfToken method
-app.use(
-  csurf({
-    cookie: {
-      secure: isProduction,
-      sameSite: isProduction && 'lax',
-      httpOnly: true
-    }
-  })
-);
+// app.use(
+//   csurf({
+//     cookie: {
+//       secure: isProduction,
+//       sameSite: isProduction && 'lax',
+//       httpOnly: true
+//     }
+//   })
+// );
 
 // set up session middleware
 
