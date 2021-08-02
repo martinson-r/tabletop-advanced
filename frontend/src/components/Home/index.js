@@ -75,26 +75,31 @@ function Home() {
 
      return (
 
-         <div>
-             <GameMessages gameId={gameId} />
-             <div>
-            <label>Show inactive games</label>
-            <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
-            <label>Show waitlist closed</label>
-            <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
-        </div>
+        <div className="main-container">
+            <div className="top-game-display-container">
+                <div className="recent-games-list">
+                    <label>Show inactive games</label>
+                    <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
+                    <label>Show waitlist closed</label>
+                    <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
 
-        <p>Active Games:</p>
-        {gameData.map((game) =>
-        (game.active === true && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
-        )}
 
-        {/* Show inactive games conditionally */}
-        {displayInactive === true && (<span><p>Inactive Games:</p>
-        {gameData.map((game) =>
-        (game.active === false && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
-        )}</span>)}
+                    <p>Active Games:</p>
+                    {gameData.map((game) =>
+                    (game.active === true && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
+                    )}
+
+                    {/* Show inactive games conditionally */}
+                    {displayInactive === true && (<span><p>Inactive Games:</p>
+                    {gameData.map((game) =>
+                    (game.active === false && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
+                    )}</span>)}
+                </div>
+                <div className="popular-game-preview">
+                    <GameMessages gameId={gameId} />
+                </div>
         </div>
+    </div>
      )
      }
     }

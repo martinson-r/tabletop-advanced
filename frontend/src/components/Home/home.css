@@ -14,3 +14,30 @@ a {
     color: var(--navLink);
     text-decoration: none;
 }
+
+.main-container {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+.top-game-display-container {
+    display: grid;
+    grid-template-columns: 25% 75%;
+    width: 100%;
+}
+
+.bottom-game-display-container {
+    display: flex;
+    width: 100%;
+}
+
+/* .recent-games-list {
+
+}
+
+.popular-game-preview {
+
+} */

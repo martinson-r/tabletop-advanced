@@ -46,8 +46,6 @@ function App() {
       {isLoaded && (<Switch>
         <Route path="/login" component={Login}></Route>
         <Route path="/signup" component={SignUp}></Route>
-
-        {/* TODO: refactor GameMessages */}
         <Route path="/game/:gameId/gameroom/" name="GamePage" component={GamePage} exact={true}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
