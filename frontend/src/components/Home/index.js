@@ -27,6 +27,8 @@ function Home() {
 
     //TODO: Grab most recent/popular game and feed it into GameMessages
 
+    //TODO: Grab rulesets for display
+
     //This needs to be more complicated than simple toggles since
     //multiple conditions can exist
     const [displayInactive, setDisplayInactive] = useState(false);
@@ -121,14 +123,14 @@ function Home() {
                             <p>Dungeons &amp; Dragons</p>
                         </div>
                         <div className="game-card">
-
+                            <p>Dungeons &amp; Dragons</p>
                         </div>
                     </div>
 
                 </div>
                 <div>
                     {/* TODO: add Genres to database */}
-                    <div>
+                    {/* <div>
                         <p>Games by Genre:</p>
                     </div>
                     <div className="game-cards-container">
@@ -147,7 +149,7 @@ function Home() {
                         <div className="game-card">
 
                         </div>
-                    </div>
+                    </div> */}
 
                 </div>
             </div>

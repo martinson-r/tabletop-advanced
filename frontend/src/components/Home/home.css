@@ -1,13 +1,15 @@
+@import-normalize;
+
 :root {
     --lighterGray: #A8A9AB;
     --darkerGray: #5A5850;
-    --mediumGray: #D3D3BA;
+    --lightestGray: #D3D3BA;
 
     /* Doing this so that I don't accidentally change the colors of
     things by accident */
     --navLink: var(--lighterGray);
     --cardBackgroundColor: var(--darkerGray);
-    --cardTextColor: var(--mediumGray);
+    --cardTextColor: var(--lightestGray);
 }
 
 p {
@@ -23,20 +25,23 @@ a {
 .main-container {
     display: flex;
     flex-direction: column;
-    width: 100vw;
-    height: 100vh;
     margin: 0;
+    padding: 10px;
 }
 
 .top-game-display-container {
     display: grid;
     grid-template-columns: 25% 75%;
-    width: 100%;
+}
+
+.game-filters {
+    display: flex;
+    max-width: 100%;
+
 }
 
 .bottom-game-display-container {
     display: flex;
-    width: 100%;
 }
 
 /* .recent-games-list {
@@ -49,24 +54,31 @@ a {
 
 .game-filters {
     display: flex;
+    min-height: 0;
     flex-direction: column;
     align-items: flex-start;
 }
 
+/* Adding padding on container and margin on children helps
+avoid weird flexbox spacing issues */
 .game-cards-container {
     display: flex;
     flex-direction: row;
     flex-flow: row wrap;
-    width: 100vw;
-    justify-content: space-between;
+    justify-content: flex-start;
     color: white;
-}
+    padding: 10px;
+    }
 
+/* Why is this causing a scroll bar? */
 .game-card {
-    width: 150px;
-    height: 200px;
     color: var(--cardTextColor);
+    height: 100px;
     position: relative;
+    margin: 10px;
+        padding: 10px;
+    width: 175px;
+    height: 200px;
 }
 
 /* Adding image as ::before makes it so altering image opacity does
