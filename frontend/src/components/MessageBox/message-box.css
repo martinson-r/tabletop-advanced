@@ -1,15 +1,53 @@
 :root {
     --bubbleGray: #DBDBDB;
+    --lighterGray: #A8A9AB;
+    --darkerGray: #5A5850;
+    --mediumGray: #C4C4C4;
+    --lightestGray: #D3D3BA;
 
     /* Doing this so that I don't accidentally change the colors of
     things by accident */
     --messageBubbleColor: var(--bubbleGray);
+    --messageBubbleCutout: var(--mediumGray);
 }
 
 .indivMessage {
 color: black;
-background-color: var(--messageBubbleColor);
-padding: 10px;
-margin: 10px;
-border-radius: 6px;
+}
+
+.indivMessageBox {
+    background-color: var(--messageBubbleColor);
+    padding: 10px;
+    margin: 30px 10px 10px 10px;
+    border-radius: 6px;
+    position: relative;
+    text-align: center;
+    color: black;
+    border-radius: 5px;
+}
+
+.indivMessageBox::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 10px;
+    border-right: 30px solid var(--messageBubbleColor);
+    background: var(--messageBubbleColor);
+    -webkit-border-bottom-right-radius: 80px 50px;
+    -moz-border-radius-bottomright: 80px 50px;
+    border-bottom-right-radius: 80px 50px;
+}
+
+.indivMessageBox::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 10px;
+    border-right: 14px solid var(--messageBubbleCutout);
+    background: var(--messageBubbleColor);
+    -webkit-border-bottom-right-radius: 80px 50px;
+    -moz-border-radius-bottomright: 80px 50px;
+    border-bottom-right-radius: 80px 50px;
 }
