@@ -232,7 +232,7 @@ function GameMessages(props) {
         <p>Please log in to send messages.</p>
       )}
 
-      {sessionUser !== undefined && gameData !== undefined && gameData.game.active === true && (<form onSubmit={handleSubmit}>
+      {sessionUser !== undefined && gameData !== undefined && gameData.game.active === true && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>
@@ -249,7 +249,8 @@ function GameMessages(props) {
            />
          </label>
          <button type="submit">Send</button>
-       </form>)}
+       </form></div>)}
+
        {gameData !== undefined && gameData.game.active !== true && (
          <p>This game is no longer active.</p>
        )}

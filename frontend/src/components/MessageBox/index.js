@@ -3,7 +3,7 @@ import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
-
+import './message-box.css';
 
 import {
     useQuery, useMutation, useSubscription

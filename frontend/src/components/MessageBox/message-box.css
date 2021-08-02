@@ -1,0 +1,15 @@
+:root {
+    --bubbleGray: #DBDBDB;
+
+    /* Doing this so that I don't accidentally change the colors of
+    things by accident */
+    --messageBubbleColor: var(--bubbleGray);
+}
+
+.indivMessage {
+color: black;
+background-color: var(--messageBubbleColor);
+padding: 10px;
+margin: 10px;
+border-radius: 6px;
+}
