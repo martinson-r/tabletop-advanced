@@ -1,0 +1,16 @@
+:root {
+    --linkGray: #A8A9AB;
+
+    /* Doing this so that I don't accidentally change the colors of
+    things by accident */
+    --navLink: var(--linkGray);
+}
+
+p {
+    color: white;
+}
+
+a {
+    color: var(--navLink);
+    text-decoration: none;
+}

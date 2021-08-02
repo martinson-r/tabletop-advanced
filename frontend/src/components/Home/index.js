@@ -7,6 +7,7 @@ import {
 import { GET_CURRENT_ACCOUNT } from "../../gql"
 import { GET_GAMES } from "../../gql"
 import { v4 as uuidv4 } from 'uuid';
+import './home.css';
 
 function Home() {
 
@@ -22,6 +23,8 @@ function Home() {
     const { loading, error, data } = useQuery(GET_GAMES);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
+
+    //TODO: Grab most recent/popular game and feed it into GameMessages
 
     //This needs to be more complicated than simple toggles since
     //multiple conditions can exist

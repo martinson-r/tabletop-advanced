@@ -38,9 +38,9 @@ function App() {
 
   return (
     <div className="App">
-      {sessionUser&&(<div className="logout" onClick={logout}>Log Out</div>)}
-      {!sessionUser&&<div></div>}
-      {!sessionUser&&<div><NavLink to="/signup">Sign Up</NavLink><NavLink to="/login">Log In</NavLink></div>}
+      {/* {sessionUser&&(<div className="logout" onClick={logout}>Log Out</div>)} */}
+      {/* {!sessionUser&&<div></div>} */}
+      {/* {!sessionUser&&<div><NavLink to="/signup">Sign Up</NavLink><NavLink to="/login">Log In</NavLink></div>} */}
       <Navigation isLoaded={isLoaded} />
       {isLoaded && (<Switch>
         <Route path="/login" component={Login}></Route>
