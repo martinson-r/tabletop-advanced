@@ -12,7 +12,7 @@ import {
   } from "@apollo/client";
 import { GET_GAME, EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
 
-function GameMessages() {
+function GameMessages(props) {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
     const [messageText, setMessage] = useState("");
@@ -24,7 +24,10 @@ function GameMessages() {
 
     const messageBoxRef = useRef(null);
 
-    const { gameId } = useParams();
+    console.log('props', props)
+
+    const gameId = props.gameId;
+    console.log('gameId', gameId)
 
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
 

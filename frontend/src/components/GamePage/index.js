@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import GameMessages from "../GameMessages";
 
-function GamePage() {
+function GamePage(props) {
 
 const { gameId } = useParams();
 

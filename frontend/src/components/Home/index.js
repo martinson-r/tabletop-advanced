@@ -8,6 +8,7 @@ import { GET_CURRENT_ACCOUNT } from "../../gql"
 import { GET_GAMES } from "../../gql"
 import { v4 as uuidv4 } from 'uuid';
 import './home.css';
+import GameMessages from "../GameMessages";
 
 function Home() {
 
@@ -70,10 +71,12 @@ function Home() {
 
         //Just turning data.games into something easier to work with
         const gameData = data.games;
+        const gameId = 3;
 
      return (
 
          <div>
+             <GameMessages gameId={gameId} />
              <div>
             <label>Show inactive games</label>
             <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
