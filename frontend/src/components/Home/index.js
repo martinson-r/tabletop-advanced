@@ -78,24 +78,24 @@ function Home() {
      return (
 
         <div className="main-container">
+            <div className="newest-games-container"><p><b>Newest Games:</b>
+                <label>Show inactive games</label>
+                <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
+                <label>Show waitlist closed</label>
+                <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/></p></div>
             <div className="top-game-display-container">
                 <div className="recent-games-list">
-                    <label>Show inactive games</label>
-                    <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
-                    <label>Show waitlist closed</label>
-                    <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
 
-
-                    <p>Active Games:</p>
+                    {/* <p>Active Games:</p> */}
                     {gameData.map((game) =>
-                    (game.active === true && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
+                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
                     )}
 
                     {/* Show inactive games conditionally */}
-                    {displayInactive === true && (<span><p>Inactive Games:</p>
+                    {/* {displayInactive === true && (<span><p>Inactive Games:</p>
                     {gameData.map((game) =>
-                    (game.active === false && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
-                    )}</span>)}
+                    (game.active === false && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
+                    )}</span>)} */}
                 </div>
                 <div className="popular-game-preview">
                     <GameMessages gameId={gameId} />
