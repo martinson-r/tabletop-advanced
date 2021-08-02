@@ -99,6 +99,59 @@ function Home() {
                     <GameMessages gameId={gameId} />
                 </div>
         </div>
+        <div className="bottom-game-display-container">
+            <div className="game-filters">
+                 {/* TODO: a component that fetches/displays by category fed in */}
+                <div>
+                    <div>
+                        <p>Games by Ruleset:</p>
+                    </div>
+                    {/* TODO: fetch all rulesets from database and map containers */}
+                    <div className="game-cards-container">
+                        <div className="game-card">
+                            <p>Dungeons &amp; Dragons</p>
+                        </div>
+                        <div className="game-card">
+                            <p>Dungeons &amp; Dragons</p>
+                        </div>
+                        <div className="game-card">
+                            <p>Dungeons &amp; Dragons</p>
+                        </div>
+                        <div className="game-card">
+                            <p>Dungeons &amp; Dragons</p>
+                        </div>
+                        <div className="game-card">
+
+                        </div>
+                    </div>
+
+                </div>
+                <div>
+                    {/* TODO: add Genres to database */}
+                    <div>
+                        <p>Games by Genre:</p>
+                    </div>
+                    <div className="game-cards-container">
+                        <div className="game-card">
+
+                        </div>
+                        <div className="game-card">
+
+                        </div>
+                        <div className="game-card">
+
+                        </div>
+                        <div className="game-card">
+
+                        </div>
+                        <div className="game-card">
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
      )
      }

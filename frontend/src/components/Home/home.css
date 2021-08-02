@@ -1,13 +1,18 @@
 :root {
-    --linkGray: #A8A9AB;
+    --lighterGray: #A8A9AB;
+    --darkerGray: #5A5850;
+    --mediumGray: #D3D3BA;
 
     /* Doing this so that I don't accidentally change the colors of
     things by accident */
-    --navLink: var(--linkGray);
+    --navLink: var(--lighterGray);
+    --cardBackgroundColor: var(--darkerGray);
+    --cardTextColor: var(--mediumGray);
 }
 
 p {
     color: white;
+    margin: 0;
 }
 
 a {
@@ -17,7 +22,7 @@ a {
 
 .main-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     width: 100vw;
     height: 100vh;
     margin: 0;
@@ -41,3 +46,44 @@ a {
 .popular-game-preview {
 
 } */
+
+.game-filters {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.game-cards-container {
+    display: flex;
+    flex-direction: row;
+    flex-flow: row wrap;
+    width: 100vw;
+    justify-content: space-between;
+    color: white;
+}
+
+.game-card {
+    width: 150px;
+    height: 200px;
+    color: var(--cardTextColor);
+    position: relative;
+}
+
+/* Adding image as ::before makes it so altering image opacity does
+not alter text opacity */
+.game-card::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    border-radius: 3px;
+    height: 100%;
+    width: 100%;
+    background-image: url("../../media/dragon-face.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: multiply;
+    background-color: var(--cardBackgroundColor);
+    opacity: .75;
+    z-index: -1;
+}
