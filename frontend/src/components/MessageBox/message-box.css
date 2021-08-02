@@ -19,12 +19,18 @@ color: black;
     background-color: var(--messageBubbleColor);
     padding: 10px;
     margin: 30px 10px 10px 10px;
+    height: 50%;
     border-radius: 6px;
     position: relative;
     text-align: center;
     color: black;
     border-radius: 5px;
+    max-width: 80%;
 }
+
+.indivMessageBox span {
+    word-wrap: break-word;
+ }
 
 .indivMessageBox::before {
     content: "";
@@ -39,6 +45,13 @@ color: black;
     border-bottom-right-radius: 80px 50px;
 }
 
+.avatarAndMessages {
+    min-height: 100px;
+    display: flex;
+    flex-direction: row;
+    flex-flow: row wrap;
+}
+
 .indivMessageBox::after {
     content: "";
     position: absolute;
@@ -50,4 +63,26 @@ color: black;
     -webkit-border-bottom-right-radius: 80px 50px;
     -moz-border-radius-bottomright: 80px 50px;
     border-bottom-right-radius: 80px 50px;
+}
+
+.avatarBox {
+    display: flex;
+    align-content: flex-end;
+    align-items: flex-end;
+}
+
+.avatar-position {
+    display: block;
+    position: absolute;
+}
+
+.avatar {
+    margin-top: 30px;
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+    background-image: url('../../media/avatar.png');
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: cover;
 }

@@ -9,7 +9,12 @@
     --messageBoxColor: var(--mediumGray);
 }
 
-#messageBox {
+.messagesContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.messageBox {
     background-color: var(--messageBoxColor);
     height:300px;
     overflow-x:hidden;
@@ -19,7 +24,11 @@
     border-radius: 6px 6px 0 0;
 }
 
-#messageBox:hover {
+.messageBox.game {
+    width: 75%;
+}
+
+.messageBox:hover {
     overflow-y: scroll;
 }
 
