@@ -6,6 +6,7 @@
     --mediumGray: #C4C4C4;
     --lightestGray: #D3D3BA;
     --veryDarkGray: #585858;
+    --jacquaranda: #7B61FF;
 
     /* Doing this so that I don't accidentally change the colors of
     things by accident */
@@ -14,6 +15,7 @@
     --cardTextColor: var(--lightestGray);
     --gameBoxColor: var(--mediumGray);
     --gameBoxTextColor: var(--veryDarkGray);
+    --createGameButton: var(--jacquaranda);
 }
 
 p {
@@ -108,6 +110,13 @@ not alter text opacity */
     margin-left: 10px;
     margin-top: 30px;
     margin-bottom: 10px;
+}
+
+.create-game-button {
+    padding: 10px 20px;
+    color: white;
+    background-color: var(--createGameButton);
+    border-radius: 6px;
 }
 
 .recent-games-list {

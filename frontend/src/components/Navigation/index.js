@@ -34,7 +34,6 @@ function Navigation({ isLoaded }){
       <div className="navigation">
       <p><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></p>
       <NavLink to="/">Find a Game</NavLink>
-      <NavLink to="/start-game">Start a Game</NavLink>
       <NavLink to="/account">Account</NavLink>
       <NavLink to="/dashboard">My Games</NavLink>
       <NavLink to={`${userId}/bio`}>My Bio</NavLink>

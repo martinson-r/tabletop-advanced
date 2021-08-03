@@ -5,13 +5,12 @@ import {
     useQuery,
   } from "@apollo/client";
 import { GET_CURRENT_ACCOUNT } from "../../gql"
-import { GET_GAMES } from "../../gql"
+import { GET_GAMES, GET_RULESETS } from "../../gql"
 import { v4 as uuidv4 } from 'uuid';
 import './home.css';
 import GameMessages from "../GameMessages";
 
 function Home() {
-
 
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
@@ -22,12 +21,14 @@ function Home() {
 
     //grab all games
     const { loading, error, data } = useQuery(GET_GAMES);
+    const { loading: rulesetsLoading, error: rulesetsError, data: rulesetsData } = useQuery(GET_RULESETS);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
 
     //TODO: Grab most recent/popular game and feed it into GameMessages
 
     //TODO: Grab rulesets for display
+    console.log('rulesets', rulesetsData)
 
     //This needs to be more complicated than simple toggles since
     //multiple conditions can exist
@@ -69,20 +70,27 @@ function Home() {
         )
     }
 
-    if (data) {
+    if (data && rulesetsData) {
 
         //Just turning data.games into something easier to work with
         const gameData = data.games;
+        const ruleSetsData = data.rulesets;
         const gameId = 3;
 
      return (
 
         <div className="main-container">
-            <div className="newest-games-container"><p><b>Newest Games:</b>
+            <div className="newest-games-container">
+                {/* TODO: grid this, align everything to bottom */}
+                <span><b>Newest Games:</b>
                 <label>Show inactive games</label>
                 <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
                 <label>Show waitlist closed</label>
-                <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/></p></div>
+                <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
+                <Link className="create-game-button" to="/start-game">Create a Game</Link>
+                </span></div>
+
+                {/* TODO: position and style */}
             <div className="top-game-display-container">
                 <div className="recent-games-list">
 
@@ -110,7 +118,7 @@ function Home() {
                     </div>
                     {/* TODO: fetch all rulesets from database and map containers */}
                     <div className="game-cards-container">
-                        <div className="game-card">
+                        {/* <div className="game-card">
                             <p>Dungeons &amp; Dragons</p>
                         </div>
                         <div className="game-card">
@@ -124,7 +132,10 @@ function Home() {
                         </div>
                         <div className="game-card">
                             <p>Dungeons &amp; Dragons</p>
-                        </div>
+                        </div> */}
+                       {rulesetsData.rulesets.map((ruleset) =>  <div className="game-card">
+                            <p>{ruleset.ruleset}</p>
+                        </div>)}
                     </div>
 
                 </div>

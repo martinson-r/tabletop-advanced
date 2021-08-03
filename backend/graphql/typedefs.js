@@ -7,6 +7,7 @@ const typeDefs = gql`
     user(id: ID!): User
     about(id: ID): [AboutMe]
     games: [Game]
+    rulesets: [Ruleset]
     game(gameId: ID!): Game
     messages: [Message]
     convos(gameId: ID, offset: Int): CountAll
@@ -70,6 +71,10 @@ const typeDefs = gql`
     gameApplication: [Application]
     applicationOwner: [Application]
   }
+  type Ruleset {
+    id: ID,
+    ruleset: String
+  }
   type Conversation {
     id: ID
     recipient: [Recipient]
@@ -99,9 +104,6 @@ const typeDefs = gql`
       author: String,
       publisher: String,
       description: String
-  }
-  type Ruleset {
-      ruleset: String
   }
   type GameType {
       type: String

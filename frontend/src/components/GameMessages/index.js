@@ -233,16 +233,18 @@ function GameMessages(props) {
            ))}
          </ul> */}
          {/* TODO: error message for no blank messages */}
-         <label>
+         <label hidden>
            Send Message
+           </label>
            <input
              type="text"
+             className="chat-input"
              value={messageText}
+             placeholder="Type your message here"
              onChange={(e) => setMessage(e.target.value)}
              required
            />
-         </label>
-         <button type="submit">Send</button>
+         <button className="submitButton" type="submit">Send</button>
        </form></div>)}
       </div>
 
