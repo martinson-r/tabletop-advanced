@@ -166,6 +166,8 @@ const typeDefs = gql`
     allowPlayerDeletes: Boolean,
     active: Boolean,
     applicant: [User],
+    player: [User],
+    Characters: [Character],
     Applications: [Application]
   }
   type Application {
@@ -205,6 +207,13 @@ const typeDefs = gql`
   type Player {
     userId: ID,
     player: [User]
+  }
+  type Character {
+    id: ID,
+    name: String,
+    imageUrl: String,
+    bio: String,
+    User: User
   }
   type Waitlist {
       id: ID,

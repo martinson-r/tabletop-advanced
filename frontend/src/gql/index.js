@@ -133,6 +133,16 @@ const GET_GAME = gql`
             userName
             id
         }
+        player {
+            userName
+            id
+        }
+        Characters {
+            name
+            User {
+                userName
+            }
+        }
         Applications {
             id
             charName

@@ -1,4 +1,4 @@
-const { Message, Recipient, PlayerJoin, Conversation, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist } = require('../db/models');
+const { Message, Recipient, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -46,10 +46,11 @@ const resolvers = {
             console.log(Ruleset.findAll())
             return Ruleset.findAll();
         },
-        game: (obj, args, context, info) => {
+        game:(obj, args, context, info) => {
            const {gameId} = args
-           return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
-        },
+        //    return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: User, as: "player"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
+        return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: Character, include: {model: User}}, {model: User, as: "player"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
+    },
         messages: (obj, args, context, info) => {
             return Message.findAll();
         },

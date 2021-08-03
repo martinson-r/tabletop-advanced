@@ -11,10 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       //Aliased, to make life easier
-      User.belongsToMany(models.Game, { through: 'PlayerJoins', as: "player", foreignKey: 'userId', otherKey: 'gameId' });
+      User.belongsToMany(models.Game, { through: 'PlayerJoins', as: "gamePlayed", foreignKey: 'userId', otherKey: 'gameId' });
       // User.belongsToMany(models.Game, {as: "GameModerator", through: 'Moderator', foreignKey: 'userId', otherKey: 'gameId' });
       // User.belongsToMany(models.Game, {as: "GameSpectator", through: 'Spectator', foreignKey: 'userId', otherKey: 'gameId' });
       User.hasMany(models.Game, { as: "host", foreignKey: 'hostId' });
+      User.hasMany(models.Character, { foreignKey: 'userId'});
       User.hasMany(models.Message, { as: "sender", foreignKey: "senderId" });
       //User.hasMany(models.Application, {as: "applicant", foreignKey: "userId"});
 
