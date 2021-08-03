@@ -57,6 +57,11 @@ const resolvers = {
                 [{userId}, {gameId}]}});
         },
 
+        characterById: (obj, args, context, info) => {
+            const { characterId } = args;
+            return Character.findOne({where: { id: characterId }, include: [{ model: User }, { model: Game }]})
+        },
+
         messages: (obj, args, context, info) => {
             return Message.findAll();
         },

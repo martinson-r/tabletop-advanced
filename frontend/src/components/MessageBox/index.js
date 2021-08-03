@@ -26,12 +26,20 @@ function MessageBox(props) {
     const [newMessage, setNewMessage] = useState(null);
     const [editDisplay, setEditDisplay] = useState(false);
     const [editMessageText, setEditMessageText] = useState("");
+    const [isGame, setIsGame] = useState(true);
 
     const [editMessage] = useMutation(EDIT_MESSAGE, { variables: { messageId, userId, editMessageText } } );
     const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
     const { loading, error, data } = useQuery(GET_CHARACTER, { variables: { userId: message.sender.id, gameId } });
 
     console.log('user', userId, 'game', gameId, 'CHAR DATA', data);
+
+   useEffect(() => {
+    //  If there's no gameId, it's not a game
+    if (gameId === undefined) {
+      setIsGame(false);
+    }
+   },[gameId])
 
     const editMessageSubmit = (e) => {
         if (editMessageText) {
@@ -89,6 +97,10 @@ function MessageBox(props) {
             <div className="avatar-position">
 
             </div>
+            {/* Display default user avatars if not a game chat. */}
+            {isGame.toString() === "false" && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
+            </div>)}
+
             {/* Display default DM avatar (DM has no character) */}
             {data !== undefined && data.character === null && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
             </div>)}
@@ -97,7 +109,7 @@ function MessageBox(props) {
             {data !== undefined && data.character !== null && (<div className="avatar" style={{backgroundImage: "url(" + data.character.imageUrl + ")"}}>
             </div>)}
         </div>
-        <div className="indivMessageBox status" data-status={message.sender.id.toString()===userId.toString()}>
+        <div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
           <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{message.sender.userName}</Link>: {message.deleted !== true &&
             (<span>{message.messageText} {userId !== null && message.sender.id === userId.toString() && (<><button id={message.id} onClick={editMessageBox(message.messageText)}>edit</button>
             <button onClick={deleteMessageBox(message.id, userId)}>delete</button></>)}</span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
-import "./messages.css";
+import "./game-messages.css";
 import MessageBox from "../MessageBox";
 import { v4 as uuidv4 } from 'uuid';
 

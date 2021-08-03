@@ -21,6 +21,7 @@ const typeDefs = gql`
     getPlayingWaitingGames(userId: ID): [User]
     getWaitlistGames(userId: ID): [Game]
     getGamesPlayingIn(userId: ID): [Game]
+    characterById(characterId: ID): Character
   }
   type GameCreationInfo {
     languages: [Language],
@@ -214,7 +215,8 @@ const typeDefs = gql`
     name: String,
     imageUrl: String,
     bio: String,
-    User: User
+    User: User,
+    Game: Game
   }
   type Waitlist {
       id: ID,
