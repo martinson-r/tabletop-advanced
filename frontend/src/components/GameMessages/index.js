@@ -246,11 +246,12 @@ function GameMessages(props) {
            />
          <button className="submitButton" type="submit">Send</button>
        </form></div>)}
-      </div>
-
-      {!sessionUser && (
+       {!sessionUser && (
+        <div className="sendChatBox">
         <p>Please log in to send messages.</p>
+        </div>
       )}
+      </div>
 
 
       {/* TODO: debug, Heroky is saying gameData.game is null */}
@@ -259,6 +260,11 @@ function GameMessages(props) {
        )} */}
        <div className="messageBox">
          <p>Placeholder for Spectator Chat</p>
+         {!sessionUser && (
+        <div>
+        <p>Please log in to send messages.</p>
+        </div>
+      )}
        </div>
        </div>
 

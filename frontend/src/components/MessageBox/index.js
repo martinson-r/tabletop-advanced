@@ -14,6 +14,7 @@ import { EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SE
 
 function MessageBox(props) {
 
+    const sessionUser = useSelector(state => state.session.user);
     const message = props.message;
     const userId = props.userId;
     const gameId = props.gameId;
@@ -56,7 +57,7 @@ function MessageBox(props) {
           console.log('TO DELETE', messageToDelete)
       }
 
-      if (editDisplay === true) return (
+      if (editDisplay === true && sessionUser !== undefined) return (
         <div className="indivMessageBox">
         <p key={uuidv4()} className="indivMessage">{message.sender.userName}: </p>
         <form onSubmit={editMessageSubmit}>

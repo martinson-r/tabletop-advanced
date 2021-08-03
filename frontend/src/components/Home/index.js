@@ -75,7 +75,7 @@ function Home() {
         //Just turning data.games into something easier to work with
         const gameData = data.games;
         const ruleSetsData = data.rulesets;
-        const gameId = 3;
+        const gameId = 1;
 
      return (
 

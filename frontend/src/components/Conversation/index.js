@@ -271,10 +271,6 @@ function Conversation() {
       {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} conversationId={conversationId} convosData={nonGameConvosData}/>)}
       </div>
 
-      {!sessionUser && (
-        <p>Please log in to send messages.</p>
-      )}
-
       {sessionUser !== undefined && (
         <div>
       <form onSubmit={handleSubmit}>
