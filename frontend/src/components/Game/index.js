@@ -11,6 +11,9 @@ import { DateTime } from "../../utils/luxon";
 
 export const pubsub = new PubSub();
 
+//TODO: Refactor so gameId is fed into Game as prop
+//Put Game inside of a container component
+
 function Game() {
 
     // Grab our session user
@@ -33,8 +36,6 @@ function Game() {
   }
 
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } });
-
-    console.log('DATA', data);
 
       return (
         <div>

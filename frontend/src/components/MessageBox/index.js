@@ -3,7 +3,7 @@ import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
-
+import './message-box.css';
 
 import {
     useQuery, useMutation, useSubscription
@@ -57,7 +57,7 @@ function MessageBox(props) {
       }
 
       if (editDisplay === true) return (
-        <div>
+        <div className="indivMessageBox">
         <p key={uuidv4()} className="indivMessage">{message.sender.userName}: </p>
         <form onSubmit={editMessageSubmit}>
          {/* <ul>
@@ -80,10 +80,21 @@ function MessageBox(props) {
       )
 
     return (
-        <div>
-     <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{message.sender.userName}</Link>: {message.deleted !== true &&
+      <div className="avatarAndMessages">
+          <div className="avatarBox">
+            <div className="avatar-position">
+
+            </div>
+            <div className="avatar">
+
+            </div>
+        </div>
+        <div className="indivMessageBox">
+          <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{message.sender.userName}</Link>: {message.deleted !== true &&
             (<span>{message.messageText} {userId !== null && message.sender.id === userId.toString() && (<><button id={message.id} onClick={editMessageBox(message.messageText)}>edit</button>
             <button onClick={deleteMessageBox(message.id, userId)}>delete</button></>)}</span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>
+        </div>
+
             )
 
 }

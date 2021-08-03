@@ -1,0 +1,141 @@
+@import-normalize;
+
+:root {
+    --lighterGray: #A8A9AB;
+    --darkerGray: #5A5850;
+    --mediumGray: #C4C4C4;
+    --lightestGray: #D3D3BA;
+    --veryDarkGray: #585858;
+    --jacquaranda: #7B61FF;
+
+    /* Doing this so that I don't accidentally change the colors of
+    things by accident */
+    --navLink: var(--lighterGray);
+    --cardBackgroundColor: var(--darkerGray);
+    --cardTextColor: var(--lightestGray);
+    --gameBoxColor: var(--mediumGray);
+    --gameBoxTextColor: var(--veryDarkGray);
+    --createGameButton: var(--jacquaranda);
+}
+
+p {
+    color: white;
+    margin: 0;
+}
+
+a {
+    color: var(--navLink);
+    text-decoration: none;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 10px;
+}
+
+.top-game-display-container {
+    display: grid;
+    grid-template-columns: 25% 75%;
+}
+
+.game-filters {
+    display: flex;
+    max-width: 100%;
+
+}
+
+.bottom-game-display-container {
+    display: flex;
+}
+
+/* .recent-games-list {
+
+}
+
+.popular-game-preview {
+
+} */
+
+.game-filters {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Adding padding on container and margin on children helps
+avoid weird flexbox spacing issues */
+.game-cards-container {
+    display: flex;
+    flex-direction: row;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    color: white;
+    padding: 10px;
+    }
+
+/* Why is this causing a scroll bar? */
+.game-card {
+    color: var(--cardTextColor);
+    height: 100px;
+    position: relative;
+    margin: 10px;
+        padding: 10px;
+    width: 175px;
+    height: 200px;
+}
+
+/* Adding image as ::before makes it so altering image opacity does
+not alter text opacity */
+.game-card::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    border-radius: 3px;
+    height: 100%;
+    width: 100%;
+    background-image: url("../../media/dragon-face.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: multiply;
+    background-color: var(--cardBackgroundColor);
+    opacity: .75;
+    z-index: -1;
+}
+
+.newest-games-container {
+    margin-left: 10px;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.create-game-button {
+    padding: 10px 20px;
+    color: white;
+    background-color: var(--createGameButton);
+    border-radius: 6px;
+}
+
+.recent-games-list {
+    background-color: var(--darkerGray);
+    margin: 0 10px;
+    border-radius: 6px;
+}
+
+.gameBox {
+    background-color: var(--gameBoxColor);
+    padding: 10px;
+    margin: 10px;
+    border-radius: 6px;
+}
+
+.gameBox p {
+    color: var(--gameBoxTextColor);
+}
+
+.gameBox a {
+    color: black;
+}

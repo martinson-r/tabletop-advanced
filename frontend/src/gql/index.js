@@ -47,6 +47,15 @@ const GET_GAMES = gql`
     }
 `;
 
+const GET_RULESETS = gql`
+    query GetAllRulesets {
+       rulesets {
+            id,
+            ruleset
+       }
+    }
+`;
+
 const GET_PLAYING_WAITING_GAMES = gql`
     query GetPlayingWaitingGames($userId: ID) {
         getPlayingWaitingGames(userId: $userId) {
@@ -246,12 +255,15 @@ const GET_GAME_CREATION_INFO = gql`
 query GetGameCreationInfo {
     getGameCreationInfo {
         languages {
+            id
             language
         }
         rulesets {
+            id
             ruleset
         }
         gameTypes {
+            id
             type
         }
     }
@@ -498,6 +510,7 @@ export { GET_ACCOUNTS,
         GET_ABOUT,
         ADD_BLOCKED_USER,
         GET_GAMES,
+        GET_RULESETS,
         GET_GAME,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,

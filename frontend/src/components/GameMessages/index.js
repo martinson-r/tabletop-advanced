@@ -12,7 +12,7 @@ import {
   } from "@apollo/client";
 import { GET_GAME, EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
 
-function GameMessages() {
+function GameMessages(props) {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
     const [messageText, setMessage] = useState("");
@@ -24,7 +24,10 @@ function GameMessages() {
 
     const messageBoxRef = useRef(null);
 
-    const { gameId } = useParams();
+    console.log('props', props)
+
+    const gameId = props.gameId;
+    console.log('gameId', gameId)
 
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
 
@@ -218,39 +221,47 @@ function GameMessages() {
     }
 
     return (
-      <div>
+      <div className="messagesContainer">
 
-      <div ref={messageBoxRef} id="messageBox">
+      <div ref={messageBoxRef} className="messageBox game">
        {/* Behaves very strangely if not passed a key. */}
       {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
-      </div>
-
-      {!sessionUser && (
-        <p>Please log in to send messages.</p>
-      )}
-
-      {sessionUser !== undefined && gameData !== undefined && gameData.game.active === true && (<form onSubmit={handleSubmit}>
+      {sessionUser !== undefined && gameData !== undefined && gameData.game.active === true && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>
            ))}
          </ul> */}
          {/* TODO: error message for no blank messages */}
-         <label>
+         <label hidden>
            Send Message
+           </label>
            <input
              type="text"
+             className="chat-input"
              value={messageText}
+             placeholder="Type your message here"
              onChange={(e) => setMessage(e.target.value)}
              required
            />
-         </label>
-         <button type="submit">Send</button>
-       </form>)}
+         <button className="submitButton" type="submit">Send</button>
+       </form></div>)}
+      </div>
+
+      {!sessionUser && (
+        <p>Please log in to send messages.</p>
+      )}
+
+
+
        {gameData !== undefined && gameData.game.active !== true && (
          <p>This game is no longer active.</p>
        )}
+       <div className="messageBox">
+         <p>Placeholder for Spectator Chat</p>
        </div>
+       </div>
+
     )
 }
 

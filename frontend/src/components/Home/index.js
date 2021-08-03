@@ -5,11 +5,12 @@ import {
     useQuery,
   } from "@apollo/client";
 import { GET_CURRENT_ACCOUNT } from "../../gql"
-import { GET_GAMES } from "../../gql"
+import { GET_GAMES, GET_RULESETS } from "../../gql"
 import { v4 as uuidv4 } from 'uuid';
+import './home.css';
+import GameMessages from "../GameMessages";
 
 function Home() {
-
 
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
@@ -20,8 +21,14 @@ function Home() {
 
     //grab all games
     const { loading, error, data } = useQuery(GET_GAMES);
+    const { loading: rulesetsLoading, error: rulesetsError, data: rulesetsData } = useQuery(GET_RULESETS);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
+
+    //TODO: Grab most recent/popular game and feed it into GameMessages
+
+    //TODO: Grab rulesets for display
+    console.log('rulesets', rulesetsData)
 
     //This needs to be more complicated than simple toggles since
     //multiple conditions can exist
@@ -67,28 +74,98 @@ function Home() {
 
         //Just turning data.games into something easier to work with
         const gameData = data.games;
+        const ruleSetsData = data.rulesets;
+        const gameId = 3;
 
      return (
 
-         <div>
-             <div>
-            <label>Show inactive games</label>
-            <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
-            <label>Show waitlist closed</label>
-            <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
-        </div>
+        <div className="main-container">
+            <div className="newest-games-container">
+                {/* TODO: grid this, align everything to bottom */}
+                <span><b>Newest Games:</b>
+                <label>Show inactive games</label>
+                <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
+                <label>Show waitlist closed</label>
+                <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
+                <Link className="create-game-button" to="/start-game">Create a Game</Link>
+                </span></div>
 
-        <p>Active Games:</p>
-        {gameData.map((game) =>
-        (game.active === true && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
-        )}
+                {/* TODO: position and style */}
+            <div className="top-game-display-container">
+                <div className="recent-games-list">
 
-        {/* Show inactive games conditionally */}
-        {displayInactive === true && (<span><p>Inactive Games:</p>
-        {gameData.map((game) =>
-        (game.active === false && (<p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>))
-        )}</span>)}
+                    {/* <p>Active Games:</p> */}
+                    {gameData.map((game) =>
+                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
+                    )}
+
+                    {/* Show inactive games conditionally */}
+                    {/* {displayInactive === true && (<span><p>Inactive Games:</p>
+                    {gameData.map((game) =>
+                    (game.active === false && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
+                    )}</span>)} */}
+                </div>
+                <div className="popular-game-preview">
+                    <GameMessages gameId={gameId} />
+                </div>
         </div>
+        <div className="bottom-game-display-container">
+            <div className="game-filters">
+                 {/* TODO: a component that fetches/displays by category fed in */}
+                <div>
+                    <div>
+                        <p>Games by Ruleset:</p>
+                    </div>
+                    {/* TODO: fetch all rulesets from database and map containers */}
+                    <div className="game-cards-container">
+                        {/* <div className="game-card">
+                            <p>Dungeons &amp; Dragons</p>
+                        </div>
+                        <div className="game-card">
+                            <p>Dungeons &amp; Dragons</p>
+                        </div>
+                        <div className="game-card">
+                            <p>Dungeons &amp; Dragons</p>
+                        </div>
+                        <div className="game-card">
+                            <p>Dungeons &amp; Dragons</p>
+                        </div>
+                        <div className="game-card">
+                            <p>Dungeons &amp; Dragons</p>
+                        </div> */}
+                       {rulesetsData !==undefined && (rulesetsData.rulesets.map((ruleset) =>  <div className="game-card">
+                            <p>{ruleset.ruleset}</p>
+                        </div>))}
+                    </div>
+
+                </div>
+                <div>
+                    {/* TODO: add Genres to database */}
+                    {/* <div>
+                        <p>Games by Genre:</p>
+                    </div>
+                    <div className="game-cards-container">
+                        <div className="game-card">
+
+                        </div>
+                        <div className="game-card">
+
+                        </div>
+                        <div className="game-card">
+
+                        </div>
+                        <div className="game-card">
+
+                        </div>
+                        <div className="game-card">
+
+                        </div>
+                    </div> */}
+
+                </div>
+            </div>
+        </div>
+    </div>
      )
      }
     }

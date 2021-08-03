@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import './App.css';
+// import './App.css';
 import { BrowserRouter, Route, Switch, NavLink } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +8,7 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import Game from "./components/Game";
+import GamePage from "./components/GamePage";
 import SubmitGame from "./components/SubmitGame";
 import JoinWaitList from "./components/JoinWaitList";
 import Navigation from "./components/Navigation";
@@ -38,14 +39,14 @@ function App() {
 
   return (
     <div className="App">
-      {sessionUser&&(<div className="logout" onClick={logout}>Log Out</div>)}
-      {!sessionUser&&<div></div>}
-      {!sessionUser&&<div><NavLink to="/signup">Sign Up</NavLink><NavLink to="/login">Log In</NavLink></div>}
+      {/* {sessionUser&&(<div className="logout" onClick={logout}>Log Out</div>)} */}
+      {/* {!sessionUser&&<div></div>} */}
+      {/* {!sessionUser&&<div><NavLink to="/signup">Sign Up</NavLink><NavLink to="/login">Log In</NavLink></div>} */}
       <Navigation isLoaded={isLoaded} />
       {isLoaded && (<Switch>
         <Route path="/login" component={Login}></Route>
         <Route path="/signup" component={SignUp}></Route>
-        <Route path="/game/:gameId/gameroom/" name="GameMessages" component={GameMessages} exact={true}></Route>
+        <Route path="/game/:gameId/gameroom/" name="GamePage" component={GamePage} exact={true}></Route>
         <Route path="/game/:gameId" component={Game} exact={true}></Route>
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
         <Route path="/dashboard" component={Dashboard} exact={true}></Route>

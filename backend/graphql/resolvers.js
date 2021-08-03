@@ -42,6 +42,10 @@ const resolvers = {
             });
 
         },
+        rulesets: (obj, args, context, info) => {
+            console.log(Ruleset.findAll())
+            return Ruleset.findAll();
+        },
         game: (obj, args, context, info) => {
            const {gameId} = args
            return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
