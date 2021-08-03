@@ -253,10 +253,10 @@ function GameMessages(props) {
       )}
 
 
-
-       {gameData !== undefined && gameData.game.active !== true && (
+      {/* TODO: debug, Heroky is saying gameData.game is null */}
+       {/* {gameData !== undefined && gameData.game.active !== true && (
          <p>This game is no longer active.</p>
-       )}
+       )} */}
        <div className="messageBox">
          <p>Placeholder for Spectator Chat</p>
        </div>
