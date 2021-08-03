@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 
 import {
@@ -21,12 +21,13 @@ function JoinWaitList({...props}) {
     const [hostId, setHostId] = useState(null);
 
     const { gameId } = useParams();
+    const history = useHistory();
 
     //TODO: Add ability to pass in userId to get back info on if this user has already applied for this game
     const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { userId, gameId }})
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_STATUS, { variables: { userId, _id: gameId }})
 
-    const [submitWaitlistApp] = useMutation(SUBMIT_WAITLIST_APP, { variables: { userId, charName, charConcept, experience, whyJoin, gameId, hostId } } );
+    const [submitWaitlistApp] = useMutation(SUBMIT_WAITLIST_APP, { variables: { userId, charName, charConcept, experience, whyJoin, gameId, hostId }, onCompleted: submitWaitlistApp => { history.push(`/game/${gameId}/application/${submitWaitlistApp.joinWaitlist.id}`)} } );
 
     const [errors, setErrors] = useState([]);
 

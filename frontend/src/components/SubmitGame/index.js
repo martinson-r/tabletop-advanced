@@ -43,13 +43,11 @@ function SubmitGame() {
      //We could also do a useEffect with a dependency, I guess.
     const [submitGame] = useMutation(SUBMIT_GAME, { variables: { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId }, onCompleted: submitGame => { history.push(`/game/${submitGame.submitGame.id}`) }});
 
-
     const [errors, setErrors] = useState([]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      console.log(userId, title, description, gameLanguageId, "ruleSetId:", gameRulesetId, gameTypeId)
       submitGame(userId, title, description, gameLanguageId, gameRulesetId, gameTypeId);
     };
 

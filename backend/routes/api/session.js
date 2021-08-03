@@ -120,7 +120,6 @@ const router = express.Router();
         //We really don't want to send more than this back.
         res.json({user: {userName: user.userName, email: user.email, id: user.id}});
       } else {
-        console.log('hit errors')
         const errors = validatorErrors.array().map((error) => error.msg);
         res.json({errors})
     }
