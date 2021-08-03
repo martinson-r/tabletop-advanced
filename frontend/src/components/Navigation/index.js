@@ -51,6 +51,7 @@ function Navigation({ isLoaded }){
         <p><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></p>
         <NavLink to="/">Find a Game</NavLink>
         <NavLink to="/login">Log In</NavLink>
+        <NavLink to="/signup">Sign Up</NavLink>
         {/* <SearchModal /> */}
       </div>
     );
