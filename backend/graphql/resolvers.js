@@ -47,10 +47,16 @@ const resolvers = {
             return Ruleset.findAll();
         },
         game:(obj, args, context, info) => {
-           const {gameId} = args
+           const {gameId} = args;
         //    return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: User, as: "player"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
         return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: Character, include: {model: User}}, {model: User, as: "player"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
     },
+        character:(obj, args, context, info) => {
+            const {userId, gameId} = args;
+            return Character.findOne({where: {[Op.and]:
+                [{userId}, {gameId}]}});
+        },
+
         messages: (obj, args, context, info) => {
             return Message.findAll();
         },

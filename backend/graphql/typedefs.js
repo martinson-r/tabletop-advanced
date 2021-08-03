@@ -7,6 +7,7 @@ const typeDefs = gql`
     user(id: ID!): User
     about(id: ID): [AboutMe]
     games: [Game]
+    character(userId: ID, gameId: ID): Character
     rulesets: [Ruleset]
     game(gameId: ID!): Game
     messages: [Message]

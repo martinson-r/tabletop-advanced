@@ -158,6 +158,15 @@ const GET_GAME = gql`
     }
 `;
 
+const GET_CHARACTER = gql`
+query GetCharacter($userId: ID, $gameId: ID) {
+    character(userId: $userId, gameId: $gameId) {
+        name
+        imageUrl
+    }
+}
+`
+
 //Get games a player is hosting
 //Grab waitlist info as well so they can see new apps
 const GET_HOSTED_GAMES = gql`
@@ -523,6 +532,7 @@ export { GET_ACCOUNTS,
         GET_GAMES,
         GET_RULESETS,
         GET_GAME,
+        GET_CHARACTER,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,

@@ -8,7 +8,7 @@ import './message-box.css';
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { EDIT_MESSAGE, DELETE_MESSAGE, GET_CHARACTER, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
 
 //Behavior is very unreliable right now in both Chrome and Safari.
 
@@ -29,6 +29,9 @@ function MessageBox(props) {
 
     const [editMessage] = useMutation(EDIT_MESSAGE, { variables: { messageId, userId, editMessageText } } );
     const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
+    const { loading, error, data } = useQuery(GET_CHARACTER, { variables: { userId: message.sender.id, gameId } });
+
+    console.log('user', userId, 'game', gameId, 'CHAR DATA', data);
 
     const editMessageSubmit = (e) => {
         if (editMessageText) {
@@ -86,9 +89,13 @@ function MessageBox(props) {
             <div className="avatar-position">
 
             </div>
-            <div className="avatar">
+            {/* Display default DM avatar (DM has no character) */}
+            {data !== undefined && data.character === null && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
+            </div>)}
 
-            </div>
+            {/* Display character avatars by character */}
+            {data !== undefined && data.character !== null && (<div className="avatar" style={{backgroundImage: "url(" + data.character.imageUrl + ")"}}>
+            </div>)}
         </div>
         <div className="indivMessageBox status" data-status={message.sender.id.toString()===userId.toString()}>
           <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{message.sender.userName}</Link>: {message.deleted !== true &&
