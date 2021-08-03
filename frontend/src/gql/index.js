@@ -135,6 +135,7 @@ const GET_GAME = gql`
         }
         Applications {
             id
+            charName
             ignored
             accepted
             createdAt

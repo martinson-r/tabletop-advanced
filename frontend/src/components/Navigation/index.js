@@ -23,6 +23,7 @@ function Navigation({ isLoaded }){
   useEffect(() => {
     if (sessionUser !== null && sessionUser !== undefined ) {
       setUserId(sessionUser.id);
+      console.log('user', sessionUser);
     }
 
   },[sessionUser])
@@ -33,10 +34,11 @@ function Navigation({ isLoaded }){
     sessionLinks = (
       <div className="navigation">
       <p><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></p>
-      <NavLink to="/">Find a Game</NavLink>
-      <NavLink to="/account">Account</NavLink>
-      <NavLink to="/dashboard">My Games</NavLink>
-      <NavLink to={`${userId}/bio`}>My Bio</NavLink>
+      <div><p>Hello, {sessionUser.userName}!</p></div>
+      <div><NavLink to="/">Find a Game</NavLink></div>
+      <div><NavLink to="/account">Account</NavLink></div>
+      <div><NavLink to="/dashboard">My Games</NavLink></div>
+      <div><NavLink to={`${userId}/bio`}>My Bio</NavLink></div>
       <div onClick={logout}>Log Out</div>
       <div className="search-messages">
         <div><NavLink to={`/conversations`}><i className="far fa-envelope"></i></NavLink></div>
