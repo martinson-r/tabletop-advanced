@@ -97,6 +97,7 @@ const typeDefs = gql`
     imageUrl: String
   }
   type Language {
+      id: ID,
       language: String
   }
   type Book {
@@ -106,6 +107,7 @@ const typeDefs = gql`
       description: String
   }
   type GameType {
+      id: ID,
       type: String
   }
   type CountAll {

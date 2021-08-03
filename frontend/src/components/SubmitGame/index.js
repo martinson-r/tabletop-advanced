@@ -35,6 +35,8 @@ function SubmitGame() {
      //grab available gameType, language, etc info from database
      const { loading, error, data } = useQuery(GET_GAME_CREATION_INFO);
 
+     console.log('data', data)
+
      //We also need to grab the data GraphQL returns.
      //We have to use a callback to get that sweet, sweet data out.
      //Then, we redirect the user to their new game.
@@ -47,6 +49,7 @@ function SubmitGame() {
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
+      console.log(userId, title, description, gameLanguageId, "ruleSetId:", gameRulesetId, gameTypeId)
       submitGame(userId, title, description, gameLanguageId, gameRulesetId, gameTypeId);
     };
 
@@ -91,13 +94,13 @@ function SubmitGame() {
            Game Type:
            {/* {console.log('TYPES', gameTypes)} */}
            <select value={gameTypeId} onChange={updateGameTypeId}>
-            {gameTypes.map(gameType => <option key={uuidv4()} value={1}>{gameType.type}</option>)}
+            {gameTypes.map(gameType => <option key={uuidv4()} value={gameType.id}>{gameType.type}</option>)}
             </select>
          </label>
          <label>
            Ruleset:
            <select value={gameRulesetId} onChange={updateGameRulesetId}>
-             {gameRulesets.map(ruleset => <option key={uuidv4()} alue={ruleset.id}>{ruleset.ruleset}</option>)}
+             {gameRulesets.map(ruleset => <option key={uuidv4()} value={ruleset.id}>{ruleset.ruleset}</option>)}
              </select>
          </label>
          <label>

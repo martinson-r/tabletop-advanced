@@ -70,7 +70,7 @@ function Home() {
         )
     }
 
-    if (data && rulesetsData) {
+    if (data) {
 
         //Just turning data.games into something easier to work with
         const gameData = data.games;
@@ -133,9 +133,9 @@ function Home() {
                         <div className="game-card">
                             <p>Dungeons &amp; Dragons</p>
                         </div> */}
-                       {rulesetsData.rulesets.map((ruleset) =>  <div className="game-card">
+                       {rulesetsData !==undefined && (rulesetsData.rulesets.map((ruleset) =>  <div className="game-card">
                             <p>{ruleset.ruleset}</p>
-                        </div>)}
+                        </div>))}
                     </div>
 
                 </div>

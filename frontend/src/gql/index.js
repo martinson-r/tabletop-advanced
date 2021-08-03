@@ -255,12 +255,15 @@ const GET_GAME_CREATION_INFO = gql`
 query GetGameCreationInfo {
     getGameCreationInfo {
         languages {
+            id
             language
         }
         rulesets {
+            id
             ruleset
         }
         gameTypes {
+            id
             type
         }
     }
