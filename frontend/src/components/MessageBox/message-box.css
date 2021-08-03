@@ -39,7 +39,7 @@ color: black;
     left: 0;
     height: 10px;
     border-right: 30px solid var(--messageBubbleColor);
-    background: var(--messageBubbleColor);
+    /* background: var(--messageBubbleColor); */
     -webkit-border-bottom-right-radius: 80px 50px;
     -moz-border-radius-bottomright: 80px 50px;
     border-bottom-right-radius: 80px 50px;
@@ -59,11 +59,29 @@ color: black;
     left: 0;
     height: 10px;
     border-right: 14px solid var(--messageBubbleCutout);
-    background: var(--messageBubbleColor);
+    /* background: var(--messageBubbleColor); */
     -webkit-border-bottom-right-radius: 80px 50px;
     -moz-border-radius-bottomright: 80px 50px;
     border-bottom-right-radius: 80px 50px;
 }
+
+.indivMessageBox.status[data-status="true"] {
+    background: white;
+}
+
+.indivMessageBox.status[data-status="true"]::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 10px;
+    border-right: 30px solid white;
+    /* background: var(--messageBubbleColor); */
+    -webkit-border-bottom-right-radius: 80px 50px;
+    -moz-border-radius-bottomright: 80px 50px;
+    border-bottom-right-radius: 80px 50px;
+}
+
 
 .avatarBox {
     display: flex;
