@@ -155,6 +155,7 @@ const typeDefs = gql`
     premium: Boolean,
     remote: Boolean,
     host: User,
+    waitListOpen: Boolean,
     players: [User],
     spectators: [User],
     waitlist: [Waitlist],

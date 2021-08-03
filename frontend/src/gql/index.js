@@ -128,6 +128,7 @@ const GET_GAME = gql`
         active,
         allowPlayerEdits,
         allowPlayerDeletes,
+        waitListOpen,
         active,
         host {
             userName
@@ -522,6 +523,25 @@ subscription OnMessageSent($gameId: ID, $conversationId: ID) {
   }
 `;
 
+const SPECTATOR_MESSAGES_SUBSCRIPTION = gql`
+subscription OnMessageSent($gameId: ID, $conversationId: ID) {
+    messageSent(gameId: $gameId, conversationId: $conversationId) {
+        count
+        rows {
+            id
+            sender {
+                id
+                userName
+            }
+            id
+            messageText
+            createdAt
+            deleted
+       }
+    }
+  }
+`;
+
 const NON_GAME_MESSAGES_SUBSCRIPTION = gql`
 subscription OnMessageSent($conversationId: ID!) {
     messageSent(conversationId: $conversationId) {
@@ -572,6 +592,7 @@ export { GET_ACCOUNTS,
         START_NEW_PRIVATE_CHAT,
         GAME_MESSAGES_SUBSCRIPTION,
         NON_GAME_MESSAGES_SUBSCRIPTION,
+        SPECTATOR_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
         SUBMIT_WAITLIST_APP,
         EDIT_WAITLIST_APP,

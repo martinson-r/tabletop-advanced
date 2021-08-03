@@ -96,14 +96,21 @@ function Home() {
 
                     {/* <p>Active Games:</p> */}
                     {gameData && (gameData.map((game) =>
-                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
+                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>{console.log('ACTIVE', game.active)}</div>))
                     ))}
 
                     {/* Show inactive games conditionally */}
-                    {/* {displayInactive === true && (<span><p>Inactive Games:</p>
+                    {displayInactive === true && (<span><p>Inactive Games:</p>
                     {gameData.map((game) =>
                     (game.active === false && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
+                    )}</span>)}
+
+                    {/* Show closed waitlist games conditionally */}
+                    {/* {displayClosedWaitlist === true && (<span><p>Games With Closed Waitlists:</p>
+                    {gameData.map((game) =>
+                    (game.waitListOpen === false && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
                     )}</span>)} */}
+
                 </div>
                 <div className="popular-game-preview">
                     <GameMessages gameId={gameId} />

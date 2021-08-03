@@ -10,13 +10,14 @@ import { v4 as uuidv4 } from 'uuid';
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { GET_GAME, EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, GAME_MESSAGES_SUBSCRIPTION, SPECTATOR_MESSAGES_SUBSCRIPTION } from "../../gql";
 
 function GameMessages(props) {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
     const [messageText, setMessage] = useState("");
     const [newMessage, setNewMessage] = useState(null);
+    const [newSpectatorMessage, setNewSpectatorMessage] = useState(null);
     const [sortedConvos, setSortedConvos] = useState([]);
     const [offset, setOffset] = useState(0)
     const [submittedMessage, setSubmittedMessage] = useState(false);
@@ -125,7 +126,30 @@ function GameMessages(props) {
               convos: {...prev.rows, ...newFeedItem}
             });
           }
-      })
+      });
+
+      subscribeToMore({
+        document: SPECTATOR_MESSAGES_SUBSCRIPTION,
+        variables: { gameId },
+        updateQuery: (prev, { subscriptionData }) => {
+          if (!subscriptionData.data) return prev;
+          console.log(subscriptionData.data)
+          const newFeedItem = subscriptionData.data.messageSent;
+          setNewSpectatorMessage(newFeedItem)
+
+          console.log('SUB', subscriptionData)
+
+          console.log('NEW', newFeedItem)
+
+          console.log('PREV', prev);
+
+          //This part is broken.
+          //This really should be done in cache.
+            return Object.assign({}, prev, {
+              convos: {...prev.rows, ...newFeedItem}
+            });
+          }
+      });
 
     },[]);
 
@@ -222,6 +246,8 @@ function GameMessages(props) {
 
     return (
       <div className="messagesContainer">
+
+      {/* TODO: Query to see if player is in game */}
 
       <div ref={messageBoxRef} className="messageBox game">
        {/* Behaves very strangely if not passed a key. */}

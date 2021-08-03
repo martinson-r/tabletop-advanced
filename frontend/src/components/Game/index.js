@@ -47,14 +47,16 @@ function Game() {
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p>
         <p>{data.game.description}</p>
         <p>Players:</p>
-        {console.log('DATA', data.game)}
         {/* This feels a little backwards, but we're grabbing the player associated with the character */}
         {data.game.Characters.map((character) => <p>{character.User.userName} as {character.name}</p>)}
-        {console.log('DATA GAME', data.game)}
         </>)}
-        {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && (<><Link to={`/waitlist/${gameId}`}>Join Waitlist</Link><br /></>)}
+        {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Join Waitlist</Link><br /></>)}
+        {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
         {data !== undefined && (<Link to={`/game/${gameId}/gameroom`}>Enter game room</Link>)}
         {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (
+
+        // TODO: Query to see if player is in game
+
           <>
             <p>Applications:</p>
             <label for="ignored">Show ignored</label>
