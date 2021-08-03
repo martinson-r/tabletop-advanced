@@ -95,9 +95,9 @@ function Home() {
                 <div className="recent-games-list">
 
                     {/* <p>Active Games:</p> */}
-                    {gameData.map((game) =>
+                    {gameData && (gameData.map((game) =>
                     (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
-                    )}
+                    ))}
 
                     {/* Show inactive games conditionally */}
                     {/* {displayInactive === true && (<span><p>Inactive Games:</p>
@@ -118,21 +118,6 @@ function Home() {
                     </div>
                     {/* TODO: fetch all rulesets from database and map containers */}
                     <div className="game-cards-container">
-                        {/* <div className="game-card">
-                            <p>Dungeons &amp; Dragons</p>
-                        </div>
-                        <div className="game-card">
-                            <p>Dungeons &amp; Dragons</p>
-                        </div>
-                        <div className="game-card">
-                            <p>Dungeons &amp; Dragons</p>
-                        </div>
-                        <div className="game-card">
-                            <p>Dungeons &amp; Dragons</p>
-                        </div>
-                        <div className="game-card">
-                            <p>Dungeons &amp; Dragons</p>
-                        </div> */}
                        {rulesetsData !==undefined && (rulesetsData.rulesets.map((ruleset) =>  <div className="game-card">
                             <p>{ruleset.ruleset}</p>
                         </div>))}
