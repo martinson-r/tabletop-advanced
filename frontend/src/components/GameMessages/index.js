@@ -16,6 +16,7 @@ import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, GAME_MESSAGES_SUBSCRIP
 function GameMessages(props) {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
+    const [isPlayer, setIsPlayer] = useState(false);
     const [messageText, setMessage] = useState("");
     const [spectatorMessageText, setSpectatorMessage] = useState("");
     const [newMessage, setNewMessage] = useState(null);
@@ -31,9 +32,21 @@ function GameMessages(props) {
     console.log('props', props)
 
     const gameId = props.gameId;
-    console.log('gameId', gameId)
 
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
+
+    console.log('GAME DATA', gameData)
+
+    useEffect(() => {
+      if (gameData !== undefined) {
+        gameData.game.player.forEach((player) => {
+          if (player.id.toString() === userId.toString()) {
+              setIsPlayer(true);
+              console.log('match');
+          }
+        });
+      }
+    },[gameData]);
 
     let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
       //add offset
@@ -253,8 +266,10 @@ function GameMessages(props) {
 
       <div ref={messageBoxRef} className="messageBox game">
        {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos && sortedConvos.map(message => message.spectatorChat.toString() !== "true" && <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
-      {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
+      {sortedConvos !== null && sortedConvos.map(message => message.spectatorChat.toString() !== "true" && <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
+      {/* TODO: move to component */}
+      {sessionUser !== undefined && gameData !== undefined && (isPlayer.toString() === "true" || gameData.game.host.id.toString() === userId.toString()) && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
+         {console.log(gameData)}
          {/* <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>
@@ -281,9 +296,6 @@ function GameMessages(props) {
       )}
       </div>
 
-
-{/* NOTE: possibly turn this into a component, so you can feed messagetext in through prop... and avoid issues */}
-        {/* TODO: debug, Heroky is saying gameData.game is null */}
        {/* {gameData !== undefined && gameData.game.active !== true && (
          <p>This game is no longer active.</p>
        )} */}
