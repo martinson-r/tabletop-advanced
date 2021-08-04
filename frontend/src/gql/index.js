@@ -257,6 +257,7 @@ const GET_GAME_CONVOS = gql`
             }
             id
             messageText
+            spectatorChat
             createdAt
             deleted
        }
@@ -356,6 +357,7 @@ editMessage(messageId: $messageId, userId: $userId, editMessageText: $editMessag
             }
             id
             messageText
+            spectatorChat
             createdAt
             deleted
        }
@@ -374,6 +376,7 @@ deleteMessage(messageId: $messageId, userId: $userId) {
         }
         id
         messageText
+        spectatorChat
         createdAt
         deleted
    }
@@ -524,6 +527,7 @@ subscription OnMessageSent($gameId: ID, $conversationId: ID) {
             }
             id
             messageText
+            spectatorChat
             createdAt
             deleted
        }
@@ -542,6 +546,7 @@ subscription OnMessageSent($gameId: ID, $conversationId: ID) {
                 userName
             }
             id
+            spectatorChat
             messageText
             createdAt
             deleted
@@ -561,6 +566,7 @@ subscription OnMessageSent($conversationId: ID!) {
                 userName
             }
             id
+            spectatorChat
             messageText
             createdAt
             deleted

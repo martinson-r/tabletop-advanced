@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     metaGameMessageTypeId: DataTypes.INTEGER,
     conversationTypeId: DataTypes.INTEGER,
     conversationId: DataTypes.INTEGER,
+    spectatorChat: DataTypes.BOOLEAN,
     gameId: DataTypes.INTEGER,
     senderId: DataTypes.INTEGER,
     deleted: DataTypes.BOOLEAN,

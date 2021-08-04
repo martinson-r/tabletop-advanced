@@ -251,7 +251,7 @@ function GameMessages(props) {
 
       <div ref={messageBoxRef} className="messageBox game">
        {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
+      {sortedConvos && sortedConvos.map(message => <div>{console.log('ISSPECTATE', message)}<MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/></div>)}
       {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (
@@ -284,14 +284,7 @@ function GameMessages(props) {
        {/* {gameData !== undefined && gameData.game.active !== true && (
          <p>This game is no longer active.</p>
        )} */}
-       <div className="messageBox">
-         <p>Placeholder for Spectator Chat</p>
-         {!sessionUser && (
-        <div>
-        <p>Please log in to send messages.</p>
-        </div>
-      )}
-       </div>
+
        </div>
 
     )

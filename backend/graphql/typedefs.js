@@ -201,6 +201,7 @@ const typeDefs = gql`
     createdAt: String,
     deleted: Boolean,
     reported: Boolean,
+    spectatorChat: Boolean,
     metaGameMessageTypeId: ID,
     User: User,
     sender: User
