@@ -96,7 +96,7 @@ function Home() {
 
                     {/* <p>Active Games:</p> */}
                     {gameData && (gameData.map((game) =>
-                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p>{console.log('ACTIVE', game.active)}</div>))
+                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
                     ))}
 
                     {/* Show inactive games conditionally */}

@@ -29,24 +29,19 @@ function GameMessages(props) {
 
     const messageBoxRef = useRef(null);
 
-    console.log('props', props)
-
     const gameId = props.gameId;
 
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
 
-    console.log('GAME DATA', gameData)
-
     useEffect(() => {
-      if (gameData !== undefined) {
+      if (gameData !== undefined && userId !== null) {
         gameData.game.player.forEach((player) => {
           if (player.id.toString() === userId.toString()) {
               setIsPlayer(true);
-              console.log('match');
           }
         });
       }
-    },[gameData]);
+    },[gameData, userId]);
 
     let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
       //add offset
@@ -266,9 +261,9 @@ function GameMessages(props) {
 
       <div ref={messageBoxRef} className="messageBox game">
        {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos !== null && sortedConvos.map(message => message.spectatorChat.toString() !== "true" && <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
+      {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message => message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
       {/* TODO: move to component */}
-      {sessionUser !== undefined && gameData !== undefined && (isPlayer.toString() === "true" || gameData.game.host.id.toString() === userId.toString()) && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
+      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
          {console.log(gameData)}
          {/* <ul>
            {errors.map((error, idx) => (
@@ -301,7 +296,8 @@ function GameMessages(props) {
        )} */}
        <div ref={messageBoxRef} className="messageBox game">
        {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos && sortedConvos.map(message => message.spectatorChat.toString() === "true" && (<MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>))}
+       {console.log('sorted', sortedConvos)}
+      {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message => message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>))}
       {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox">
         <SendChatBox gameId={gameId} userId={userId} spectatorChat={spectatorChat} />
       </div>)}

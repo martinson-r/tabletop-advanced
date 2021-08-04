@@ -42,6 +42,7 @@ const GET_GAMES = gql`
         description
         host {
             userName
+            id
         }
        }
     }
