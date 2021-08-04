@@ -7,7 +7,7 @@ import { useParams, useHistory } from "react-router-dom";
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { GET_GAME, SUBMIT_WAITLIST_APP, GET_WAITLIST_STATUS  } from "../../gql";
+import { GET_GAME, SUBMIT_WAITLIST_APP, GET_WAITLIST_APPLIED  } from "../../gql";
 
 function JoinWaitList({...props}) {
 
@@ -25,7 +25,7 @@ function JoinWaitList({...props}) {
 
     //TODO: Add ability to pass in userId to get back info on if this user has already applied for this game
     const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { userId, gameId }})
-    const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_STATUS, { variables: { userId, _id: gameId }})
+    const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
 
     const [submitWaitlistApp] = useMutation(SUBMIT_WAITLIST_APP, { variables: { userId, charName, charConcept, experience, whyJoin, gameId, hostId }, onCompleted: submitWaitlistApp => { history.push(`/game/${gameId}/application/${submitWaitlistApp.joinWaitlist.id}`)} } );
 
@@ -52,7 +52,10 @@ function JoinWaitList({...props}) {
         }
     }, [sessionUser]);
 
-    if (waitlistStatus && waitlistStatus.checkWaitList.length) {
+    {/* Right now, this shows if ANYBODY has applied. Include Players and match ids, or else just
+        use a completely different query. */}
+    if (waitlistStatus !== undefined && waitlistStatus.checkApplied.length) {
+      console.log(waitlistStatus.checkApplied.length);
         return (
             <p>You have already applied for this game and are on the waitlist.</p>
         )

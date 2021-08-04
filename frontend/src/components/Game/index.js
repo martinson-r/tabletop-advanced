@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
     useQuery, useSubscription, InMemoryCache
   } from "@apollo/client";
-import { GET_GAME } from "../../gql"
+import { GET_GAME, GET_WAITLIST_APPLIED } from "../../gql"
 import { DateTime } from "../../utils/luxon";
 
 export const pubsub = new PubSub();
@@ -41,6 +41,8 @@ function Game() {
 }
 
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } });
+    const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
+
 
       return (
         <div>
@@ -50,9 +52,22 @@ function Game() {
         {/* This feels a little backwards, but we're grabbing the player associated with the character */}
         {data.game.Characters.map((character) => <p>{character.User.userName} as {character.name}</p>)}
         </>)}
-        {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Join Waitlist</Link><br /></>)}
+
+        {/* Player is able to join waitlist */}
+        {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Submit a Character to the Waitlist</Link><br /></>)}
+
+        {/* GM is not allowing multiple apps and player has applied */}
+        {/* Right now, this shows if ANYBODY has applied. Include Players and match ids, or else just
+        use a completely different query. */}
+        {waitlistStatus && waitlistStatus.checkApplied.length && (
+
+          <p>You have already applied to this game, and multiple applications are not allowed by the GM.</p>
+        )}
+
         {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
+
         {data !== undefined && (<Link to={`/game/${gameId}/gameroom`}>Enter game room</Link>)}
+
         {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (
 
         // TODO: Query to see if player is in game

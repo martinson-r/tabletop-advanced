@@ -212,6 +212,14 @@ const GET_WAITLIST_STATUS = gql`
     }
 `;
 
+const GET_WAITLIST_APPLIED = gql`
+    query CheckApplied($gameId: ID, $userId: ID) {
+        checkApplied(gameId: $gameId, userId: $userId) {
+           id
+        }
+    }
+`;
+
 const GET_APPLICATION = gql`
 query GetApplication($gameId: ID, $applicationId: ID) {
     getApplication(gameId: $gameId, applicationId: $applicationId) {
@@ -597,6 +605,7 @@ export { GET_ACCOUNTS,
         SUBMIT_WAITLIST_APP,
         EDIT_WAITLIST_APP,
         GET_WAITLIST_STATUS,
+        GET_WAITLIST_APPLIED,
         GET_GAME_CREATION_INFO,
         CHANGE_EMAIL,
         CHANGE_PASSWORD,

@@ -120,10 +120,23 @@ const resolvers = {
         checkWaitList: async (obj, args, context, info) => {
             const { id, userId } = args;
 
-            //check if this user has applied to this game before. Must match both game _id and
-            //userId in waitlist.
             const game = await Game.findAll({ where: {id}});
             return game;
+        },
+
+        checkApplied: async (obj, args, context, info) => {
+            const { gameId, userId } = args;
+
+            console.log('ARGS', gameId, userId)
+
+            console.log(gameId, userId);
+
+            //check if this user has applied to this game before. Must match both game _id and
+            //userId in waitlist.
+            //Users can apply multiple times, hence findAll.
+            const list = await Waitlist.findAll({ where: {gameId, userId}});
+            return list;
+            // console.log(list);
         },
 
         getWaitlistGames: async (obj, args, context, info) => {
@@ -156,6 +169,9 @@ const resolvers = {
     Mutation: {
         sendMessageToGame: async(root,args) => {
 
+            //TODO: add a spectatorChat flag of true or false
+            //TODO: update migrations to flag if spectatorChat
+
         const { gameId, messageText, userId, offset } = args;
 
             //Check to see if this is a dice roll.
@@ -182,6 +198,19 @@ const resolvers = {
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
         }
     },
+
+    // sendSpectatorMessages: async(root,args) => {
+
+    //     //Is there a better way to do this, such as flag it Spectator?
+    //     const { conversationId, messageText, userId, offset } = args;
+    //     const senderId = userId;
+    //         await Message.create({conversationId,gameId,messageText,senderId});
+
+    //         const conversation = await Message.findAndCountAll({ where: { gameId, conversationId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
+    //         //console.log('CONVO', conversation.rows[0].conversationId)
+    //         pubsub.publish('NEW_MESSAGE', {spectatorMessageSent: conversation});
+    //         return conversation;
+    // },
 
     sendNonGameMessages: async(root,args) => {
 

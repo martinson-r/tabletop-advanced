@@ -252,7 +252,7 @@ function GameMessages(props) {
       <div ref={messageBoxRef} className="messageBox game">
        {/* Behaves very strangely if not passed a key. */}
       {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
-      {sessionUser !== undefined && gameData !== undefined && gameData.game.active === true && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
+      {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>

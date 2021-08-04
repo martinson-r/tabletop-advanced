@@ -15,6 +15,7 @@ const typeDefs = gql`
     getNonGameConvos(userId: ID!): [User]
     getNonGameMessages(conversationId: ID, offset: Int): CountAll
     checkWaitList(id: ID, userId: ID!): [Game]
+    checkApplied(gameId: ID, userId: ID): [Waitlist]
     getGameCreationInfo: GameCreationInfo
     getGamesHosting(userId: ID): [Game]
     getApplication(gameId: ID, applicationId: ID): [Application]
