@@ -172,7 +172,7 @@ const resolvers = {
             //TODO: add a spectatorChat flag of true or false
             //TODO: update migrations to flag if spectatorChat
 
-        const { gameId, messageText, userId, offset } = args;
+        const { gameId, messageText, userId, offset, spectatorChat } = args;
 
             //Check to see if this is a dice roll.
             //Fun with regex
@@ -184,14 +184,14 @@ const resolvers = {
                 //push roll results into messageText
                 const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
 
-                await Message.create({gameId, messageText, senderId: userId});
+                await Message.create({gameId, messageText, senderId: userId,spectatorChat});
 
                 const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 
                 pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
             } else if (numbers === null) {
             const senderId = userId;
-            await Message.create({gameId,messageText,senderId});
+            await Message.create({gameId,messageText,senderId,spectatorChat});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 

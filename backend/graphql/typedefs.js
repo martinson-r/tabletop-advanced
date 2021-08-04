@@ -231,7 +231,7 @@ const typeDefs = gql`
   }
   type Mutation {
     blockUser(emailToBlock: String!, blockerEmail: String!): User
-    sendMessageToGame(gameId: ID, userId: ID, messageText: String): CountAll
+    sendMessageToGame(gameId: ID, userId: ID, messageText: String, spectatorChat: Boolean): CountAll
     editMessage(messageId: ID, userId: ID, editMessageText: String):CountAll
     deleteMessage(messageId: ID, userId: ID): CountAll
     sendNonGameMessages(userId: ID!, messageText: String!, conversationId: ID): CountAll

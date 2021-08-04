@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import "./game-messages.css";
 import MessageBox from "../MessageBox";
+import SendChatBox from "../SendChatBox";
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -16,12 +17,14 @@ function GameMessages(props) {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
     const [messageText, setMessage] = useState("");
+    const [spectatorMessageText, setSpectatorMessage] = useState("");
     const [newMessage, setNewMessage] = useState(null);
     const [newSpectatorMessage, setNewSpectatorMessage] = useState(null);
     const [sortedConvos, setSortedConvos] = useState([]);
     const [offset, setOffset] = useState(0)
     const [submittedMessage, setSubmittedMessage] = useState(false);
     const [isScrolling, setIsScrolling] = useState(false);
+    const [spectatorChat, setSpectatorChat] = useState(false);
 
     const messageBoxRef = useRef(null);
 
@@ -39,7 +42,7 @@ function GameMessages(props) {
     );
 
 
-    const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText } } );
+    const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat } } );
 
     useEffect(() => {
 
@@ -137,12 +140,6 @@ function GameMessages(props) {
           const newFeedItem = subscriptionData.data.messageSent;
           setNewSpectatorMessage(newFeedItem)
 
-          console.log('SUB', subscriptionData)
-
-          console.log('NEW', newFeedItem)
-
-          console.log('PREV', prev);
-
           //This part is broken.
           //This really should be done in cache.
             return Object.assign({}, prev, {
@@ -238,11 +235,16 @@ function GameMessages(props) {
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
+      setSpectatorChat(false);
+      console.log('non spectator', spectatorChat)
 
         //Offset is fine at this point. No need to do anything with it.
-        updateMessages(gameId, userId, messageText);
+        updateMessages(gameId, userId, messageText, spectatorChat);
         setSubmittedMessage(true);
     }
+
+
+
 
     return (
       <div className="messagesContainer">
@@ -280,40 +282,24 @@ function GameMessages(props) {
       </div>
 
 
-      {/* TODO: debug, Heroky is saying gameData.game is null */}
+{/* NOTE: possibly turn this into a component, so you can feed messagetext in through prop... and avoid issues */}
+        {/* TODO: debug, Heroky is saying gameData.game is null */}
        {/* {gameData !== undefined && gameData.game.active !== true && (
          <p>This game is no longer active.</p>
        )} */}
-        <div ref={messageBoxRef} className="messageBox game">
+       <div ref={messageBoxRef} className="messageBox game">
        {/* Behaves very strangely if not passed a key. */}
       {sortedConvos && sortedConvos.map(message => message.spectatorChat.toString() === "true" && (<MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>))}
-      {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
-         {/* <ul>
-           {errors.map((error, idx) => (
-             <li key={idx}>{error}</li>
-           ))}
-         </ul> */}
-         {/* TODO: error message for no blank messages */}
-         {/* TODO: messages sent from this chat box are marked Spectator chats */}
-         <label hidden>
-           Send Message
-           </label>
-           <input
-             type="text"
-             className="chat-input"
-             value={messageText}
-             placeholder="Type your message here"
-             onChange={(e) => setMessage(e.target.value)}
-             required
-           />
-         <button className="submitButton" type="submit">Send</button>
-       </form></div>)}
+      {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox">
+        <SendChatBox gameId={gameId} userId={userId} spectatorChat={spectatorChat} />
+      </div>)}
        {!sessionUser && (
         <div className="sendChatBox">
         <p>Please log in to send messages.</p>
         </div>
       )}
       </div>
+
 
        </div>
 

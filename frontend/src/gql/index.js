@@ -329,8 +329,8 @@ const ADD_BLOCKED_USER = gql`
 `;
 
 const SEND_MESSAGE_TO_GAME = gql`
-  mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
-    sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
+  mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String, $spectatorChat: Boolean) {
+    sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText, spectatorChat: $spectatorChat) {
         count
         rows {
             sender {
@@ -339,6 +339,7 @@ const SEND_MESSAGE_TO_GAME = gql`
             }
             id
             messageText
+            spectatorChat
             createdAt
             deleted
        }
