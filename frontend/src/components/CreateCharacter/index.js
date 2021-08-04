@@ -16,8 +16,9 @@ const [bio, setBio] = useState("");
 const [imageUrl, setImageUrl] = useState("");
 const { gameId } = useParams();
 const [errors, setErrors] = useState([]);
+const history = useHistory();
 
-const [submitCharacterCreation] = useMutation(SUBMIT_CHARACTER_CREATION, { variables: { userId, name, bio, imageUrl, gameId }, onCompleted: submitCharacterCreation => { console.log( 'submitted', submitCharacterCreation )} } );
+const [submitCharacterCreation] = useMutation(SUBMIT_CHARACTER_CREATION, { variables: { userId, name, bio, imageUrl, gameId }, onCompleted: submitCharacterCreation => {  history.push(`/characters/${submitCharacterCreation.submitCharacterCreation.id}`) } } );
 
 const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,7 +41,7 @@ const handleSubmit = (e) => {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 required/>
-                <label>Name</label>
+                <label>Portrait Image URL</label>
                 <input type="text"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}

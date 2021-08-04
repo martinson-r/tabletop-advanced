@@ -29,8 +29,12 @@ function Home() {
     const { loading, error, data } = useQuery(GET_GAMES);
     const [getHosting, { loading: loadingHosted, error: errorHosted, data: dataHosted}] = useLazyQuery(GET_HOSTED_GAMES);
     const [getWaitlistGames, { loading: loadingWaiting, error: errorWaiting, data: dataWaiting}] = useLazyQuery(GET_WAITING_LIST_GAMES);
-    const [getGamesPlayingIn, {loading: loadingPlayingIn, data: playingInData}] = useLazyQuery(GET_GAMES_PLAYING_IN);
-    const [character, { data: charData, error: charError, loading: charLoading }] = useLazyQuery(GET_CHARACTER);
+
+    // Force query to not use cache so that new characters show up right away
+    const [getGamesPlayingIn, {loading: loadingPlayingIn, data: playingInData}] = useLazyQuery(GET_GAMES_PLAYING_IN, {
+        fetchPolicy: 'network-only'
+      });
+    //const [character, { data: charData, error: charError, loading: charLoading }] = useLazyQuery(GET_CHARACTER);
 
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
@@ -39,10 +43,10 @@ function Home() {
     const [acceptOffer] = useMutation(ACCEPT_OFFER, { variables: { applicationId, userId, gameId }});
     const [declineOffer] = useMutation(DECLINE_OFFER, { variables: { applicationId }});
 
-    const getchar = (userId, gameId) => {
-        const char = character({ variables: { userId, gameId }});
-        return char;
-    }
+    // const getchar = (userId, gameId) => {
+    //     const char = character({ variables: { userId, gameId }});
+    //     return char;
+    // }
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -65,7 +69,7 @@ function Home() {
             getWaitlistGames({ variables: { userId }});
             getGamesPlayingIn({ variables: { userId }});
         }
-    },[userId]);
+    },[userId, history]);
 
    //Calculate number of apps that have not been accepted or ignored (open apps) & set to our variable.
    //data object is non-extensible, so we can't set it as a key on there.
@@ -106,7 +110,8 @@ function Home() {
                 <p>Games I'm Playing In:</p>
                 {/* Link to character info from character name */}
                 {/* Use lazy query */}
-                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}>{console.log('GAMES', playingInData.getGamesPlayingIn)}<Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}, as <Link to={`/characters/${game.player[0].Characters[0].id}`}>{game.player[0].Characters[0].name}</Link></p>))}
+                {console.log('playing in data', playingInData)}
+                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}>{console.log('GAMES', playingInData.getGamesPlayingIn)}<Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}, as {game.player[0].Characters[0] === undefined && (<span><Link to={`/game/${game.id}/create-character`}>Create a character now</Link></span>)}{game.player[0].Characters[0] !== undefined && (<Link to={`/characters/${game.player[0].Characters[0].id}`}>{game.player[0].Characters[0].name}</Link>)}</p>))}
 
                 {/* TODO: create a character for a game if one doesn't exist */}
 

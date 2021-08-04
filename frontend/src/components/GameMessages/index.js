@@ -274,14 +274,14 @@ function GameMessages(props) {
          <label hidden>
            Send Message
            </label>
-           <input
-             type="text"
+           <textarea
              className="chat-input"
+             rows="6"
              value={messageText}
              placeholder="Type your message here"
              onChange={(e) => setMessage(e.target.value)}
              required
-           />
+           ></textarea>
          <button className="submitButton" type="submit">Send</button>
        </form></div>)}
        {!sessionUser && (
