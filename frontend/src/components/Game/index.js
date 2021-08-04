@@ -50,7 +50,7 @@ function Game() {
         <p>{data.game.description}</p>
         <p>Players:</p>
         {/* This feels a little backwards, but we're grabbing the player associated with the character */}
-        {data.game.Characters.map((character) => <p>{character.User.userName} as {character.name}</p>)}
+        {data.game.Characters.map((character) => <p><Link to={`/${character.User.id}/bio`}>{character.User.userName}</Link> as <Link to={`/characters/${character.id}`}>{character.name}</Link></p>)}
         </>)}
 
         {/* Player is able to join waitlist */}

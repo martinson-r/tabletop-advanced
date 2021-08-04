@@ -50,6 +50,10 @@ a {
     display: flex;
 }
 
+.premise {
+    color: black;
+}
+
 /* .recent-games-list {
 
 }

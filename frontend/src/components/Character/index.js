@@ -21,7 +21,9 @@ const { loading, error, data } = useQuery(GET_CHARACTER_BY_ID, { variables: { ch
             {(data !== undefined && !data.characterById) && (
                 <div><p>Sorry, it looks like that character doesn't exist.</p></div>
             )}
-            {(data !== undefined && data.characterById !== null) && (<div><p>Name: {data.characterById.name}, played by: {data.characterById.User.userName} in {data.characterById.Game.title}</p>
+            {(data !== undefined && data.characterById !== null) && (<div>
+                <img src={data.characterById.imageUrl} />
+                <p>Name: {data.characterById.name}, played by: {data.characterById.User.userName} in {data.characterById.Game.title}</p>
             <p>{data.characterById.bio}</p>
             </div>)}
 

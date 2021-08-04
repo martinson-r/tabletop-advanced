@@ -33,12 +33,13 @@ function Navigation({ isLoaded }){
   if (sessionUser && userId !== null) {
     sessionLinks = (
       <div className="navigation">
-      <p><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></p>
+      <p><i className="fas fa-dice-d20"></i></p>
+      <div><NavLink exact to="/">Tabletop Advanced</NavLink></div>
       <div><p>Hello, {sessionUser.userName}!</p></div>
       <div><NavLink to="/">Find a Game</NavLink></div>
       <div><NavLink to="/account">Account</NavLink></div>
       <div><NavLink to="/dashboard">My Games</NavLink></div>
-      <div><NavLink to={`${userId}/bio`}>My Bio</NavLink></div>
+      <div><NavLink to={`/${userId}/bio`}>My Bio</NavLink></div>
       <div onClick={logout}>Log Out</div>
       <div className="search-messages">
         <div><NavLink to={`/conversations`}><i className="far fa-envelope"></i></NavLink></div>

@@ -173,7 +173,8 @@ const typeDefs = gql`
     applicant: [User],
     player: [User],
     Characters: [Character],
-    Applications: [Application]
+    Applications: [Application],
+    blurb: String
   }
   type Application {
     id: ID

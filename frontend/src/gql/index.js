@@ -39,6 +39,7 @@ const GET_GAMES = gql`
         id
         title
         active
+        blurb
         description
         host {
             userName
@@ -139,6 +140,7 @@ const GET_GAME = gql`
         allowPlayerDeletes,
         waitListOpen,
         active,
+        blurb,
         host {
             userName
             id
@@ -148,8 +150,10 @@ const GET_GAME = gql`
             id
         }
         Characters {
+            id
             name
             User {
+                id
                 userName
             }
         }

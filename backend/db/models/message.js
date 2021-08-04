@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Message.init({
-    messageText: DataTypes.STRING,
+    messageText: DataTypes.TEXT,
     metaGameMessageTypeId: DataTypes.INTEGER,
     conversationTypeId: DataTypes.INTEGER,
     conversationId: DataTypes.INTEGER,
