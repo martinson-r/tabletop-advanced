@@ -4,14 +4,13 @@ import { Link, useHistory } from "react-router-dom";
 import {
     useQuery, useLazyQuery, useMutation
   } from "@apollo/client";
-import { GET_GAMES, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITING_LIST_GAMES,
+import { GET_GAMES, GET_CHARACTER, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITING_LIST_GAMES,
     GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES } from "../../gql"
 import "./dashboard.css";
 import { v4 as uuidv4 } from 'uuid';
 import { assertWrappingType } from "graphql";
 
 function Home() {
-
 
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
@@ -31,6 +30,7 @@ function Home() {
     const [getHosting, { loading: loadingHosted, error: errorHosted, data: dataHosted}] = useLazyQuery(GET_HOSTED_GAMES);
     const [getWaitlistGames, { loading: loadingWaiting, error: errorWaiting, data: dataWaiting}] = useLazyQuery(GET_WAITING_LIST_GAMES);
     const [getGamesPlayingIn, {loading: loadingPlayingIn, data: playingInData}] = useLazyQuery(GET_GAMES_PLAYING_IN);
+    const [character, { data: charData, error: charError, loading: charLoading }] = useLazyQuery(GET_CHARACTER);
 
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
@@ -38,6 +38,11 @@ function Home() {
 
     const [acceptOffer] = useMutation(ACCEPT_OFFER, { variables: { applicationId, userId, gameId }});
     const [declineOffer] = useMutation(DECLINE_OFFER, { variables: { applicationId }});
+
+    const getchar = (userId, gameId) => {
+        const char = character({ variables: { userId, gameId }});
+        return char;
+    }
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -100,7 +105,11 @@ function Home() {
                     {/* Just do 2 separate queries. One for Waiting List (excluding offerAccepted apps), one for games the user is a player in. */}
                 <p>Games I'm Playing In:</p>
                 {/* Link to character info from character name */}
-                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}, as add column for character data</p>))}
+                {/* Use lazy query */}
+                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}>{console.log('GAMES', playingInData.getGamesPlayingIn)}<Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}, as <Link to={`/characters/${game.player[0].Characters.filter(character => character.gameId === game.id)[0].id}`}>{game.player[0].Characters.filter(character => character.gameId === game.id)[0].name}</Link></p>))}
+
+                {/* TODO: create a character for a game if one doesn't exist */}
+
                 </div>
                 <div className="appliedTo">
                 <p>Games I've Applied To:</p>

@@ -154,7 +154,7 @@ const resolvers = {
         getGamesPlayingIn: (obj, args, context, info) => {
             const { userId } = args;
 
-            return Game.findAll({include: [{model: User, as: "player", where: { id: userId }}, {model: User, as: "host"}] });
+            return Game.findAll({include: [{model: User, as: "player", where: { id: userId }, include: {model: Character}}, {model: User, as: "host"}] });
         },
 
         getGameCreationInfo: async(obj, args, context, info) => {
@@ -500,6 +500,13 @@ const resolvers = {
             //Add app to waitlist
             await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
             return newApp;
+        },
+
+        submitCharacterCreation: async(root, args) => {
+            const { userId, gameId, bio, name, imageUrl } = args;
+            console.log('ARGS', args)
+            const character = await Character.create({userId, gameId, bio, name, imageUrl});
+            return character;
         },
 
         editWaitlistApp: async(root, args) => {

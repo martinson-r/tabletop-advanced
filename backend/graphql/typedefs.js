@@ -73,6 +73,7 @@ const typeDefs = gql`
     Applications: [Application]
     gameApplication: [Application]
     applicationOwner: [Application]
+    Characters: [Character]
   }
   type Ruleset {
     id: ID,
@@ -219,7 +220,8 @@ const typeDefs = gql`
     imageUrl: String,
     bio: String,
     User: User,
-    Game: Game
+    Game: Game,
+    gameId: ID
   }
   type Waitlist {
       id: ID,
@@ -237,6 +239,7 @@ const typeDefs = gql`
     sendNonGameMessages(userId: ID!, messageText: String!, conversationId: ID): CountAll
     submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
+    submitCharacterCreation(userId: ID, gameId: ID, bio: String, name: String, imageUrl: String): Character
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
     joinWaitlist(hostId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application

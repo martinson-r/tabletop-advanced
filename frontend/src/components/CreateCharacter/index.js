@@ -5,16 +5,49 @@ import { PubSub } from 'graphql-subscriptions';
 import {
     useLazyQuery, useMutation, useSubscription, InMemoryCache
   } from "@apollo/client";
+  import { SUBMIT_CHARACTER_CREATION  } from "../../gql";
 
   function CreateCharacter() {
     // Grab our session user
 const sessionUser = useSelector((state) => state.session.user);
-const currentUserId = sessionUser.id;
-const { userId } = useParams();
+const userId = sessionUser.id;
+const [name, setName] = useState("");
+const [bio, setBio] = useState("");
+const [imageUrl, setImageUrl] = useState("");
+const { gameId } = useParams();
+const [errors, setErrors] = useState([]);
+
+const [submitCharacterCreation] = useMutation(SUBMIT_CHARACTER_CREATION, { variables: { userId, name, bio, imageUrl, gameId }, onCompleted: submitCharacterCreation => { console.log( 'submitted', submitCharacterCreation )} } );
+
+const handleSubmit = (e) => {
+    e.preventDefault();
+    setErrors([]);
+    submitCharacterCreation(userId, gameId, name, bio, imageUrl);
+  };
 
     return (
         <div>
-
+            <p>Create Character:</p>
+            {/* TODO: create character form */}
+            <form onSubmit={handleSubmit}>
+                <label>Name</label>
+                <input type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required/>
+                <label>Bio</label>
+                <input type="text"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                required/>
+                <label>Name</label>
+                <input type="text"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                required/>
+                <button type="submit">Submit</button>
+            </form>
+            {/* TODO: character form changes depending on ruleset selected */}
         </div>
     )
 

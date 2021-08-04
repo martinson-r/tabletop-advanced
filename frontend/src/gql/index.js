@@ -116,6 +116,14 @@ query GetGamesPlayingIn($userId: ID) {
         host {
             userName
         }
+        player {
+            id
+            Characters {
+                id
+                gameId
+                name
+            }
+        }
     }
 }
 `;
@@ -467,6 +475,14 @@ const SUBMIT_WAITLIST_APP = gql`
 }
 `;
 
+const SUBMIT_CHARACTER_CREATION = gql`
+  mutation SubmitCharacterCreation($userId: ID, $gameId: ID, $bio: String, $imageUrl: String, $name: String) {
+    submitCharacterCreation(gameId: $gameId, userId: $userId, bio: $bio, imageUrl: $imageUrl, name: $name) {
+                id
+    }
+}
+`;
+
 const EDIT_WAITLIST_APP = gql`
   mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
     editWaitlistApp(applicationId: $applicationId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
@@ -611,6 +627,7 @@ export { GET_ACCOUNTS,
         SPECTATOR_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
         SUBMIT_WAITLIST_APP,
+        SUBMIT_CHARACTER_CREATION,
         EDIT_WAITLIST_APP,
         GET_WAITLIST_STATUS,
         GET_WAITLIST_APPLIED,
