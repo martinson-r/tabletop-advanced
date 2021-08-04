@@ -154,7 +154,7 @@ const resolvers = {
         getGamesPlayingIn: (obj, args, context, info) => {
             const { userId } = args;
 
-            return Game.findAll({include: [{model: User, as: "player", where: { id: userId }, include: {model: Character}}, {model: User, as: "host"}] });
+            return Game.findAll({include: [{model: User, as: "player", where: { id: userId }, include: {model: Character, where: { gameId: {[Op.col]: 'Game.id'} }}}, {model: User, as: "host"}] });
         },
 
         getGameCreationInfo: async(obj, args, context, info) => {

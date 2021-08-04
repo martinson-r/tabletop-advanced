@@ -106,7 +106,7 @@ function Home() {
                 <p>Games I'm Playing In:</p>
                 {/* Link to character info from character name */}
                 {/* Use lazy query */}
-                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}>{console.log('GAMES', playingInData.getGamesPlayingIn)}<Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}, as <Link to={`/characters/${game.player[0].Characters.filter(character => character.gameId === game.id)[0].id}`}>{game.player[0].Characters.filter(character => character.gameId === game.id)[0].name}</Link></p>))}
+                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}>{console.log('GAMES', playingInData.getGamesPlayingIn)}<Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}, as <Link to={`/characters/${game.player[0].Characters[0].id}`}>{game.player[0].Characters[0].name}</Link></p>))}
 
                 {/* TODO: create a character for a game if one doesn't exist */}
 
