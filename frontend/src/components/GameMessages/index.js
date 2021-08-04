@@ -251,7 +251,7 @@ function GameMessages(props) {
 
       <div ref={messageBoxRef} className="messageBox game">
        {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos && sortedConvos.map(message => <div>{console.log('ISSPECTATE', message)}<MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/></div>)}
+      {sortedConvos && sortedConvos.map(message => message.spectatorChat.toString() !== "true" && <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
       {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (
@@ -284,6 +284,36 @@ function GameMessages(props) {
        {/* {gameData !== undefined && gameData.game.active !== true && (
          <p>This game is no longer active.</p>
        )} */}
+        <div ref={messageBoxRef} className="messageBox game">
+       {/* Behaves very strangely if not passed a key. */}
+      {sortedConvos && sortedConvos.map(message => message.spectatorChat.toString() === "true" && (<MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>))}
+      {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
+         {/* <ul>
+           {errors.map((error, idx) => (
+             <li key={idx}>{error}</li>
+           ))}
+         </ul> */}
+         {/* TODO: error message for no blank messages */}
+         {/* TODO: messages sent from this chat box are marked Spectator chats */}
+         <label hidden>
+           Send Message
+           </label>
+           <input
+             type="text"
+             className="chat-input"
+             value={messageText}
+             placeholder="Type your message here"
+             onChange={(e) => setMessage(e.target.value)}
+             required
+           />
+         <button className="submitButton" type="submit">Send</button>
+       </form></div>)}
+       {!sessionUser && (
+        <div className="sendChatBox">
+        <p>Please log in to send messages.</p>
+        </div>
+      )}
+      </div>
 
        </div>
 
