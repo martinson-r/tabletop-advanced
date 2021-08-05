@@ -44,11 +44,8 @@ function Navigation({ isLoaded }){
         <div><NavLink to="/account">Account</NavLink></div>
         <div><NavLink to="/dashboard">My Games</NavLink></div>
         <div><NavLink to={`/${userId}/bio`}>My Bio</NavLink></div>
-        <div onClick={logout}>Log Out</div>
-      </div>
-
-      <div className="search-messages">
         <div><NavLink to={`/conversations`}><i className="far fa-envelope"></i></NavLink></div>
+        <div onClick={logout}>Log Out</div>
         {/* <ProfileButton user={sessionUser} />
         <SearchModal /> */}
         </div>

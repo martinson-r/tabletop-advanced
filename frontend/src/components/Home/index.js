@@ -97,7 +97,7 @@ function Home() {
 
                     {/* <p>Active Games:</p> */}
                     {gameData && (gameData.map((game) =>
-                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, presented by {game.host.userName}<br /><span className="premise">Premise: {game.blurb}</span></p></div>))
+                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, presented by {game.host.userName}<br /><span className="premise"><i>{game.blurb}</i></span></p></div>))
                     ))}
 
                     {/* Show inactive games conditionally */}
@@ -121,9 +121,7 @@ function Home() {
             <div className="game-filters">
                  {/* TODO: a component that fetches/displays by category fed in */}
                 <div>
-                    <div>
-                        <p>Games by Ruleset:</p>
-                    </div>
+                        <h2>Games by Ruleset:</h2>
                     {/* TODO: fetch all rulesets from database and map containers */}
                     <div className="game-cards-container">
                        {rulesetsData !==undefined && (rulesetsData.rulesets.map((ruleset) =>  <div className="game-card">

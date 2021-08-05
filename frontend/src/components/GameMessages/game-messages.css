@@ -106,11 +106,14 @@
 
 .gameDetails {
     display: flex;
-    justify-content: space-between;
     background-color: var(--jacquaranda);
     border-radius: 6px 6px 0 0;
     padding: 10px;
     margin-top: 10px;
+}
+
+.gameDetails p {
+    margin-left: 50px;
 }
 
 .gameDetails a, .notification a {

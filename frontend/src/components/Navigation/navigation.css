@@ -22,6 +22,12 @@
 
   .lefthand-nav {
     padding-left: 10px;
+    display: flex;
+    width: 40%;
+  }
+
+  .lefthand-nav div:last-of-type {
+    margin-left: 30px;
   }
 
   .righthand-nav {

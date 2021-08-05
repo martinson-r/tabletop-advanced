@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams, Link } from 'react-router-dom';
-
+import './ViewApplication.css';
 
 //Query to get app.
 //Display edit fields conditionally if app belongs to user.
@@ -90,13 +90,13 @@ function ViewApplication() {
     return (
         <>
         {console.log('app', application)}
-        {data !== undefined && Object.keys(application).length !== 0 && (<div><p><Link to={`/game/${application.Games[0].id}/gameroom`}>Back to Game: {application.Games[0].title}</Link></p>
+        {data !== undefined && Object.keys(application).length !== 0 && (<div><Link to={`/game/${application.Games[0].id}/gameroom`}>Back to Game: {application.Games[0].title}</Link>
         <p>Application</p>
         {/* TODO: Make this less ugly */}
         {console.log('id', application.applicationOwner[0].id)}
         <p>User name: {application.applicationOwner[0].userName}</p>
-        {application.accepted.toString() === 'true' && (<p><i>This application has been approved.</i></p>)}
-        {application.ignored.toString() === 'true' && application.accepted.toString() !== 'true' && (<p><i>This application has been ignored.</i></p>)}
+        {application.accepted.toString() === 'true' && (<i>This application has been approved.</i>)}
+        {application.ignored.toString() === 'true' && application.accepted.toString() !== 'true' && (<i>This application has been ignored.</i>)}
         {/* Display text or form depending on if the applicant wishes to edit the application. */}
         {editApplication.toString() === 'false' && (<div>
         <p>Why Join: {application.whyJoin}</p>

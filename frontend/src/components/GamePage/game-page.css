@@ -1,0 +1,14 @@
+.game-content-block {
+    display: block;
+    padding-bottom: 30px;
+}
+
+label:first-of-type {
+    margin-left: 0;
+}
+
+.toggle-flex {
+    display: flex;
+    width: 40%;
+    justify-content: space-between;
+}
