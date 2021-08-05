@@ -18,7 +18,6 @@ function GameMessages(props) {
     const [userId, setUserId] = useState(null);
     const [isPlayer, setIsPlayer] = useState(false);
     const [messageText, setMessage] = useState("");
-    const [spectatorMessageText, setSpectatorMessage] = useState("");
     const [newMessage, setNewMessage] = useState(null);
     const [newSpectatorMessage, setNewSpectatorMessage] = useState(null);
     const [sortedConvos, setSortedConvos] = useState([]);
@@ -258,58 +257,65 @@ function GameMessages(props) {
       <div className="messagesContainer">
 
       {/* TODO: Query to see if player is in game */}
+      <div className="messageListing">
+        <div ref={messageBoxRef} className="messageBox game">
+
+          {/* Hack to get flexbox to space items properly */}
+          <div class="spacer"></div>
+
+          {/* Behaves very strangely if not passed a key. */}
+          {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
+            message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message}
+            userId={userId} gameId={gameId} gameData={gameData}/>)}
+        </div>
 
       <div ref={messageBoxRef} className="messageBox game">
-       {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message => message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
-      {/* TODO: move to component */}
-      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
-         {console.log(gameData)}
-         {/* <ul>
-           {errors.map((error, idx) => (
-             <li key={idx}>{error}</li>
-           ))}
-         </ul> */}
-         {/* TODO: error message for no blank messages */}
-         <label hidden>
-           Send Message
-           </label>
-           <textarea
-             className="chat-input"
-             rows="6"
-             value={messageText}
-             placeholder="Type your message here"
-             onChange={(e) => setMessage(e.target.value)}
-             required
-           ></textarea>
-         <button className="submitButton" type="submit">Send</button>
-       </form></div>)}
-       {!sessionUser && (
-        <div className="sendChatBox">
-        <p>Please log in to send messages.</p>
-        </div>
-      )}
+        <div class="spacer">boo</div>
+        {/* Behaves very strangely if not passed a key. */}
+
+        {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
+          message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message}
+          userId={userId} gameId={gameId} gameData={gameData}/>))}
       </div>
+    </div>
+
+      <div className="sendChatBoxes">
+
+       {/* {!sessionUser && (
+        <div className="notification">
+        <p>Please log in to send in-game messages.</p>
+        </div>
+      )} */}
+      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer !== true && gameData.game.host.id !== userId.toString()) && (<div>You must be a player to send an in-game chat</div>)}
+
+
 
        {/* {gameData !== undefined && gameData.game.active !== true && (
          <p>This game is no longer active.</p>
        )} */}
-       <div ref={messageBoxRef} className="messageBox game">
-       {/* Behaves very strangely if not passed a key. */}
-       {console.log('sorted', sortedConvos)}
-      {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message => message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>))}
+
+
+      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
+      <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
+
       {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox">
-        <SendChatBox gameId={gameId} userId={userId} spectatorChat={spectatorChat} />
-      </div>)}
-       {!sessionUser && (
-        <div className="sendChatBox">
-        <p>Please log in to send messages.</p>
+      <SendChatBox gameId={gameId} userId={userId} spectatorChat={true} /></div>)}
+
+      {!sessionUser && (
+        <div className="notification">
+        <p>Please log in to send in-game messages.</p>
         </div>
       )}
+      {!sessionUser && (
+        <div className="notification">
+        <p>Please log in to send spectator messages.</p>
+        </div>
+      )}
+
+
+      </div>
       </div>
 
-
-       </div>
 
     )
 }

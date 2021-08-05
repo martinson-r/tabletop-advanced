@@ -16,8 +16,7 @@ import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, GAME_MESSAGES_SUBSCRIP
 function SendChatBox(props){
 
     const [messageText, setMessage] = useState("");
-    const {gameId, userId} = props;
-    const [spectatorChat, setSpectatorChat] = useState(true);
+    const {gameId, userId, spectatorChat} = props;
     const [errors, setErrors] = useState([]);
     const [submittedMessage, setSubmittedMessage] = useState(false);
 
