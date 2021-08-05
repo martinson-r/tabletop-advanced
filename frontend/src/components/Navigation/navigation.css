@@ -45,11 +45,11 @@
   } */
 
   .navigation div:hover {
-    font-weight: bold;
+    color: white;
   }
 
   .navigation a:hover {
-    font-weight: bold;
+    color:  white;
   }
 
   /* Cool but looks like crap... keeping for reference

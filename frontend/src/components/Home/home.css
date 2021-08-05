@@ -11,6 +11,7 @@
     --lightestGray: #D3D3BA;
     --veryDarkGray: #585858;
     --jacquaranda: #7B61FF;
+    --deepJacquaranda: #5b3aff;
 
     /* Doing this so that I don't accidentally change the colors of
     things by accident */
@@ -20,6 +21,7 @@
     --gameBoxColor: var(--mediumGray);
     --gameBoxTextColor: var(--veryDarkGray);
     --createGameButton: var(--jacquaranda);
+    --createGameButtonHover: var(--deepJacquaranda);
 }
 
 p {
@@ -125,10 +127,11 @@ not alter text opacity */
 
 .newest-games-container {
     margin-left: 10px;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     display: flex;
     justify-content:space-between;
+    align-items: center;
 }
 
 .newest-title {
@@ -140,6 +143,10 @@ not alter text opacity */
     color: white;
     background-color: var(--createGameButton);
     border-radius: 6px;
+}
+
+.create-game-button:hover {
+    background-color: var(--createGameButtonHover);
 }
 
 .recent-games-list {
