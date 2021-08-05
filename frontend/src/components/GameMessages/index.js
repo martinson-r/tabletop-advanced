@@ -270,7 +270,7 @@ function GameMessages(props) {
         </div>
 
       <div ref={messageBoxRef} className="messageBox game">
-        <div class="spacer">boo</div>
+        <div class="spacer"></div>
         {/* Behaves very strangely if not passed a key. */}
 
         {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
@@ -286,7 +286,7 @@ function GameMessages(props) {
         <p>Please log in to send in-game messages.</p>
         </div>
       )} */}
-      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer !== true && gameData.game.host.id !== userId.toString()) && (<div>You must be a player to send an in-game chat</div>)}
+      {/* {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer !== true && gameData.game.host.id !== userId.toString()) && (<div>You must be a player to send an in-game chat</div>)} */}
 
 
 
@@ -298,17 +298,14 @@ function GameMessages(props) {
       {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
       <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
 
+      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
+      You are a spectator</div>)}
+
       {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox">
       <SendChatBox gameId={gameId} userId={userId} spectatorChat={true} /></div>)}
-
       {!sessionUser && (
         <div className="notification">
-        <p>Please log in to send in-game messages.</p>
-        </div>
-      )}
-      {!sessionUser && (
-        <div className="notification">
-        <p>Please log in to send spectator messages.</p>
+        <p>Please log in to participate.</p>
         </div>
       )}
 

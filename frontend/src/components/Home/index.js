@@ -85,8 +85,8 @@ function Home() {
                 <span><b>Newest Games:</b>
                 <label>Show inactive games</label>
                 <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
-                <label>Show waitlist closed</label>
-                <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
+                {/* <label>Show waitlist closed</label>
+                <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/> */}
                 <Link className="create-game-button" to="/start-game">Create a Game</Link>
                 </span></div>
 

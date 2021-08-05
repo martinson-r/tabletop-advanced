@@ -26,7 +26,7 @@
     background-color: var(--messageBoxColor);
     height:300px;
     overflow-x:hidden;
-    overflow-y:auto;
+    overflow-y:hidden;
     padding: 0;
     /* display: block; */
     display: flex;
@@ -38,10 +38,19 @@
 .messageBox.game {
     height: 400px;
     width:100vw;
-    border-radius: 6px 0 0 6px;
+    border-radius: 6px 0 0 0;
     display:flex;
     justify-content:space-between;
 }
+
+.messageBox.game:last-of-type {
+    height: 400px;
+    width:100vw;
+    border-radius: 0 6px 0 0;
+    display:flex;
+    justify-content:space-between;
+}
+
 
 .messageBox:hover {
     overflow-y: scroll;
@@ -72,7 +81,6 @@
     background-color: var(--submitButtonColor);
     border: none;
     width: 100%;
-    margin-top:20px;
 }
 
 .chat-input {

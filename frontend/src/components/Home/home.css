@@ -143,3 +143,8 @@ not alter text opacity */
 .gameBox a {
     color: black;
 }
+
+textarea {
+    resize: vertical;
+    min-height: 2em;
+}

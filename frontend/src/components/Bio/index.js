@@ -42,14 +42,14 @@ useEffect(() => {
      setRecipients([data.about[0].User.userName]);
     }
  }
-},[data])
-
+},[data]);
 
 return (
     // Edge case: user has no bio
     // Solution: user has an 'empty' bio created for them upon signup
     <div>
-    {data !== undefined && data.about !== undefined &&
+        {console.log(data)}
+    {data !== undefined && data.about[0] !== undefined &&
     (<div><p>About {data.about[0].User.userName}:</p>
     {/* Conditional edit buttons based on whether user or not */}
     {/* Edit form fields directly */}
