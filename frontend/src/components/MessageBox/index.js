@@ -123,7 +123,6 @@ function MessageBox(props) {
           <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{data !== undefined && data.character !== null && (<span>{data.character.name} &#40;</span>)}{message.sender.userName}{data !== undefined && data.character !== null && (<span>&#41;</span>)}</Link>:<br /> {message.deleted !== true &&
             (<span>{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>)}
         </div>
-
             )
 
 }

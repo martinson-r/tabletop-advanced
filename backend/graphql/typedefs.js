@@ -22,12 +22,16 @@ const typeDefs = gql`
     getPlayingWaitingGames(userId: ID): [User]
     getWaitlistGames(userId: ID): [Game]
     getGamesPlayingIn(userId: ID): [Game]
+    simpleSearch(text: String): resultsArray
     characterById(characterId: ID): Character
   }
   type GameCreationInfo {
     languages: [Language],
     rulesets: [Ruleset]
     gameTypes: [GameType]
+  }
+  type resultsArray {
+    wordsArray: [[Game]]
   }
   type User {
     id: ID,

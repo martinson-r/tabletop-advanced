@@ -164,7 +164,34 @@ const resolvers = {
             const rulesets = await Ruleset.findAll();
             const gameTypes = await GameType.findAll();
             return {languages, rulesets, gameTypes};
-        }
+        },
+
+        simpleSearch: async(obj, args, context, info) => {
+            const { text } = args;
+            const words = text.split(' ');
+            const wordsArray = [];
+            // console.log('WORDS', words);
+
+            console.log('WORDS 2', words);
+
+            // const test = await Game.findAll({where: { title: {[Op.iLike]: '%' + sentence + '%'} }})
+            // console.log('TEST', test);
+
+                    for (word in words) {
+                        wordsArray.push(await Game.findAll({where: { title: {[Op.iLike]: '%' + words[word] + '%'} }}));
+                    }
+
+            return { wordsArray: wordsArray }
+
+            // console.log('RESULT', wordsArray);
+
+
+            // return {wordsArray};
+
+            // return Game.findAll({where: { title: {
+            //     [Sequelize.Op.iLike]: '%' + text + '%'
+            // } }})
+        },
     },
     Mutation: {
         sendMessageToGame: async(root,args) => {

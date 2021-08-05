@@ -331,6 +331,18 @@ query GetGameCreationInfo {
 }
 `;
 
+const SIMPLE_SEARCH = gql`
+query SimpleSearch($text: String) {
+    simpleSearch(text: $text) {
+        wordsArray {
+            id
+            title
+            blurb
+          }
+    }
+}
+`
+
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
   mutation AddBlockedUser($email: String) {
@@ -630,6 +642,7 @@ export { GET_ACCOUNTS,
         NON_GAME_MESSAGES_SUBSCRIPTION,
         SPECTATOR_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
+        SIMPLE_SEARCH,
         SUBMIT_WAITLIST_APP,
         SUBMIT_CHARACTER_CREATION,
         EDIT_WAITLIST_APP,

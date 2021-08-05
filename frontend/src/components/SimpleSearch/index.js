@@ -3,21 +3,24 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {  useHistory } from "react-router-dom";
 import "./SimpleSearch.css"
-// import search from "../../media/search.svg";
+import {
+  useLazyQuery, useMutation, useSubscription, InMemoryCache
+} from "@apollo/client";
+
+import { SIMPLE_SEARCH } from "../../gql";
+
 
 const SimpleSearch = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const [query, setQuery] = useState("");
   const updateQuery = (e) => setQuery(e.target.value);
+  const [simpleSearch, { data, error, loading }] = useLazyQuery(SIMPLE_SEARCH);
 
   const submitForm = async (e) => {
     e.preventDefault();
-    const payload = {
-        query
-      };
-    // dispatch(searchTables(payload));
-    history.push('/results')
+
+    history.push(`/search/${query}`)
   };
 
   return (

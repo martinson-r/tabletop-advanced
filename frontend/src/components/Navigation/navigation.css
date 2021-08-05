@@ -24,6 +24,14 @@
     padding-left: 10px;
   }
 
+  .righthand-nav {
+    padding-right: 10px;
+    display: flex;
+    width: 40%;
+    justify-content: space-between;
+  }
+
+
   /* @keyframes rainbow {
     0%   {background-position: 0px 0px;}
     14.2%  {background-position: 14.2%, 14.2%;}

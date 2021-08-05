@@ -56,10 +56,12 @@ function Navigation({ isLoaded }){
     );
   } else {
     sessionLinks = (
-      <div className="navigation">
-        <div><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></div>
 
-      <div>
+      <div className="navigation">
+        <div className="lefthand-nav">
+        <div><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></div>
+      </div>
+      <div className="righthand-nav">
         <SimpleSearch />
         <NavLink to="/login">Log In</NavLink>
         <NavLink to="/signup">Sign Up</NavLink>
