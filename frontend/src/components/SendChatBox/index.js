@@ -29,6 +29,7 @@ function SendChatBox(props){
           //Offset is fine at this point. No need to do anything with it.
           updateMessages(gameId, userId, messageText, spectatorChat);
           setSubmittedMessage(true);
+          setMessage('');
       }
 
  return (
