@@ -25,6 +25,7 @@ function GameMessages(props) {
     const [submittedMessage, setSubmittedMessage] = useState(false);
     const [isScrolling, setIsScrolling] = useState(false);
     const [spectatorChat, setSpectatorChat] = useState(false);
+    const [hideSpectatorChat, setHideSpectatorChat] = useState(false);
 
     const messageBoxRef = useRef(null);
 
@@ -123,12 +124,6 @@ function GameMessages(props) {
           console.log(subscriptionData.data)
           const newFeedItem = subscriptionData.data.messageSent;
           setNewMessage(newFeedItem)
-
-          console.log('SUB', subscriptionData)
-
-          console.log('NEW', newFeedItem)
-
-          console.log('PREV', prev);
 
           //This part is broken.
           //This really should be done in cache.
@@ -251,9 +246,18 @@ function GameMessages(props) {
     }
 
 
+    const toggleHideSpectatorChat = () => {
+      setHideSpectatorChat(!hideSpectatorChat);
+    }
 
 
     return (
+      <div>
+
+        <form>
+         <label for="hideSpectatorChat">Hide spectator chat</label>
+          <input type="checkbox" name="hideSpectatorChat" checked={hideSpectatorChat} onChange={toggleHideSpectatorChat} />
+        </form>
       <div className="messagesContainer">
 
       {/* TODO: Query to see if player is in game */}
@@ -269,7 +273,18 @@ function GameMessages(props) {
             userId={userId} gameId={gameId} gameData={gameData}/>)}
         </div>
 
-      <div ref={messageBoxRef} className="messageBox game">
+        {/* <div className="sendChatBoxes"> */}
+          {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
+          <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
+
+          {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (<div className="sendChatBox">
+          You are a spectator</div>)}
+        {/* </div> */}
+    </div>
+
+    {hideSpectatorChat.toString() === "false" && (<div className="messageListing">
+
+    <div ref={messageBoxRef} className="messageBox game">
         <div class="spacer"></div>
         {/* Behaves very strangely if not passed a key. */}
 
@@ -277,9 +292,8 @@ function GameMessages(props) {
           message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message}
           userId={userId} gameId={gameId} gameData={gameData}/>))}
       </div>
-    </div>
 
-      <div className="sendChatBoxes">
+      {/* <div className="sendChatBoxes"> */}
 
        {/* {!sessionUser && (
         <div className="notification">
@@ -294,14 +308,7 @@ function GameMessages(props) {
          <p>This game is no longer active.</p>
        )} */}
 
-
-      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
-      <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
-
-      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
-      You are a spectator</div>)}
-
-      {sessionUser !== undefined && gameData !== undefined && (<div className="sendChatBox">
+      {sessionUser !== undefined && sessionUser !== null && gameData !== undefined && (<div className="sendChatBox">{console.log('userId',sessionUser)}
       <SendChatBox gameId={gameId} userId={userId} spectatorChat={true} /></div>)}
       {!sessionUser && (
         <div className="notification">
@@ -309,7 +316,8 @@ function GameMessages(props) {
         </div>
       )}
 
-
+      {/* </div> */}
+      </div>)}
       </div>
       </div>
 
