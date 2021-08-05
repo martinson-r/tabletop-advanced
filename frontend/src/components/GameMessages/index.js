@@ -11,7 +11,8 @@ import { v4 as uuidv4 } from 'uuid';
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, GAME_MESSAGES_SUBSCRIPTION, SPECTATOR_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { GET_GAME, GET_WAITLIST_APPLIED, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, GAME_MESSAGES_SUBSCRIPTION, SPECTATOR_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { DateTime } from "../../utils/luxon";
 
 function GameMessages(props) {
     const sessionUser = useSelector(state => state.session.user);
@@ -256,7 +257,9 @@ function GameMessages(props) {
         <div className="gameDetails">
           <div><input type="checkbox" name="hideSpectatorChat" checked={hideSpectatorChat} onChange={toggleHideSpectatorChat} />
           <label for="hideSpectatorChat">Hide spectator chat</label></div>
-          {gameData !== undefined && (<p><Link to={`/game/${gameData.game.id}`}>{gameData.game.title}</Link> presented by {gameData.game.host.userName}</p>)}
+          {gameData !== undefined && (<div><p><Link to={`/game/${gameData.game.id}`}>{gameData.game.title}</Link> presented by {gameData.game.host.userName}</p>
+          <p><i>{gameData.game.blurb}</i></p>
+          </div>)}
         </div>
 
       <div className="messagesContainer">

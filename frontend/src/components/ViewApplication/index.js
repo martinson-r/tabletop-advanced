@@ -90,7 +90,7 @@ function ViewApplication() {
     return (
         <>
         {console.log('app', application)}
-        {data !== undefined && Object.keys(application).length !== 0 && (<div><p><Link to={`/game/${application.Games[0].id}`}>Back to Game: {application.Games[0].title}</Link></p>
+        {data !== undefined && Object.keys(application).length !== 0 && (<div><p><Link to={`/game/${application.Games[0].id}/gameroom`}>Back to Game: {application.Games[0].title}</Link></p>
         <p>Application</p>
         {/* TODO: Make this less ugly */}
         {console.log('id', application.applicationOwner[0].id)}
@@ -155,7 +155,7 @@ function ViewApplication() {
         }
         {/* Check if user is host before displaying approve/ignore buttons */}
         {userId.toString() === application.Games[0].host.id.toString() && (
-            <div>{application.accepted.toString() !== 'true' && (<button onClick={handleApproveApplication}>Approve</button>)}
+            <div>{application.accepted.toString() !== 'true' && (<button onClick={handleApproveApplication}>Accept</button>)}
             {application.ignored.toString() !== 'true' && application.accepted.toString() !== 'true' && (<button onClick={handleIgnoreApplication}>Ignore</button>)}</div>
         )}
         </div>)}
