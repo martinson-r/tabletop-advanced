@@ -41,7 +41,7 @@ function SearchResults() {
         <>
         <div className="container">
         {console.log('RESULTS', data)}
-        {dedupedResults !== undefined && (dedupedResults.map(results => results.map(indivResult => <div>{indivResult.title} - {indivResult.blurb}</div>)))}
+        {dedupedResults !== undefined && (dedupedResults.map(results => results.map(indivResult => <div><Link to={`/game/${indivResult.id}/gameroom`}>{indivResult.title}</Link> - {indivResult.blurb}</div>)))}
         </div>
         </>
     )
