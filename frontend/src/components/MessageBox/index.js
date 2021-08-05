@@ -71,7 +71,7 @@ function MessageBox(props) {
       if (editDisplay === true && sessionUser !== undefined) return (
         <div className="indivMessageBox">
         <p key={uuidv4()} className="indivMessage">{message.sender.userName}: </p>
-        <form onSubmit={editMessageSubmit}>
+        <form className="edit-message-form" onSubmit={editMessageSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>

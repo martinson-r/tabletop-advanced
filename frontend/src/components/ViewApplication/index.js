@@ -88,21 +88,22 @@ function ViewApplication() {
       };
 
     return (
-        <>
+        <div class="container">
+          <div class="gray-backdrop">
         {console.log('app', application)}
         {data !== undefined && Object.keys(application).length !== 0 && (<div><Link to={`/game/${application.Games[0].id}/gameroom`}>Back to Game: {application.Games[0].title}</Link>
-        <p>Application</p>
+        <h2><Link to={`/${application.applicationOwner[0].id}/bio`}>{application.applicationOwner[0].userName}'s</Link> Application</h2>
         {/* TODO: Make this less ugly */}
         {console.log('id', application.applicationOwner[0].id)}
-        <p>User name: {application.applicationOwner[0].userName}</p>
-        {application.accepted.toString() === 'true' && (<i>This application has been approved.</i>)}
+
+        {application.accepted.toString() === 'true' && (<p><i>This application has been approved.</i></p>)}
         {application.ignored.toString() === 'true' && application.accepted.toString() !== 'true' && (<i>This application has been ignored.</i>)}
         {/* Display text or form depending on if the applicant wishes to edit the application. */}
         {editApplication.toString() === 'false' && (<div>
-        <p>Why Join: {application.whyJoin}</p>
-        <p>Experience: {application.experience}</p>
-        <p>Character Name: {application.charName}</p>
-        <p>Character Concept: {application.charConcept}</p>
+        <p><b>Why Join:</b> {application.whyJoin}</p>
+        <p><b>Experience:</b> {application.experience}</p>
+        <p><b>Character Name:</b> {application.charName}</p>
+        <p><b>Character Concept:</b> {application.charConcept}</p>
         {console.log('owner', application.applicationOwner[0].id.toString(), userId)}
         {application !== undefined && application.applicationOwner[0].id.toString() === userId.toString() && (<button onClick={editApplicationButton}>Edit Application</button>)}
         </div>)}
@@ -159,7 +160,8 @@ function ViewApplication() {
             {application.ignored.toString() !== 'true' && application.accepted.toString() !== 'true' && (<button onClick={handleIgnoreApplication}>Ignore</button>)}</div>
         )}
         </div>)}
-        </>
+        </div>
+        </div>
 
     )
 

@@ -4,26 +4,6 @@
     box-sizing: border-box;
 }
 
-:root {
-    --lighterGray: #A8A9AB;
-    --darkerGray: #5A5850;
-    --mediumGray: #C4C4C4;
-    --lightestGray: #D3D3BA;
-    --veryDarkGray: #585858;
-    --jacquaranda: #7B61FF;
-    --deepJacquaranda: #5b3aff;
-
-    /* Doing this so that I don't accidentally change the colors of
-    things by accident */
-    --navLink: var(--lighterGray);
-    --cardBackgroundColor: var(--darkerGray);
-    --cardTextColor: var(--lightestGray);
-    --gameBoxColor: var(--mediumGray);
-    --gameBoxTextColor: var(--veryDarkGray);
-    --createGameButton: var(--jacquaranda);
-    --createGameButtonHover: var(--deepJacquaranda);
-}
-
 p {
     color: white;
     margin: 0;
@@ -104,6 +84,7 @@ avoid weird flexbox spacing issues */
 .game-card p {
     padding: 10px;
     text-align: center;
+    color: white;
 }
 
 /* Adding image as ::before makes it so altering image opacity does

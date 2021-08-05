@@ -104,3 +104,9 @@ color: black;
     background-position: top;
     background-size: cover;
 }
+
+.edit-message-form input {
+    border: 0;
+    padding: 10px;
+    width: 100%;
+}

@@ -1,0 +1,16 @@
+p {
+    margin-bottom: 20px;
+    color: black;
+  }
+
+  h2, h3 {
+    color: black;
+  }
+
+  a {
+      color: var(--jacquaranda);
+  }
+
+  a:hover {
+      color: white;
+  }
