@@ -261,7 +261,7 @@ function GameMessages(props) {
       <div className="messagesContainer">
 
       {/* TODO: Query to see if player is in game */}
-      <div className="messageListing">
+      <div className="messageListing" data-status={hideSpectatorChat}>
         <div ref={messageBoxRef} className="messageBox game">
 
           {/* Hack to get flexbox to space items properly */}

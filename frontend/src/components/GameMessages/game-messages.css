@@ -17,20 +17,23 @@
     width:100%;
     border-radius: 6px;
     background-color: var(--messageBoxColor);
+    overflow: hidden;
 }
 
 .messageListing {
-    width: 50%;
     display: flex;
     flex-flow:column;
     justify-content:space-between;
+    width: 50%;
+}
+
+.messageListing[data-status="true"] {
+    width: 100%;
 }
 
 .messageBox {
-    /* height:300px; */
     overflow-x:hidden;
     padding: 0;
-    display: flex;
     min-height: 20px;
 }
 
@@ -38,7 +41,6 @@
     height: 400px;
     display:flex;
     flex-direction: column;
-    width: 100%;
 }
 
 .messageBox.game:last-of-type {
@@ -59,7 +61,7 @@
 .sendChatBox {
     bottom: 0px;
     border-radius: 0 0 6px 6px;
-    width:100%;
+    /* width:100%; */
     min-height:140px;
     display: flex;
 }
@@ -78,7 +80,7 @@
     background-color: var(--submitButtonColor);
     border: none;
     align-self:flex-end;
-    width: 100%;
+    /* width: 100%; */
 }
 
 .chat-input {

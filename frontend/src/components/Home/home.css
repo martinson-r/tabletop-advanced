@@ -40,6 +40,7 @@ a {
 }
 
 .top-game-display-container {
+    width: 100%;
     display: grid;
     grid-template-columns: 25% 75%;
 }
@@ -58,13 +59,10 @@ a {
     color: black;
 }
 
-/* .recent-games-list {
-
-}
 
 .popular-game-preview {
-
-} */
+width: 100%;
+}
 
 .game-filters {
     display: flex;
@@ -117,7 +115,7 @@ not alter text opacity */
 .newest-games-container {
     margin-left: 10px;
     margin-top: 30px;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 .create-game-button {
