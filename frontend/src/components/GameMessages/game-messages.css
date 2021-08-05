@@ -41,6 +41,7 @@
     height: 400px;
     display:flex;
     flex-direction: column;
+    flex-grow: 2;
 }
 
 .messageBox.game:last-of-type {
@@ -80,7 +81,11 @@
     background-color: var(--submitButtonColor);
     border: none;
     align-self:flex-end;
-    /* width: 100%; */
+    width: 100%;
+}
+
+.notification.spectator {
+    align-self:flex-start;
 }
 
 .chat-input {

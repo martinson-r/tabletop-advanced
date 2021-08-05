@@ -262,6 +262,9 @@ function GameMessages(props) {
 
       {/* TODO: Query to see if player is in game */}
       <div className="messageListing" data-status={hideSpectatorChat}>
+      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
+          <div className="notification spectator">You are a spectator</div>)}
+
         <div ref={messageBoxRef} className="messageBox game">
 
           {/* Hack to get flexbox to space items properly */}
@@ -278,11 +281,8 @@ function GameMessages(props) {
           {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
           <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
 
-          {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
-          <div className="notification">You are a spectator</div>)}
-
 {!sessionUser && (
-        <div className="notification">Please log in to participate.
+        <div className="notification">Please <Link to={`/login`}>log in</Link> to participate.
         </div>
       )}
 
