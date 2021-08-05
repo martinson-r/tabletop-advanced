@@ -2,7 +2,7 @@
 .navigation {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     background: linear-gradient(
         90deg,
         rgba(123, 97, 255, 1) 0%,
@@ -18,6 +18,10 @@
     color: black;
     padding: 5px 0 5px 0;
     align-items: flex-end;
+  }
+
+  .lefthand-nav {
+    padding-left: 10px;
   }
 
   /* @keyframes rainbow {
@@ -101,6 +105,10 @@
 
   .fa-user {
     color: #b5b5b5;
+  }
+
+ .fa-dice-d20 {
+    margin-right: 10px;
   }
 
   .my-tables {

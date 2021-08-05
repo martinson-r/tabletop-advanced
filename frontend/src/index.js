@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import { ModalProvider } from './context/Modal';
 import configureStore from './store';
 import reportWebVitals from './reportWebVitals';
 import {
@@ -122,11 +123,13 @@ const client = new ApolloClient({
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
+    <ModalProvider>
       <Provider store={store}>
         <BrowserRouter>
           <App />
         </BrowserRouter>
       </Provider>
+      </ModalProvider>
     </ApolloProvider>
   </React.StrictMode>,
   document.getElementById('root')

@@ -253,13 +253,13 @@ function GameMessages(props) {
 
     return (
       <div>
+        <div className="gameDetails">
+          <div><input type="checkbox" name="hideSpectatorChat" checked={hideSpectatorChat} onChange={toggleHideSpectatorChat} />
+          <label for="hideSpectatorChat">Hide spectator chat</label></div>
+          {gameData !== undefined && (<p><Link to={`/game/${gameData.game.id}`}>{gameData.game.title}</Link> presented by {gameData.game.host.userName}</p>)}
+        </div>
 
-        <form>
-         <label for="hideSpectatorChat">Hide spectator chat</label>
-          <input type="checkbox" name="hideSpectatorChat" checked={hideSpectatorChat} onChange={toggleHideSpectatorChat} />
-        </form>
       <div className="messagesContainer">
-
       {/* TODO: Query to see if player is in game */}
       <div className="messageListing" data-status={hideSpectatorChat}>
       {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
