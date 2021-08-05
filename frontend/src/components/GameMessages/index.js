@@ -271,15 +271,24 @@ function GameMessages(props) {
           {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
             message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message}
             userId={userId} gameId={gameId} gameData={gameData}/>)}
+
         </div>
 
         {/* <div className="sendChatBoxes"> */}
           {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
           <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
 
-          {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (<div className="sendChatBox">
-          You are a spectator</div>)}
-        {/* </div> */}
+          {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
+          <div className="notification">You are a spectator</div>)}
+
+{!sessionUser && (
+        <div className="notification">Please log in to participate.
+        </div>
+      )}
+
+          {/* {userId === null && gameData !== undefined && (
+          <div className="notification">You are a spectator</div>)} */}
+
     </div>
 
     {hideSpectatorChat.toString() === "false" && (<div className="messageListing">
@@ -291,6 +300,7 @@ function GameMessages(props) {
         {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
           message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message}
           userId={userId} gameId={gameId} gameData={gameData}/>))}
+
       </div>
 
       {/* <div className="sendChatBoxes"> */}
@@ -310,12 +320,12 @@ function GameMessages(props) {
 
       {sessionUser !== undefined && sessionUser !== null && gameData !== undefined && (<div className="sendChatBox">{console.log('userId',sessionUser)}
       <SendChatBox gameId={gameId} userId={userId} spectatorChat={true} /></div>)}
+
       {!sessionUser && (
         <div className="notification">
-        <p>Please log in to participate.</p>
+        &nbsp;
         </div>
       )}
-
       {/* </div> */}
       </div>)}
       </div>

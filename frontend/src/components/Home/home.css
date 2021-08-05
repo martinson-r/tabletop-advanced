@@ -1,5 +1,9 @@
 @import-normalize;
 
+* {
+    box-sizing: border-box;
+}
+
 :root {
     --lighterGray: #A8A9AB;
     --darkerGray: #5A5850;

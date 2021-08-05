@@ -23,11 +23,11 @@
     width: 50%;
     display: flex;
     flex-flow:column;
-    justify-content:flex-end;
+    justify-content:space-between;
 }
 
 .messageBox {
-    height:300px;
+    /* height:300px; */
     overflow-x:hidden;
     padding: 0;
     display: flex;
@@ -61,6 +61,7 @@
     border-radius: 0 0 6px 6px;
     width:100%;
     min-height:140px;
+    display: flex;
 }
 
 .submitButton {
@@ -76,6 +77,8 @@
     color: white;
     background-color: var(--submitButtonColor);
     border: none;
+    align-self:flex-end;
+    width: 100%;
 }
 
 .chat-input {
