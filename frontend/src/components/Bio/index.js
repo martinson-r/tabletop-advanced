@@ -6,6 +6,7 @@ import {
     useLazyQuery, useMutation, useSubscription, InMemoryCache
   } from "@apollo/client";
 import { GET_USER, GET_ABOUT,START_NEW_PRIVATE_CHAT } from "../../gql"
+import './bio.css';
 
 function Bio() {
     // Grab our session user
