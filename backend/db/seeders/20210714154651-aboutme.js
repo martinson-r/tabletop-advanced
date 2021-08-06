@@ -65,17 +65,8 @@ module.exports = {
                   houserules: true,
                   profanity: false,
                   },
-                  {
-                    userId: 8,
-                    firstName: "Rouge",
-                    pronouns: "she/her",
-                    bio: "Just gonna steal everything not nailed down.",
-                    homebrew: true,
-                    houserules: true,
-                    profanity: false,
-                    },
                     {
-                      userId: 9,
+                      userId: 8,
                       firstName: "Definitely not Mercedes Lackey",
                       pronouns: "she/her",
                       bio: "yep",
@@ -84,7 +75,7 @@ module.exports = {
                       profanity: false,
                       },
                       {
-                        userId: 10,
+                        userId: 9,
                         firstName: "Hardy",
                         pronouns: "he/him",
                         bio: "I love math so much I do it for fun!",

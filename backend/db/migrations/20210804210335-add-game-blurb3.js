@@ -12,6 +12,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn('Games', 'blurb');
+    // return queryInterface.removeColumn('Games', 'blurb');
   }
 };

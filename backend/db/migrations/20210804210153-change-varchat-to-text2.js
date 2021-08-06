@@ -12,13 +12,13 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.changeColumn(
-      'Messages',
-      'messageText',
-      {
-        type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: false,
-      });
-  }
+  //   return queryInterface.changeColumn(
+  //     'Messages',
+  //     'messageText',
+  //     {
+  //       type: Sequelize.STRING,
+  //       allowNull: false,
+  //       defaultValue: false,
+  //     });
+   }
 };
