@@ -10,16 +10,19 @@ const pubsub = new PubSub();
 const rolldice = (number, sides) => {
 //roll `number` `side`ed dice.
     const getRandomRoll = (sides) => {
-        return Math.floor(Math.random() * (sides - 1) + 1);
+        return Math.floor((Math.random() * (sides - 1))  + 1);
     };
+
+    console.log('roll', getRandomRoll);
+
     const diceMultiplier = (accumulator, currentValue) => accumulator + currentValue;
 
     const diceArray = [];
 
-    for (let i = 0; i <= number; i++) {
+    for (let i = 0; i < number; i++) {
         diceArray.push(getRandomRoll(sides))
     }
-    console.log(diceArray);
+    console.log('Dice array', diceArray);
     return diceArray.reduce(diceMultiplier);
 
 };
