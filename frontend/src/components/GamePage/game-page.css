@@ -1,3 +1,11 @@
+.game-content-block h2 {
+    color: white;
+}
+
+.game-content-block span {
+    display: block;
+}
+
 .game-content-block {
     display: block;
     padding-bottom: 30px;
