@@ -33,10 +33,13 @@
   .righthand-nav {
     padding-right: 10px;
     display: flex;
-    width: 40%;
+    width: 50%;
     justify-content: space-between;
   }
 
+  .righthand-nav div {
+    padding: 0 5px;
+  }
 
   /* @keyframes rainbow {
     0%   {background-position: 0px 0px;}
