@@ -151,6 +151,14 @@ not alter text opacity */
     color: black;
 }
 
+.gameDetails a {
+    color: white;
+}
+
+.gameDetails a:hover {
+    color: rgb(228, 228, 228);
+}
+
 textarea {
     resize: vertical;
     min-height: 2em;

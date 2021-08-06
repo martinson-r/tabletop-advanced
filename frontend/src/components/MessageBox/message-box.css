@@ -110,3 +110,11 @@ color: black;
     padding: 10px;
     width: 100%;
 }
+
+.indivMessageBox a {
+    color: var(--teal);
+}
+
+.indivMessageBox a:hover {
+    color: var(--deepTeal);
+}

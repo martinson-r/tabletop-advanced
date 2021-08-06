@@ -49,9 +49,8 @@ useEffect(() => {
 },[data]);
 
 return (
-    // Edge case: user has no bio
-    // Solution: user has an 'empty' bio created for them upon signup
-    <div>
+    <div className="container">
+    <div className="gray-backdrop">
         {console.log(data)}
     {data !== undefined && data.about[0] !== undefined &&
     (<div><p>About {data.about[0].User.userName}:</p>
@@ -62,6 +61,7 @@ return (
     </div>)}
     {currentUserId !== null && (<button onClick={sendNewMessage}>Send this user a private message</button>)}
     {currentUserId === null && (<p>Please <Link to={`/login`}>log in</Link> to send this user a message.</p>)}
+    </div>
     </div>
 )
 

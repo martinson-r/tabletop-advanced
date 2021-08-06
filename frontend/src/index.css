@@ -79,3 +79,9 @@ button {
   color: white;
   margin: 5px;
 }
+
+input {
+  padding: 5px;
+  border-radius: 6px;
+  border: 0;
+}
