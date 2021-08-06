@@ -25,6 +25,7 @@
     flex-flow:column;
     justify-content:space-between;
     width: 50%;
+
 }
 
 .messageListing[data-status="true"] {
@@ -35,6 +36,7 @@
     overflow-x:hidden;
     padding: 0;
     min-height: 20px;
+    border-right: 2px solid rgb(160, 160, 160);
 }
 
 .messageBox.game {
@@ -67,7 +69,6 @@
 .sendChatBox {
     bottom: 0px;
     border-radius: 0 0 6px 6px;
-    /* width:100%; */
     min-height:140px;
     display: flex;
 }
