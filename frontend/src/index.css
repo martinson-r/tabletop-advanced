@@ -85,3 +85,15 @@ input {
   border-radius: 6px;
   border: 0;
 }
+
+textarea {
+  padding: 5px;
+  border-radius: 6px;
+  border: 0;
+}
+
+select {
+  padding: 5px;
+  border-radius: 6px;
+  border: 0;
+}

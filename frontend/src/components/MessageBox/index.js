@@ -101,14 +101,10 @@ function MessageBox(props) {
            ))}
          </ul> */}
          {/* TODO: error message for no blank messages */}
-         <label style={{visibility:"hidden"}}>
-           Edit Message
-         </label>
-           <input
-             type="text"
+           <textarea
              value={editMessageText}
              onChange={(e) => setEditMessageText(e.target.value)}
-             required></input>
+             required />
          <button type="submit">Send</button>
          <button className="cancel" onClick={cancelMessageSubmit}>Cancel</button>
        </form>

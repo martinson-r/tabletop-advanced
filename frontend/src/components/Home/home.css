@@ -115,6 +115,10 @@ not alter text opacity */
     align-items: center;
 }
 
+.newest-games-container label {
+    color: white;
+}
+
 .newest-title {
     margin-right: 15px;
 }

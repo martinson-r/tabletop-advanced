@@ -13,6 +13,7 @@
 
 .indivMessage {
 color: black;
+margin-bottom: 0;
 }
 
 .indivMessageBox {
@@ -105,6 +106,10 @@ color: black;
     background-size: cover;
 }
 
+.edit-message-form {
+    padding: 0;
+}
+
 .edit-message-form input {
     border: 0;
     padding: 10px;
@@ -162,6 +167,10 @@ color: black;
     z-index: 1;
   }
 
+  .edit-message-form button {
+    margin: 5px;
+  }
+
   /* Links inside the dropdown */
   .dropdown-box p {
     color: black;
@@ -188,4 +197,9 @@ color: black;
   .message-text {
       margin-top: 5px;
       display: block;
+  }
+
+  textarea {
+      resize: vertical;
+      height: 100px;
   }
