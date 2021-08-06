@@ -27,6 +27,8 @@ function MessageBox(props) {
     const [editDisplay, setEditDisplay] = useState(false);
     const [editMessageText, setEditMessageText] = useState("");
     const [isGame, setIsGame] = useState(true);
+    const dropdownButton = useRef(null);
+    const editDropdown = useRef(null);
 
     const [editMessage] = useMutation(EDIT_MESSAGE, { variables: { messageId, userId, editMessageText } } );
     const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
@@ -45,6 +47,10 @@ function MessageBox(props) {
         if (editMessageText) {
           editMessage(userId, messageId, editMessageText);
         }
+        setEditDisplay(false);
+      }
+
+      const cancelMessageSubmit = (e) => {
         setEditDisplay(false);
       }
 
@@ -68,6 +74,23 @@ function MessageBox(props) {
           console.log('TO DELETE', messageToDelete)
       }
 
+      const displayEditCancel = (e) => {
+        if (dropdownButton.current !== null && editDropdown.current.classList.contains('dropdown-content-hidden')) {
+          editDropdown.current.classList.remove('dropdown-content-hidden')
+        } else {
+          editDropdown.current.classList.add('dropdown-content-hidden')
+        }
+        // if (e.target.firstChild.classList.contains('dropdown-content-hidden')) {
+        //   console.log('click')
+        //   e.target.firstChild.classList.remove('dropdown-content-hidden');
+        //   e.target.firstChild.classList.add('dropdown-content-shown');
+        // } else {
+        //   e.target.firstChild.classList.remove('dropdown-content-hidden');
+        //   e.target.firstChild.classList.add('dropdown-content-shown');
+        // }
+
+      }
+
       if (editDisplay === true && sessionUser !== undefined) return (
         <div className="indivMessageBox">
         <p key={uuidv4()} className="indivMessage">{message.sender.userName}: </p>
@@ -80,13 +103,14 @@ function MessageBox(props) {
          {/* TODO: error message for no blank messages */}
          <label style={{visibility:"hidden"}}>
            Edit Message
-           </label>
+         </label>
            <input
              type="text"
              value={editMessageText}
              onChange={(e) => setEditMessageText(e.target.value)}
              required></input>
          <button type="submit">Send</button>
+         <button className="cancel" onClick={cancelMessageSubmit}>Cancel</button>
        </form>
        </div>
       )
@@ -116,9 +140,25 @@ function MessageBox(props) {
             </div>)}
         </div>
         {userId !== null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
-          <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{data !== undefined && data.character !== null && (<span>{data.character.name} &#40;</span>)}{message.sender.userName}{data !== undefined && data.character !== null && (<span>&#41;</span>)}</Link>:<br /> {message.deleted !== true &&
-            (<span>{message.messageText} {userId !== null && message.sender.id === userId.toString() && (<><button id={message.id} onClick={editMessageBox(message.messageText)}>edit</button>
-            <button onClick={deleteMessageBox(message.id, userId)}>delete</button></>)}</span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>)}
+
+          <span key={uuidv4()} className="indivMessage">
+            <span><Link to={`/${message.sender.id}/bio`}>{data !== undefined && data.character !== null && (<span>{data.character.name} &#40;</span>)}
+            {message.sender.userName}
+            {data !== undefined && data.character !== null && (<span>&#41;</span>)}</Link>:</span>
+
+
+            {userId !== null && message.sender.id === userId.toString() && (
+            <div class="dropdown">
+              <div class="btncontainer">
+                <p class="dropbtn" ref={dropdownButton} onClick={displayEditCancel}>...</p></div>
+              <div ref={editDropdown} className="dropdown-content-hidden dropdown-box">
+               <span><p id={message.id} onClick={editMessageBox(message.messageText)}>edit</p></span>
+                <p onClick={deleteMessageBox(message.id, userId)}>delete</p>
+              </div>
+            </div>)}
+
+            {message.deleted !== true &&
+            (<span className="message-text">{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</span></div>)}
             {userId === null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={false}>
           <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{data !== undefined && data.character !== null && (<span>{data.character.name} &#40;</span>)}{message.sender.userName}{data !== undefined && data.character !== null && (<span>&#41;</span>)}</Link>:<br /> {message.deleted !== true &&
             (<span>{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>)}
