@@ -8,6 +8,7 @@ import {
   } from "@apollo/client";
 import { GET_GAME, GET_WAITLIST_APPLIED } from "../../gql"
 import { DateTime } from "../../utils/luxon";
+import './game.css';
 
 export const pubsub = new PubSub();
 
@@ -45,7 +46,9 @@ function Game() {
 
 
       return (
-        <div>
+        <div className="container">
+        <div className="gray-backdrop">
+
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p>
         <p>{data.game.description}</p>
         <p>Players:</p>
@@ -86,6 +89,7 @@ function Game() {
             {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
           </>
         )}
+      </div>
       </div>
       );
 

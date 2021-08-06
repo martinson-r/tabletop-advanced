@@ -6,8 +6,10 @@
   --mediumGray: #C4C4C4;
   --lightestGray: #D3D3BA;
   --veryDarkGray: #585858;
-  --jacquaranda: #7B61FF;
-  --deepJacquaranda: #5b3aff;
+  --teal: #7B61FF;
+  --deepTeal: #5b3aff;
+  --teal: #40ad75;
+  --deepTeal: #1d7b4a;
 
   /* Doing this so that I don't accidentally change the colors of
   things by accident */
@@ -16,8 +18,8 @@
   --cardTextColor: var(--lightestGray);
   --gameBoxColor: var(--mediumGray);
   --gameBoxTextColor: var(--veryDarkGray);
-  --createGameButton: var(--jacquaranda);
-  --createGameButtonHover: var(--deepJacquaranda);
+  --createGameButton: var(--teal);
+  --createGameButtonHover: var(--deepTeal);
 }
 
 body {
@@ -70,7 +72,7 @@ h3 {
 }
 
 button {
-  background-color: var(--jacquaranda);
+  background-color: var(--teal);
   border: 0;
   border-radius: 6px;
   padding: 10px;
