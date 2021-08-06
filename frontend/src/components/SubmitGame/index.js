@@ -9,6 +9,7 @@ import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
 import { SUBMIT_GAME, GET_GAME_CREATION_INFO  } from "../../gql";
+import './submitgame.css';
 
 function SubmitGame() {
 
@@ -63,7 +64,9 @@ function SubmitGame() {
     }, [sessionUser, data]);
 
     return (
-      <div>
+      <div className="gray-backdrop">
+        <div className="container">
+          <h2>Start a Game:</h2>
       {data && <form onSubmit={handleSubmit}>
          <ul>
            {errors.map((error, idx) => (
@@ -72,43 +75,49 @@ function SubmitGame() {
          </ul>
          <label>
            Title:
+           </label>
            <input
              type="text"
              value={title}
              onChange={(e) => setTitle(e.target.value)}
              required
            />
-         </label>
+
          <label>
            Description:
+           </label>
            <input
              type="text"
              value={description}
              onChange={(e) => setDescription(e.target.value)}
              required
            />
-         </label>
+
          <label>
            Game Type:
+           </label>
            {/* {console.log('TYPES', gameTypes)} */}
            <select value={gameTypeId} onChange={updateGameTypeId}>
             {gameTypes.map(gameType => <option key={uuidv4()} value={gameType.id}>{gameType.type}</option>)}
             </select>
-         </label>
+
          <label>
            Ruleset:
+           </label>
            <select value={gameRulesetId} onChange={updateGameRulesetId}>
              {gameRulesets.map(ruleset => <option key={uuidv4()} value={ruleset.id}>{ruleset.ruleset}</option>)}
              </select>
-         </label>
+
          <label>
            Language:
+           </label>
            <select value={gameLanguageId} onChange={updateGameLanguageId}>
              {gameLanguages.map(language => <option key={uuidv4()} value={language.id}>{language.language}</option>)}
              </select>
-         </label>
+
          <button type="submit">Send</button>
        </form>}
+       </div>
        </div>
     )
 }

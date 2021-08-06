@@ -10,7 +10,6 @@ import { GET_CHARACTER_BY_ID } from "../../gql"
 function Character() {
 // Grab our session user
 const sessionUser = useSelector((state) => state.session.user);
-const currentUserId = sessionUser.id;
 const { characterId } = useParams();
 
 // Note: include user and game so if someone has gone directly to char, they can

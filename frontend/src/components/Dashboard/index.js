@@ -99,7 +99,8 @@ function Home() {
         const gameData = data.games;
 
         return (
-            <div>
+            <div className="gray-backdrop">
+                <div className="container">
                 <div className="hosting">
                 <p>Games I'm Hosting:</p>
                 {dataHosted !== undefined && (dataHosted.getGamesHosting.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link> - {openApps} open applications</p>))}
@@ -136,6 +137,7 @@ function Home() {
                 {/* TODO: Add multiple users to private convos */}
                 {/* We need unique keys for mapped elements so React can keep track of what is what */}
                 {nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversations => <div key={uuidv4()} className="convos-box" >{conversations.recipient.map(conversation => (<p key={uuidv4()} className="private-convo" onClick={() => history.push(`/conversation/${conversation.id}`)}>{console.log('convo id', conversation.id)}{conversation.recipient.map(recipient => recipient.userName + ", ")}</p>))}</div>))}
+            </div>
             </div>
         )
     }

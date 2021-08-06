@@ -27,7 +27,8 @@ const handleSubmit = (e) => {
   };
 
     return (
-        <div>
+        <div className="gray-backdrop">
+            <div className="container">
             <p>Create Character:</p>
             {/* TODO: create character form */}
             <form onSubmit={handleSubmit}>
@@ -49,6 +50,7 @@ const handleSubmit = (e) => {
                 <button type="submit">Submit</button>
             </form>
             {/* TODO: character form changes depending on ruleset selected */}
+        </div>
         </div>
     )
 

@@ -6,6 +6,7 @@ import {
     useQuery, useMutation, useLazyQuery, useSubscription, InMemoryCache
   } from "@apollo/client";
 import { GET_USER, CHANGE_EMAIL, CHANGE_PASSWORD } from "../../gql"
+import './account.css';
 
 function Account() {
     // Grab our session user
@@ -76,10 +77,11 @@ const handleNewPasswordSubmit = (e) => {
 }
 
     return (
-    <div>
+    <div className="gray-backdrop">
+      <div className="container">
     <p>Hello, {userName}!</p>
-    <p>Your email: {email}</p>
-    <p>Change email:</p>
+    <p><b>Your email:</b> {email}</p>
+    <h2>Change email:</h2>
     <form onSubmit={handleEmailSubmit}>
         <ul>
            {/* Make sure we have errors in order to avoid race conditions */}
@@ -110,7 +112,7 @@ const handleNewPasswordSubmit = (e) => {
          <button type="submit">Change email</button>
         </form>
 
-    <p>Change password:</p>
+    <h2>Change password:</h2>
     <form onSubmit={handleNewPasswordSubmit}>
         <ul>
            {/* Make sure we have errors in order to avoid race conditions */}
@@ -121,7 +123,7 @@ const handleNewPasswordSubmit = (e) => {
         <li key={i}>{message}</li>
            ))}
          </ul>
-         <label>
+         <label className="confirm">
            Confirm old password:
            <input
              type="password"
@@ -147,6 +149,7 @@ const handleNewPasswordSubmit = (e) => {
          </label>
          <button type="submit">Change password</button>
         </form>
+    </div>
     </div>
     )
 

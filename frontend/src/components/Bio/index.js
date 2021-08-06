@@ -11,11 +11,17 @@ import './bio.css';
 function Bio() {
     // Grab our session user
 const sessionUser = useSelector((state) => state.session.user);
-const currentUserId = sessionUser.id;
+const [currentUserId, setCurrentUserId] = useState(null);
 const { userId } = useParams();
 const [recipients, setRecipients] = useState([]);
 
 const history = useHistory();
+
+useEffect(() => {
+    if (sessionUser !== undefined && sessionUser !== null) {
+        setCurrentUserId(sessionUser.id);
+    }
+})
 
 const [getAbout, { data, error, loading }] = useLazyQuery(GET_ABOUT);
 
@@ -26,9 +32,6 @@ const sendNewMessage = () => {
     //but this makes the resolver reusable for conversations with multiple recipients
 startNewNonGameConversation({recipients, currentUserId});
 }
-
-console.log(data);
-console.log(userId)
 
 useEffect(() => {
 
@@ -46,9 +49,8 @@ useEffect(() => {
 },[data]);
 
 return (
-    // Edge case: user has no bio
-    // Solution: user has an 'empty' bio created for them upon signup
-    <div>
+    <div className="container">
+    <div className="gray-backdrop">
         {console.log(data)}
     {data !== undefined && data.about[0] !== undefined &&
     (<div><p>About {data.about[0].User.userName}:</p>
@@ -57,7 +59,9 @@ return (
     {/* Toggle public display of information */}
     <p>{data.about[0].bio}</p>
     </div>)}
-    <button onClick={sendNewMessage}>Send this user a private message</button>
+    {currentUserId !== null && (<button onClick={sendNewMessage}>Send this user a private message</button>)}
+    {currentUserId === null && (<p>Please <Link to={`/login`}>log in</Link> to send this user a message.</p>)}
+    </div>
     </div>
 )
 

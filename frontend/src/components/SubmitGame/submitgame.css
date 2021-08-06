@@ -1,0 +1,10 @@
+label {
+    display: block;
+    margin-right: 5px;
+    margin-left: 0px;
+    margin-bottom: 10px;
+}
+
+select {
+    margin-bottom: 20px;
+}

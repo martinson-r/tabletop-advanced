@@ -8,7 +8,7 @@
     /* Doing this so that I don't accidentally change the colors of
     things by accident */
     --messageBoxColor: var(--mediumGray);
-    --submitButtonColor: var(--jacquaranda);
+    --submitButtonColor: var(--teal);
 }
 
 .nonGameMessagesContainer {
