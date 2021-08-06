@@ -1,4 +1,4 @@
-const { Message, Recipient, PlayerJoin, Conversation, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist } = require('../db/models');
+const { Message, Recipient, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -46,10 +46,22 @@ const resolvers = {
             console.log(Ruleset.findAll())
             return Ruleset.findAll();
         },
-        game: (obj, args, context, info) => {
-           const {gameId} = args
-           return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
+        game:(obj, args, context, info) => {
+           const {gameId} = args;
+        //    return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: User, as: "player"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
+        return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: Character, include: {model: User}}, {model: User, as: "player"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
+    },
+        character:(obj, args, context, info) => {
+            const {userId, gameId} = args;
+            return Character.findOne({where: {[Op.and]:
+                [{userId}, {gameId}]}});
         },
+
+        characterById: (obj, args, context, info) => {
+            const { characterId } = args;
+            return Character.findOne({where: { id: characterId }, include: [{ model: User }, { model: Game }]})
+        },
+
         messages: (obj, args, context, info) => {
             return Message.findAll();
         },
@@ -108,10 +120,23 @@ const resolvers = {
         checkWaitList: async (obj, args, context, info) => {
             const { id, userId } = args;
 
-            //check if this user has applied to this game before. Must match both game _id and
-            //userId in waitlist.
             const game = await Game.findAll({ where: {id}});
             return game;
+        },
+
+        checkApplied: async (obj, args, context, info) => {
+            const { gameId, userId } = args;
+
+            console.log('ARGS', gameId, userId)
+
+            console.log(gameId, userId);
+
+            //check if this user has applied to this game before. Must match both game _id and
+            //userId in waitlist.
+            //Users can apply multiple times, hence findAll.
+            const list = await Waitlist.findAll({ where: {gameId, userId}});
+            return list;
+            // console.log(list);
         },
 
         getWaitlistGames: async (obj, args, context, info) => {
@@ -129,7 +154,7 @@ const resolvers = {
         getGamesPlayingIn: (obj, args, context, info) => {
             const { userId } = args;
 
-            return Game.findAll({include: [{model: User, as: "player", where: { id: userId }}, {model: User, as: "host"}] });
+            return Game.findAll({include: [{model: User, as: "player", where: { id: userId }, include: {model: Character, where: { gameId: {[Op.col]: 'Game.id'}}, required: false}}, {model: User, as: "host"}] });
         },
 
         getGameCreationInfo: async(obj, args, context, info) => {
@@ -139,12 +164,42 @@ const resolvers = {
             const rulesets = await Ruleset.findAll();
             const gameTypes = await GameType.findAll();
             return {languages, rulesets, gameTypes};
-        }
+        },
+
+        simpleSearch: async(obj, args, context, info) => {
+            const { text } = args;
+            const words = text.split(' ');
+            const wordsArray = [];
+            // console.log('WORDS', words);
+
+            console.log('WORDS 2', words);
+
+            // const test = await Game.findAll({where: { title: {[Op.iLike]: '%' + sentence + '%'} }})
+            // console.log('TEST', test);
+
+                    for (word in words) {
+                        wordsArray.push(await Game.findAll({where: { title: {[Op.iLike]: '%' + words[word] + '%'} }}));
+                    }
+
+            return { wordsArray: wordsArray }
+
+            // console.log('RESULT', wordsArray);
+
+
+            // return {wordsArray};
+
+            // return Game.findAll({where: { title: {
+            //     [Sequelize.Op.iLike]: '%' + text + '%'
+            // } }})
+        },
     },
     Mutation: {
         sendMessageToGame: async(root,args) => {
 
-        const { gameId, messageText, userId, offset } = args;
+            //TODO: add a spectatorChat flag of true or false
+            //TODO: update migrations to flag if spectatorChat
+
+        const { gameId, messageText, userId, offset, spectatorChat } = args;
 
             //Check to see if this is a dice roll.
             //Fun with regex
@@ -156,20 +211,33 @@ const resolvers = {
                 //push roll results into messageText
                 const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
 
-                await Message.create({gameId, messageText, senderId: userId});
+                await Message.create({gameId, messageText, senderId: userId,spectatorChat});
 
                 const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 
                 pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
             } else if (numbers === null) {
             const senderId = userId;
-            await Message.create({gameId,messageText,senderId});
+            await Message.create({gameId,messageText,senderId,spectatorChat});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
         }
     },
+
+    // sendSpectatorMessages: async(root,args) => {
+
+    //     //Is there a better way to do this, such as flag it Spectator?
+    //     const { conversationId, messageText, userId, offset } = args;
+    //     const senderId = userId;
+    //         await Message.create({conversationId,gameId,messageText,senderId});
+
+    //         const conversation = await Message.findAndCountAll({ where: { gameId, conversationId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
+    //         //console.log('CONVO', conversation.rows[0].conversationId)
+    //         pubsub.publish('NEW_MESSAGE', {spectatorMessageSent: conversation});
+    //         return conversation;
+    // },
 
     sendNonGameMessages: async(root,args) => {
 
@@ -459,6 +527,13 @@ const resolvers = {
             //Add app to waitlist
             await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
             return newApp;
+        },
+
+        submitCharacterCreation: async(root, args) => {
+            const { userId, gameId, bio, name, imageUrl } = args;
+            console.log('ARGS', args)
+            const character = await Character.create({userId, gameId, bio, name, imageUrl});
+            return character;
         },
 
         editWaitlistApp: async(root, args) => {

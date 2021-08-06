@@ -19,13 +19,11 @@ color: black;
     background-color: var(--messageBubbleColor);
     padding: 10px;
     margin: 30px 10px 10px 10px;
-    height: 50%;
     border-radius: 6px;
     position: relative;
-    text-align: center;
     color: black;
     border-radius: 5px;
-    max-width: 80%;
+    max-width: 60%;
 }
 
 .indivMessageBox span {
@@ -39,17 +37,10 @@ color: black;
     left: 0;
     height: 10px;
     border-right: 30px solid var(--messageBubbleColor);
-    background: var(--messageBubbleColor);
+    /* background: var(--messageBubbleColor); */
     -webkit-border-bottom-right-radius: 80px 50px;
     -moz-border-radius-bottomright: 80px 50px;
     border-bottom-right-radius: 80px 50px;
-}
-
-.avatarAndMessages {
-    min-height: 100px;
-    display: flex;
-    flex-direction: row;
-    flex-flow: row wrap;
 }
 
 .indivMessageBox::after {
@@ -59,10 +50,33 @@ color: black;
     left: 0;
     height: 10px;
     border-right: 14px solid var(--messageBubbleCutout);
-    background: var(--messageBubbleColor);
+    /* background: var(--messageBubbleColor); */
     -webkit-border-bottom-right-radius: 80px 50px;
     -moz-border-radius-bottomright: 80px 50px;
     border-bottom-right-radius: 80px 50px;
+}
+
+.indivMessageBox.status[data-status="true"] {
+    background: white;
+}
+
+.indivMessageBox.status[data-status="true"]::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 10px;
+    border-right: 30px solid white;
+    -webkit-border-bottom-right-radius: 80px 50px;
+    -moz-border-radius-bottomright: 80px 50px;
+    border-bottom-right-radius: 80px 50px;
+}
+
+.avatarAndMessages {
+    display: flex;
+    flex-direction: column;
+    flex-flow: row wrap;
+    margin-left: 10px;
 }
 
 .avatarBox {
@@ -71,18 +85,28 @@ color: black;
     align-items: flex-end;
 }
 
-.avatar-position {
+/* .avatar-position {
     display: block;
     position: absolute;
-}
+} */
 
 .avatar {
+    position: relative;
+    align-self: flex-end;
+    bottom: -10px;
     margin-top: 30px;
     height: 50px;
     width: 50px;
     border-radius: 100%;
-    background-image: url('../../media/avatar.png');
+    /* background-image: var(--background); */
+    /* background-image: url('../../media/avatar.png'); */
     background-repeat: no-repeat;
     background-position: top;
     background-size: cover;
+}
+
+.edit-message-form input {
+    border: 0;
+    padding: 10px;
+    width: 100%;
 }

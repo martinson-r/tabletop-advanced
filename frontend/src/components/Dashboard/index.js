@@ -4,14 +4,13 @@ import { Link, useHistory } from "react-router-dom";
 import {
     useQuery, useLazyQuery, useMutation
   } from "@apollo/client";
-import { GET_GAMES, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITING_LIST_GAMES,
+import { GET_GAMES, GET_CHARACTER, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITING_LIST_GAMES,
     GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES } from "../../gql"
 import "./dashboard.css";
 import { v4 as uuidv4 } from 'uuid';
 import { assertWrappingType } from "graphql";
 
 function Home() {
-
 
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
@@ -30,7 +29,12 @@ function Home() {
     const { loading, error, data } = useQuery(GET_GAMES);
     const [getHosting, { loading: loadingHosted, error: errorHosted, data: dataHosted}] = useLazyQuery(GET_HOSTED_GAMES);
     const [getWaitlistGames, { loading: loadingWaiting, error: errorWaiting, data: dataWaiting}] = useLazyQuery(GET_WAITING_LIST_GAMES);
-    const [getGamesPlayingIn, {loading: loadingPlayingIn, data: playingInData}] = useLazyQuery(GET_GAMES_PLAYING_IN);
+
+    // Force query to not use cache so that new characters show up right away
+    const [getGamesPlayingIn, {loading: loadingPlayingIn, data: playingInData}] = useLazyQuery(GET_GAMES_PLAYING_IN, {
+        fetchPolicy: 'network-only'
+      });
+    //const [character, { data: charData, error: charError, loading: charLoading }] = useLazyQuery(GET_CHARACTER);
 
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
@@ -38,6 +42,11 @@ function Home() {
 
     const [acceptOffer] = useMutation(ACCEPT_OFFER, { variables: { applicationId, userId, gameId }});
     const [declineOffer] = useMutation(DECLINE_OFFER, { variables: { applicationId }});
+
+    // const getchar = (userId, gameId) => {
+    //     const char = character({ variables: { userId, gameId }});
+    //     return char;
+    // }
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -60,7 +69,7 @@ function Home() {
             getWaitlistGames({ variables: { userId }});
             getGamesPlayingIn({ variables: { userId }});
         }
-    },[userId]);
+    },[userId, history]);
 
    //Calculate number of apps that have not been accepted or ignored (open apps) & set to our variable.
    //data object is non-extensible, so we can't set it as a key on there.
@@ -100,7 +109,12 @@ function Home() {
                     {/* Just do 2 separate queries. One for Waiting List (excluding offerAccepted apps), one for games the user is a player in. */}
                 <p>Games I'm Playing In:</p>
                 {/* Link to character info from character name */}
-                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}, as add column for character data</p>))}
+                {/* Use lazy query */}
+                {console.log('playing in data', playingInData)}
+                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}>{console.log('GAMES', playingInData.getGamesPlayingIn)}<Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}, as {game.player[0].Characters[0] === undefined && (<span><Link to={`/game/${game.id}/create-character`}>Create a character now</Link></span>)}{game.player[0].Characters[0] !== undefined && (<Link to={`/characters/${game.player[0].Characters[0].id}`}>{game.player[0].Characters[0].name}</Link>)}</p>))}
+
+                {/* TODO: create a character for a game if one doesn't exist */}
+
                 </div>
                 <div className="appliedTo">
                 <p>Games I've Applied To:</p>
@@ -121,7 +135,7 @@ function Home() {
                 <p><Link to={'/newmessage'}>Start new conversation</Link></p>
                 {/* TODO: Add multiple users to private convos */}
                 {/* We need unique keys for mapped elements so React can keep track of what is what */}
-                {nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversations => <div key={uuidv4()} className="convos-box" >{conversations.recipient.map(conversation => (<p key={uuidv4()} className="private-convo" onClick={() => history.push(`/conversation/${conversation.id}`)}>{conversation.recipient.map(recipient => recipient.userName + ", ")}</p>))}</div>))}
+                {nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversations => <div key={uuidv4()} className="convos-box" >{conversations.recipient.map(conversation => (<p key={uuidv4()} className="private-convo" onClick={() => history.push(`/conversation/${conversation.id}`)}>{console.log('convo id', conversation.id)}{conversation.recipient.map(recipient => recipient.userName + ", ")}</p>))}</div>))}
             </div>
         )
     }

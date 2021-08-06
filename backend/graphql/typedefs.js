@@ -7,6 +7,7 @@ const typeDefs = gql`
     user(id: ID!): User
     about(id: ID): [AboutMe]
     games: [Game]
+    character(userId: ID, gameId: ID): Character
     rulesets: [Ruleset]
     game(gameId: ID!): Game
     messages: [Message]
@@ -14,17 +15,23 @@ const typeDefs = gql`
     getNonGameConvos(userId: ID!): [User]
     getNonGameMessages(conversationId: ID, offset: Int): CountAll
     checkWaitList(id: ID, userId: ID!): [Game]
+    checkApplied(gameId: ID, userId: ID): [Waitlist]
     getGameCreationInfo: GameCreationInfo
     getGamesHosting(userId: ID): [Game]
     getApplication(gameId: ID, applicationId: ID): [Application]
     getPlayingWaitingGames(userId: ID): [User]
     getWaitlistGames(userId: ID): [Game]
     getGamesPlayingIn(userId: ID): [Game]
+    simpleSearch(text: String): resultsArray
+    characterById(characterId: ID): Character
   }
   type GameCreationInfo {
     languages: [Language],
     rulesets: [Ruleset]
     gameTypes: [GameType]
+  }
+  type resultsArray {
+    wordsArray: [[Game]]
   }
   type User {
     id: ID,
@@ -70,6 +77,7 @@ const typeDefs = gql`
     Applications: [Application]
     gameApplication: [Application]
     applicationOwner: [Application]
+    Characters: [Character]
   }
   type Ruleset {
     id: ID,
@@ -153,6 +161,7 @@ const typeDefs = gql`
     premium: Boolean,
     remote: Boolean,
     host: User,
+    waitListOpen: Boolean,
     players: [User],
     spectators: [User],
     waitlist: [Waitlist],
@@ -166,7 +175,10 @@ const typeDefs = gql`
     allowPlayerDeletes: Boolean,
     active: Boolean,
     applicant: [User],
-    Applications: [Application]
+    player: [User],
+    Characters: [Character],
+    Applications: [Application],
+    blurb: String
   }
   type Application {
     id: ID
@@ -195,6 +207,7 @@ const typeDefs = gql`
     createdAt: String,
     deleted: Boolean,
     reported: Boolean,
+    spectatorChat: Boolean,
     metaGameMessageTypeId: ID,
     User: User,
     sender: User
@@ -206,6 +219,15 @@ const typeDefs = gql`
     userId: ID,
     player: [User]
   }
+  type Character {
+    id: ID,
+    name: String,
+    imageUrl: String,
+    bio: String,
+    User: User,
+    Game: Game,
+    gameId: ID
+  }
   type Waitlist {
       id: ID,
       userId: User,
@@ -216,12 +238,13 @@ const typeDefs = gql`
   }
   type Mutation {
     blockUser(emailToBlock: String!, blockerEmail: String!): User
-    sendMessageToGame(gameId: ID, userId: ID, messageText: String): CountAll
+    sendMessageToGame(gameId: ID, userId: ID, messageText: String, spectatorChat: Boolean): CountAll
     editMessage(messageId: ID, userId: ID, editMessageText: String):CountAll
     deleteMessage(messageId: ID, userId: ID): CountAll
     sendNonGameMessages(userId: ID!, messageText: String!, conversationId: ID): CountAll
     submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
+    submitCharacterCreation(userId: ID, gameId: ID, bio: String, name: String, imageUrl: String): Character
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
     joinWaitlist(hostId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application

@@ -2,34 +2,47 @@ import React, { useState, useEffect, useRef } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
-import "./messages.css";
+import "./game-messages.css";
 import MessageBox from "../MessageBox";
+import SendChatBox from "../SendChatBox";
 import { v4 as uuidv4 } from 'uuid';
 
 
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { GET_GAME, EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { GET_GAME, GET_WAITLIST_APPLIED, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, GAME_MESSAGES_SUBSCRIPTION, SPECTATOR_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { DateTime } from "../../utils/luxon";
 
 function GameMessages(props) {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
+    const [isPlayer, setIsPlayer] = useState(false);
     const [messageText, setMessage] = useState("");
     const [newMessage, setNewMessage] = useState(null);
+    const [newSpectatorMessage, setNewSpectatorMessage] = useState(null);
     const [sortedConvos, setSortedConvos] = useState([]);
     const [offset, setOffset] = useState(0)
     const [submittedMessage, setSubmittedMessage] = useState(false);
     const [isScrolling, setIsScrolling] = useState(false);
+    const [spectatorChat, setSpectatorChat] = useState(false);
+    const [hideSpectatorChat, setHideSpectatorChat] = useState(false);
 
     const messageBoxRef = useRef(null);
 
-    console.log('props', props)
-
     const gameId = props.gameId;
-    console.log('gameId', gameId)
 
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
+
+    useEffect(() => {
+      if (gameData !== undefined && userId !== null) {
+        gameData.game.player.forEach((player) => {
+          if (player.id.toString() === userId.toString()) {
+              setIsPlayer(true);
+          }
+        });
+      }
+    },[gameData, userId]);
 
     let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
       //add offset
@@ -38,7 +51,7 @@ function GameMessages(props) {
     );
 
 
-    const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText } } );
+    const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat } } );
 
     useEffect(() => {
 
@@ -113,11 +126,22 @@ function GameMessages(props) {
           const newFeedItem = subscriptionData.data.messageSent;
           setNewMessage(newFeedItem)
 
-          console.log('SUB', subscriptionData)
+          //This part is broken.
+          //This really should be done in cache.
+            return Object.assign({}, prev, {
+              convos: {...prev.rows, ...newFeedItem}
+            });
+          }
+      });
 
-          console.log('NEW', newFeedItem)
-
-          console.log('PREV', prev);
+      subscribeToMore({
+        document: SPECTATOR_MESSAGES_SUBSCRIPTION,
+        variables: { gameId },
+        updateQuery: (prev, { subscriptionData }) => {
+          if (!subscriptionData.data) return prev;
+          console.log(subscriptionData.data)
+          const newFeedItem = subscriptionData.data.messageSent;
+          setNewSpectatorMessage(newFeedItem)
 
           //This part is broken.
           //This really should be done in cache.
@@ -125,7 +149,7 @@ function GameMessages(props) {
               convos: {...prev.rows, ...newFeedItem}
             });
           }
-      })
+      });
 
     },[]);
 
@@ -214,59 +238,102 @@ function GameMessages(props) {
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
+      setSpectatorChat(false);
+      console.log('non spectator', spectatorChat)
 
         //Offset is fine at this point. No need to do anything with it.
-        updateMessages(gameId, userId, messageText);
+        updateMessages(gameId, userId, messageText, spectatorChat);
         setSubmittedMessage(true);
     }
 
-    return (
-      <div className="messagesContainer">
 
-      <div ref={messageBoxRef} className="messageBox game">
-       {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} gameId={gameId} gameData={gameData}/>)}
-      {sessionUser !== undefined && gameData !== undefined && gameData.game.active === true && (<div className="sendChatBox"><form onSubmit={handleSubmit}>
-         {/* <ul>
-           {errors.map((error, idx) => (
-             <li key={idx}>{error}</li>
-           ))}
-         </ul> */}
-         {/* TODO: error message for no blank messages */}
-         <label hidden>
-           Send Message
-           </label>
-           <input
-             type="text"
-             className="chat-input"
-             value={messageText}
-             placeholder="Type your message here"
-             onChange={(e) => setMessage(e.target.value)}
-             required
-           />
-         <button className="submitButton" type="submit">Send</button>
-       </form></div>)}
-       {!sessionUser && (
-        <div className="sendChatBox">
-        <p>Please log in to send messages.</p>
+    const toggleHideSpectatorChat = () => {
+      setHideSpectatorChat(!hideSpectatorChat);
+    }
+
+
+    return (
+      <div>
+        <div className="gameDetails">
+          <div><input type="checkbox" name="hideSpectatorChat" checked={hideSpectatorChat} onChange={toggleHideSpectatorChat} />
+          <label for="hideSpectatorChat">Hide spectator chat</label></div>
+          {gameData !== undefined && (<div><p><Link to={`/game/${gameData.game.id}`}>{gameData.game.title}</Link> presented by {gameData.game.host.userName}</p>
+          <p><i>{gameData.game.blurb}</i></p>
+          </div>)}
+        </div>
+
+      <div className="messagesContainer">
+      {/* TODO: Query to see if player is in game */}
+      <div className="messageListing" data-status={hideSpectatorChat}>
+      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
+          <div className="notification spectator">You are a spectator</div>)}
+
+        <div ref={messageBoxRef} className="messageBox game">
+
+          {/* Hack to get flexbox to space items properly */}
+          <div class="spacer"></div>
+
+          {/* Behaves very strangely if not passed a key. */}
+          {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
+            message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message}
+            userId={userId} gameId={gameId} gameData={gameData}/>)}
+
+        </div>
+
+        {/* <div className="sendChatBoxes"> */}
+          {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
+          <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
+
+{!sessionUser && (
+        <div className="notification">Please <Link to={`/login`}>log in</Link> to participate.
         </div>
       )}
+
+          {/* {userId === null && gameData !== undefined && (
+          <div className="notification">You are a spectator</div>)} */}
+
+    </div>
+
+    {hideSpectatorChat.toString() === "false" && (<div className="messageListing">
+
+    <div ref={messageBoxRef} className="messageBox game">
+        <div class="spacer"></div>
+        {/* Behaves very strangely if not passed a key. */}
+
+        {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
+          message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message}
+          userId={userId} gameId={gameId} gameData={gameData}/>))}
+
       </div>
 
+      {/* <div className="sendChatBoxes"> */}
 
-      {/* TODO: debug, Heroky is saying gameData.game is null */}
+       {/* {!sessionUser && (
+        <div className="notification">
+        <p>Please log in to send in-game messages.</p>
+        </div>
+      )} */}
+      {/* {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer !== true && gameData.game.host.id !== userId.toString()) && (<div>You must be a player to send an in-game chat</div>)} */}
+
+
+
        {/* {gameData !== undefined && gameData.game.active !== true && (
          <p>This game is no longer active.</p>
        )} */}
-       <div className="messageBox">
-         <p>Placeholder for Spectator Chat</p>
-         {!sessionUser && (
-        <div>
-        <p>Please log in to send messages.</p>
+
+      {sessionUser !== undefined && sessionUser !== null && gameData !== undefined && (<div className="sendChatBox">{console.log('userId',sessionUser)}
+      <SendChatBox gameId={gameId} userId={userId} spectatorChat={true} /></div>)}
+
+      {!sessionUser && (
+        <div className="notification">
+        &nbsp;
         </div>
       )}
-       </div>
-       </div>
+      {/* </div> */}
+      </div>)}
+      </div>
+      </div>
+
 
     )
 }

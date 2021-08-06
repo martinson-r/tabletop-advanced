@@ -1,0 +1,126 @@
+
+
+
+:root {
+    --mediumGray: #C4C4C4;
+    --jacquaranda: #7B61FF;
+
+    /* Doing this so that I don't accidentally change the colors of
+    things by accident */
+    --messageBoxColor: var(--mediumGray);
+    --submitButtonColor: var(--jacquaranda);
+}
+
+.messagesContainer {
+    display: flex;
+    flex-direction: row;
+    width:100%;
+    border-radius: 0 0 6px 6px;
+    background-color: var(--messageBoxColor);
+    overflow: hidden;
+}
+
+.messageListing {
+    display: flex;
+    flex-flow:column;
+    justify-content:space-between;
+    width: 50%;
+}
+
+.messageListing[data-status="true"] {
+    width: 100%;
+}
+
+.messageBox {
+    overflow-x:hidden;
+    padding: 0;
+    min-height: 20px;
+}
+
+.messageBox.game {
+    height: 400px;
+    display:flex;
+    flex-direction: column;
+    flex-grow: 2;
+}
+
+.messageBox.game:last-of-type {
+    height: 400px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.messageBox::-webkit-scrollbar {
+    background-color: var(--messageBubbleColor);
+    border-radius: 6px;
+}
+
+.messageBox::-webkit-scrollbar-thumb {
+    background-color: #b0b0b0;
+    border-radius: 6px;
+}
+
+.sendChatBoxes {
+    display:flex;
+}
+
+.sendChatBox {
+    bottom: 0px;
+    border-radius: 0 0 6px 6px;
+    /* width:100%; */
+    min-height:140px;
+    display: flex;
+}
+
+.submitButton {
+    padding: 10px 20px;
+    color: white;
+    background-color: var(--submitButtonColor);
+    border-radius: 6px;
+    border: none;
+}
+
+.notification {
+    padding: 10px 20px;
+    color: white;
+    background-color: var(--submitButtonColor);
+    border: none;
+    align-self:flex-end;
+    width: 100%;
+}
+
+.notification.spectator {
+    align-self:flex-start;
+}
+
+.chat-input {
+    border-radius: 6px;
+    border: 0;
+    padding: 5px;
+}
+
+.spacer {
+    display: block;
+    height: 1px;
+}
+
+.gameDetails {
+    display: flex;
+    background-color: var(--jacquaranda);
+    border-radius: 6px 6px 0 0;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.gameDetails p {
+    margin-left: 50px;
+}
+
+.gameDetails a, .notification a {
+    color: black;
+}
+
+textarea
+{
+  width:100%;
+}

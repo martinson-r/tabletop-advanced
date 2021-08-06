@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import MessageBox from "../MessageBox";
 import { v4 as uuidv4 } from 'uuid';
+import './conversation.css';
 
 import {
     useQuery, useMutation, useSubscription
@@ -264,27 +265,28 @@ function Conversation() {
 
 
     return (
-      <div>
+      <div className="nonGameMessagesContainer">
 
-      <div ref={messageBoxRef} id="messageBox">
+      <div ref={messageBoxRef} className="nonGamesMessageBox game">
        {/* Behaves very strangely if not passed a key. */}
       {sortedConvos && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} conversationId={conversationId} convosData={nonGameConvosData}/>)}
       </div>
 
       {sessionUser !== undefined && (
         <div>
-      <form onSubmit={handleSubmit}>
+      <div className="sendChatBox"><form onSubmit={handleSubmit}>
          <label>
            Send Message
            <input
              type="text"
+             className="chat-input"
              value={messageText}
              onChange={(e) => setMessage(e.target.value)}
              required
            />
          </label>
-         <button type="submit">Send</button>
-       </form>
+         <button type="submit" className="submitButton" >Send</button>
+       </form></div>
 
        <form onSubmit = {addRecipientName}>
             <textarea name="recipient" value={recipientName} onChange={(e) => setRecipientName(e.target.value)}></textarea>

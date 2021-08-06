@@ -8,7 +8,7 @@ import './message-box.css';
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { EDIT_MESSAGE, DELETE_MESSAGE, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { EDIT_MESSAGE, DELETE_MESSAGE, GET_CHARACTER, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
 
 //Behavior is very unreliable right now in both Chrome and Safari.
 
@@ -26,9 +26,20 @@ function MessageBox(props) {
     const [newMessage, setNewMessage] = useState(null);
     const [editDisplay, setEditDisplay] = useState(false);
     const [editMessageText, setEditMessageText] = useState("");
+    const [isGame, setIsGame] = useState(true);
 
     const [editMessage] = useMutation(EDIT_MESSAGE, { variables: { messageId, userId, editMessageText } } );
     const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
+    const { loading, error, data } = useQuery(GET_CHARACTER, { variables: { userId: message.sender.id, gameId } });
+
+    console.log('user', userId, 'game', gameId, 'CHAR DATA', data);
+
+   useEffect(() => {
+    //  If there's no gameId, it's not a game
+    if (gameId === undefined) {
+      setIsGame(false);
+    }
+   },[gameId])
 
     const editMessageSubmit = (e) => {
         if (editMessageText) {
@@ -60,7 +71,7 @@ function MessageBox(props) {
       if (editDisplay === true && sessionUser !== undefined) return (
         <div className="indivMessageBox">
         <p key={uuidv4()} className="indivMessage">{message.sender.userName}: </p>
-        <form onSubmit={editMessageSubmit}>
+        <form className="edit-message-form" onSubmit={editMessageSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>
@@ -86,16 +97,32 @@ function MessageBox(props) {
             <div className="avatar-position">
 
             </div>
-            <div className="avatar">
+            {/* Display default user avatars if not a game chat. */}
+            {isGame.toString() === "false" && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
+            </div>)}
 
-            </div>
+            {/* Display default DM avatar (DM has no character). DM will have a userId and be able to chat,
+            but will not have a character. */}
+            {data !== undefined && userId !== null && data.character === null && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
+            </div>)}
+
+            {/* Display default DM avatar if there is no user at all.
+            This is just to keep it from crapping out if there's a null userId. */}
+            {data !== undefined && userId === null && data.character === null && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
+            </div>)}
+
+            {/* Display character avatars by character */}
+            {data !== undefined && data.character !== null && (<div className="avatar" style={{backgroundImage: "url(" + data.character.imageUrl + ")"}}>
+            </div>)}
         </div>
-        <div className="indivMessageBox">
-          <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{message.sender.userName}</Link>: {message.deleted !== true &&
+        {userId !== null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
+          <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{data !== undefined && data.character !== null && (<span>{data.character.name} &#40;</span>)}{message.sender.userName}{data !== undefined && data.character !== null && (<span>&#41;</span>)}</Link>:<br /> {message.deleted !== true &&
             (<span>{message.messageText} {userId !== null && message.sender.id === userId.toString() && (<><button id={message.id} onClick={editMessageBox(message.messageText)}>edit</button>
-            <button onClick={deleteMessageBox(message.id, userId)}>delete</button></>)}</span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>
+            <button onClick={deleteMessageBox(message.id, userId)}>delete</button></>)}</span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>)}
+            {userId === null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={false}>
+          <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{data !== undefined && data.character !== null && (<span>{data.character.name} &#40;</span>)}{message.sender.userName}{data !== undefined && data.character !== null && (<span>&#41;</span>)}</Link>:<br /> {message.deleted !== true &&
+            (<span>{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>)}
         </div>
-
             )
 
 }

@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
     useQuery, useSubscription, InMemoryCache
   } from "@apollo/client";
-import { GET_GAME } from "../../gql"
+import { GET_GAME, GET_WAITLIST_APPLIED } from "../../gql"
 import { DateTime } from "../../utils/luxon";
 
 export const pubsub = new PubSub();
@@ -22,6 +22,7 @@ function Game() {
     // Grab our game ID
     const { gameId } = useParams();
     const [displayIgnored, setDisplayIgnored] = useState(false);
+    const [displayAccepted, setDisplayAccepted] = useState(false);
 
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
@@ -35,27 +36,54 @@ function Game() {
       setDisplayIgnored(!displayIgnored)
   }
 
+  const changeDisplayAccepted = () => {
+    setDisplayAccepted(!displayAccepted)
+}
+
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } });
+    const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
+
 
       return (
         <div>
         {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p>
         <p>{data.game.description}</p>
-        {/* List players */}
+        <p>Players:</p>
+        {/* This feels a little backwards, but we're grabbing the player associated with the character */}
+        {data.game.Characters.map((character) => <p><Link to={`/${character.User.id}/bio`}>{character.User.userName}</Link> as <Link to={`/characters/${character.id}`}>{character.name}</Link></p>)}
         </>)}
-        {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && (<><Link to={`/waitlist/${gameId}`}>Join Waitlist</Link><br /></>)}
+
+        {/* Player is able to join waitlist */}
+        {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Submit a Character to the Waitlist</Link><br /></>)}
+
+        {/* GM is not allowing multiple apps and player has applied */}
+        {/* Right now, this shows if ANYBODY has applied. Include Players and match ids, or else just
+        use a completely different query. */}
+        {waitlistStatus && waitlistStatus.checkApplied.length && (
+
+          <p>You have already applied to this game, and multiple applications are not allowed by the GM.</p>
+        )}
+
+        {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
+
         {data !== undefined && (<Link to={`/game/${gameId}/gameroom`}>Enter game room</Link>)}
+
         {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (
+
+        // TODO: Query to see if player is in game
+
           <>
-          <p>Applications:</p>
-          <label>Show ignored</label>
-            <input type="checkbox" checked={displayIgnored} onChange={changeDisplayIgnored}/>
-          <p>Open Applications:</p>
-          {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() !== 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}
-          <p>Accepted Applications:</p>
-          {data.game.Applications.map(application => application.accepted.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}
-          {displayIgnored.toString() === 'true' &&(<div><p>Ignored Applications:</p>
-          {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
+            <p>Applications:</p>
+            <label for="ignored">Show ignored</label>
+            <input type="checkbox" name="ignored" checked={displayIgnored} onChange={changeDisplayIgnored}/>
+            <label for="accepted">Show accepted</label>
+            <input type="checkbox" name="accepted" checked={displayAccepted} onChange={changeDisplayAccepted}/>
+            <p>Open Applications:</p>
+            {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() !== 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}
+            <p>Accepted Applications:</p>
+            {displayAccepted.toString() === 'true' &&(<div>{data.game.Applications.map(application => application.accepted.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link> on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
+            {displayIgnored.toString() === 'true' &&(<div><p>Ignored Applications:</p>
+            {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
           </>
         )}
       </div>

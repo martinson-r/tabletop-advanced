@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-// import SimpleSearch from "../SimpleSearch";
+import SimpleSearch from "../SimpleSearch";
 // import ProfileButton from './ProfileButton';
 // import LoginFormModal from '../LoginFormModal';
-// import SearchModal from '../SearchModal';
+import SearchModal from '../SearchModal';
 import './navigation.css';
 import * as sessionActions from "../../store/session";
 
@@ -23,6 +23,7 @@ function Navigation({ isLoaded }){
   useEffect(() => {
     if (sessionUser !== null && sessionUser !== undefined ) {
       setUserId(sessionUser.id);
+      console.log('user', sessionUser);
     }
 
   },[sessionUser])
@@ -32,14 +33,19 @@ function Navigation({ isLoaded }){
   if (sessionUser && userId !== null) {
     sessionLinks = (
       <div className="navigation">
-      <p><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></p>
-      <NavLink to="/">Find a Game</NavLink>
-      <NavLink to="/account">Account</NavLink>
-      <NavLink to="/dashboard">My Games</NavLink>
-      <NavLink to={`${userId}/bio`}>My Bio</NavLink>
-      <div onClick={logout}>Log Out</div>
-      <div className="search-messages">
+      <div className="lefthand-nav">
+        <div><i className="fas fa-dice-d20 logo"></i></div>
+        <div><NavLink exact to="/">Tabletop Advanced</NavLink></div>
+        <div><p>Hello, {sessionUser.userName}!</p></div>
+      </div>
+
+      <div className="righthand-nav">
+        <SimpleSearch />
+        <div><NavLink to="/account">Account</NavLink></div>
+        <div><NavLink to="/dashboard">My Games</NavLink></div>
+        <div><NavLink to={`/${userId}/bio`}>My Bio</NavLink></div>
         <div><NavLink to={`/conversations`}><i className="far fa-envelope"></i></NavLink></div>
+        <div onClick={logout}>Log Out</div>
         {/* <ProfileButton user={sessionUser} />
         <SearchModal /> */}
         </div>
@@ -47,11 +53,17 @@ function Navigation({ isLoaded }){
     );
   } else {
     sessionLinks = (
+
       <div className="navigation">
-        <p><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></p>
-        <NavLink to="/">Find a Game</NavLink>
+        <div className="lefthand-nav">
+        <div><i className="fas fa-dice-d20"></i><NavLink exact to="/">Tabletop Advanced</NavLink></div>
+      </div>
+      <div className="righthand-nav">
+        <SimpleSearch />
         <NavLink to="/login">Log In</NavLink>
         <NavLink to="/signup">Sign Up</NavLink>
+      </div>
+
         {/* <SearchModal /> */}
       </div>
     );

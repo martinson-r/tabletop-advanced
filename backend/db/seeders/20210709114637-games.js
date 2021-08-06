@@ -37,6 +37,7 @@ module.exports = {
 
       title: "Yet another adventure",
       description: "Exactly what it sounds like",
+      blurb: "This is a blurb",
       remote: true,
       public: true,
       premium: false,
@@ -58,6 +59,7 @@ module.exports = {
 
       title: "Grab your calculator",
       description: "Math is fun!",
+      blurb: "This is another blurb",
       remote: true,
       public: true,
       premium: false,

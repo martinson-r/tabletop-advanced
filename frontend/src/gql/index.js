@@ -39,9 +39,11 @@ const GET_GAMES = gql`
         id
         title
         active
+        blurb
         description
         host {
             userName
+            id
         }
        }
     }
@@ -115,6 +117,14 @@ query GetGamesPlayingIn($userId: ID) {
         host {
             userName
         }
+        player {
+            id
+            Characters {
+                id
+                gameId
+                name
+            }
+        }
     }
 }
 `;
@@ -128,13 +138,28 @@ const GET_GAME = gql`
         active,
         allowPlayerEdits,
         allowPlayerDeletes,
+        waitListOpen,
         active,
+        blurb,
         host {
             userName
             id
         }
+        player {
+            userName
+            id
+        }
+        Characters {
+            id
+            name
+            User {
+                id
+                userName
+            }
+        }
         Applications {
             id
+            charName
             ignored
             accepted
             createdAt
@@ -146,6 +171,33 @@ const GET_GAME = gql`
         }
     }
 `;
+
+const GET_CHARACTER = gql`
+query GetCharacter($userId: ID, $gameId: ID) {
+    character(userId: $userId, gameId: $gameId) {
+        name
+        imageUrl
+    }
+}
+`
+
+const GET_CHARACTER_BY_ID = gql`
+query GetCharacterById($characterId: ID) {
+    characterById(characterId: $characterId) {
+        name
+        bio
+        imageUrl
+        User {
+            userName
+            id
+        }
+        Game {
+            title
+            id
+        }
+    }
+}
+`
 
 //Get games a player is hosting
 //Grab waitlist info as well so they can see new apps
@@ -169,6 +221,14 @@ const GET_WAITLIST_STATUS = gql`
             id
             title
             description
+        }
+    }
+`;
+
+const GET_WAITLIST_APPLIED = gql`
+    query CheckApplied($gameId: ID, $userId: ID) {
+        checkApplied(gameId: $gameId, userId: $userId) {
+           id
         }
     }
 `;
@@ -210,6 +270,7 @@ const GET_GAME_CONVOS = gql`
             }
             id
             messageText
+            spectatorChat
             createdAt
             deleted
        }
@@ -270,6 +331,18 @@ query GetGameCreationInfo {
 }
 `;
 
+const SIMPLE_SEARCH = gql`
+query SimpleSearch($text: String) {
+    simpleSearch(text: $text) {
+        wordsArray {
+            id
+            title
+            blurb
+          }
+    }
+}
+`
+
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
   mutation AddBlockedUser($email: String) {
@@ -281,8 +354,8 @@ const ADD_BLOCKED_USER = gql`
 `;
 
 const SEND_MESSAGE_TO_GAME = gql`
-  mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String) {
-    sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText) {
+  mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String, $spectatorChat: Boolean) {
+    sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText, spectatorChat: $spectatorChat) {
         count
         rows {
             sender {
@@ -291,6 +364,7 @@ const SEND_MESSAGE_TO_GAME = gql`
             }
             id
             messageText
+            spectatorChat
             createdAt
             deleted
        }
@@ -309,6 +383,7 @@ editMessage(messageId: $messageId, userId: $userId, editMessageText: $editMessag
             }
             id
             messageText
+            spectatorChat
             createdAt
             deleted
        }
@@ -327,6 +402,7 @@ deleteMessage(messageId: $messageId, userId: $userId) {
         }
         id
         messageText
+        spectatorChat
         createdAt
         deleted
    }
@@ -415,6 +491,14 @@ const SUBMIT_WAITLIST_APP = gql`
 }
 `;
 
+const SUBMIT_CHARACTER_CREATION = gql`
+  mutation SubmitCharacterCreation($userId: ID, $gameId: ID, $bio: String, $imageUrl: String, $name: String) {
+    submitCharacterCreation(gameId: $gameId, userId: $userId, bio: $bio, imageUrl: $imageUrl, name: $name) {
+                id
+    }
+}
+`;
+
 const EDIT_WAITLIST_APP = gql`
   mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
     editWaitlistApp(applicationId: $applicationId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
@@ -477,6 +561,27 @@ subscription OnMessageSent($gameId: ID, $conversationId: ID) {
             }
             id
             messageText
+            spectatorChat
+            createdAt
+            deleted
+       }
+    }
+  }
+`;
+
+const SPECTATOR_MESSAGES_SUBSCRIPTION = gql`
+subscription OnMessageSent($gameId: ID, $conversationId: ID) {
+    messageSent(gameId: $gameId, conversationId: $conversationId) {
+        count
+        rows {
+            id
+            sender {
+                id
+                userName
+            }
+            id
+            spectatorChat
+            messageText
             createdAt
             deleted
        }
@@ -495,6 +600,7 @@ subscription OnMessageSent($conversationId: ID!) {
                 userName
             }
             id
+            spectatorChat
             messageText
             createdAt
             deleted
@@ -512,6 +618,8 @@ export { GET_ACCOUNTS,
         GET_GAMES,
         GET_RULESETS,
         GET_GAME,
+        GET_CHARACTER,
+        GET_CHARACTER_BY_ID,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,
@@ -532,10 +640,14 @@ export { GET_ACCOUNTS,
         START_NEW_PRIVATE_CHAT,
         GAME_MESSAGES_SUBSCRIPTION,
         NON_GAME_MESSAGES_SUBSCRIPTION,
+        SPECTATOR_MESSAGES_SUBSCRIPTION,
         SUBMIT_GAME,
+        SIMPLE_SEARCH,
         SUBMIT_WAITLIST_APP,
+        SUBMIT_CHARACTER_CREATION,
         EDIT_WAITLIST_APP,
         GET_WAITLIST_STATUS,
+        GET_WAITLIST_APPLIED,
         GET_GAME_CREATION_INFO,
         CHANGE_EMAIL,
         CHANGE_PASSWORD,

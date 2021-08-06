@@ -2,7 +2,7 @@
 .navigation {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     background: linear-gradient(
         90deg,
         rgba(123, 97, 255, 1) 0%,
@@ -20,9 +20,71 @@
     align-items: flex-end;
   }
 
-  navigation a {
-    color: #b5b5b5;
+  .lefthand-nav {
+    padding-left: 10px;
+    display: flex;
+    width: 40%;
   }
+
+  .lefthand-nav div:last-of-type {
+    margin-left: 30px;
+  }
+
+  .righthand-nav {
+    padding-right: 10px;
+    display: flex;
+    width: 40%;
+    justify-content: space-between;
+  }
+
+
+  /* @keyframes rainbow {
+    0%   {background-position: 0px 0px;}
+    14.2%  {background-position: 14.2%, 14.2%;}
+    28.4% {background-position: 28.4%, 28.4%;}
+    42.6% {background-position: 42.6%, 42.6%;}
+    56.8% {background-position: 56.8%, 56.8%;}
+    71% {background-position: 71%, 71%;}
+    85.2% {background-position: 85.2%, 85.2%;}
+    100% {background-position: 100%, 100%;}
+
+  } */
+
+  .navigation div:hover {
+    color: white;
+  }
+
+  .navigation a:hover {
+    color:  white;
+  }
+
+  /* Cool but looks like crap... keeping for reference
+  .navigation div:hover {
+    font-weight: bold;
+    background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red);
+    background-size: 800% 800%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation-name: rainbow;
+    animation: rainbow 6s ease infinite;
+  }
+
+  .navigation a:hover {
+    font-weight: bold;
+    background-image: linear-gradient(to left, rgba(123, 97, 255, 1),
+    rgba(204, 97, 255, 1),
+    rgba(108, 179, 244, 1),
+    rgba(150, 236, 210, 1),
+    rgba(178, 236, 150, 1),
+    rgba(236, 227, 150, 1),
+    rgba(236, 181, 150, 1),
+    rgba(123, 97, 255, 1));
+    background-size: 800% 800%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation-name: rainbow;
+    animation: rainbow 6s ease infinite;
+  } */
 
   li {
     list-style-type: none;
@@ -43,7 +105,7 @@
   }
 
   .fa-envelope {
-    color: #b5b5b5;
+    color: black;
     padding-right: 10px;
   }
 
@@ -57,6 +119,10 @@
 
   .fa-user {
     color: #b5b5b5;
+  }
+
+ .fa-dice-d20 {
+    margin-right: 10px;
   }
 
   .my-tables {

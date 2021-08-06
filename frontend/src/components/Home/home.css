@@ -1,21 +1,7 @@
 @import-normalize;
 
-:root {
-    --lighterGray: #A8A9AB;
-    --darkerGray: #5A5850;
-    --mediumGray: #C4C4C4;
-    --lightestGray: #D3D3BA;
-    --veryDarkGray: #585858;
-    --jacquaranda: #7B61FF;
-
-    /* Doing this so that I don't accidentally change the colors of
-    things by accident */
-    --navLink: var(--lighterGray);
-    --cardBackgroundColor: var(--darkerGray);
-    --cardTextColor: var(--lightestGray);
-    --gameBoxColor: var(--mediumGray);
-    --gameBoxTextColor: var(--veryDarkGray);
-    --createGameButton: var(--jacquaranda);
+* {
+    box-sizing: border-box;
 }
 
 p {
@@ -28,6 +14,10 @@ a {
     text-decoration: none;
 }
 
+label {
+    margin-left: 5px;
+}
+
 .main-container {
     display: flex;
     flex-direction: column;
@@ -36,8 +26,9 @@ a {
 }
 
 .top-game-display-container {
+    width: 100%;
     display: grid;
-    grid-template-columns: 25% 75%;
+    grid-template-columns: 20% 80%;
 }
 
 .game-filters {
@@ -50,13 +41,16 @@ a {
     display: flex;
 }
 
-/* .recent-games-list {
-
+.premise {
+    color: black;
 }
 
-.popular-game-preview {
 
-} */
+.popular-game-preview {
+width: 100%;
+background-color: var(--jacquaranda);
+border-radius: 6px;
+}
 
 .game-filters {
     display: flex;
@@ -71,7 +65,7 @@ avoid weird flexbox spacing issues */
     display: flex;
     flex-direction: row;
     flex-flow: row wrap;
-    justify-content: flex-start;
+    justify-content: space-around;
     color: white;
     padding: 10px;
     }
@@ -82,9 +76,15 @@ avoid weird flexbox spacing issues */
     height: 100px;
     position: relative;
     margin: 10px;
-        padding: 10px;
+    padding: 10px;
     width: 175px;
     height: 200px;
+}
+
+.game-card p {
+    padding: 10px;
+    text-align: center;
+    color: white;
 }
 
 /* Adding image as ::before makes it so altering image opacity does
@@ -108,8 +108,15 @@ not alter text opacity */
 
 .newest-games-container {
     margin-left: 10px;
-    margin-top: 30px;
+    margin-top: 10px;
     margin-bottom: 10px;
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+}
+
+.newest-title {
+    margin-right: 15px;
 }
 
 .create-game-button {
@@ -119,9 +126,13 @@ not alter text opacity */
     border-radius: 6px;
 }
 
+.create-game-button:hover {
+    background-color: var(--createGameButtonHover);
+}
+
 .recent-games-list {
     background-color: var(--darkerGray);
-    margin: 0 10px;
+    margin: 0 10px 0 0;
     border-radius: 6px;
 }
 
@@ -138,4 +149,9 @@ not alter text opacity */
 
 .gameBox a {
     color: black;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 2em;
 }

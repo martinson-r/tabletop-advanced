@@ -11,12 +11,12 @@
     --submitButtonColor: var(--jacquaranda);
 }
 
-.messagesContainer {
+.nonGameMessagesContainer {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 }
 
-.messageBox {
+.nonGamesMessageBox {
     background-color: var(--messageBoxColor);
     height:300px;
     overflow-x:hidden;
@@ -26,12 +26,11 @@
     border-radius: 0 6px 6px 0;
 }
 
-.messageBox.game {
-    width: 75%;
+.nonGamesMessageBox.game {
     border-radius: 6px 0 0 6px;
 }
 
-.messageBox:hover {
+.nonGamesMessageBox:hover {
     overflow-y: scroll;
 }
 
@@ -40,7 +39,10 @@
     bottom: 0px;
     background-color: var(--messageBoxColor);
     border-radius: 0 0 6px 6px;
-    padding: 10px;
+    padding-top: 10px;
+    display: block;
+    width: 90%;
+    margin: 10px;
 }
 
 .submitButton {

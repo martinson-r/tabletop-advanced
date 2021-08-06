@@ -82,13 +82,14 @@ function Home() {
         <div className="main-container">
             <div className="newest-games-container">
                 {/* TODO: grid this, align everything to bottom */}
-                <span><b>Newest Games:</b>
-                <label>Show inactive games</label>
-                <input type="checkbox" checked={displayInactive} onChange={changeDisplayInactive}/>
-                <label>Show waitlist closed</label>
-                <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/>
+                <div><b className="newest-title">Newest Games</b>
+                <input type="checkbox"  checked={displayInactive} onChange={changeDisplayInactive}/>
+                <label>Show inactive games</label></div>
+
+                {/* <label>Show waitlist closed</label>
+                <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/> */}
                 <Link className="create-game-button" to="/start-game">Create a Game</Link>
-                </span></div>
+            </div>
 
                 {/* TODO: position and style */}
             <div className="top-game-display-container">
@@ -96,14 +97,21 @@ function Home() {
 
                     {/* <p>Active Games:</p> */}
                     {gameData && (gameData.map((game) =>
-                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
+                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, presented by {game.host.userName}<br /><span className="premise"><i>{game.blurb}</i></span></p></div>))
                     ))}
 
                     {/* Show inactive games conditionally */}
-                    {/* {displayInactive === true && (<span><p>Inactive Games:</p>
+                    {displayInactive === true && (<span><p>Inactive Games:</p>
                     {gameData.map((game) =>
-                    (game.active === false && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
+                    (game.active === false && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}<br />Premise: {game.blurb}</p></div>))
+                    )}</span>)}
+
+                    {/* Show closed waitlist games conditionally */}
+                    {/* {displayClosedWaitlist === true && (<span><p>Games With Closed Waitlists:</p>
+                    {gameData.map((game) =>
+                    (game.waitListOpen === false && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
                     )}</span>)} */}
+
                 </div>
                 <div className="popular-game-preview">
                     <GameMessages gameId={gameId} />
@@ -113,9 +121,7 @@ function Home() {
             <div className="game-filters">
                  {/* TODO: a component that fetches/displays by category fed in */}
                 <div>
-                    <div>
-                        <p>Games by Ruleset:</p>
-                    </div>
+                        <h2>Games by Ruleset:</h2>
                     {/* TODO: fetch all rulesets from database and map containers */}
                     <div className="game-cards-container">
                        {rulesetsData !==undefined && (rulesetsData.rulesets.map((ruleset) =>  <div className="game-card">

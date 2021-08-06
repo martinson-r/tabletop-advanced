@@ -14,9 +14,12 @@ import JoinWaitList from "./components/JoinWaitList";
 import Navigation from "./components/Navigation";
 import Dashboard from "./components/Dashboard";
 import Account from "./components/Account";
+import SearchResults from "./components/SearchResults";
 import GameMessages from "./components/GameMessages";
 import Bio from "./components/Bio";
 import Conversation from "./components/Conversation";
+import Character from "./components/Character";
+import CreateCharacter from "./components/CreateCharacter";
 import ViewApplication from "./components/ViewApplication";
 import StartNewMessage from "./components/StartNewMessage"
 import * as sessionActions from "./store/session";
@@ -55,7 +58,10 @@ function App() {
         <Route path="/conversation/:conversationId" component={Conversation} exact={true}></Route>
         <Route path="/newmessage" component={StartNewMessage} exact={true}></Route>
         <Route path="/waitlist/:gameId" component={JoinWaitList} exact={true}></Route>
+        <Route path="/characters/:characterId" component={Character} exact={true}></Route>
         <Route path="/game/:gameId/application/:applicationId" component={ViewApplication} exact={true}></Route>
+        <Route path="/game/:gameId/create-character" component={CreateCharacter} exact={true}></Route>
+        <Route path="/search/:text" component={SearchResults} exact={true}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>
