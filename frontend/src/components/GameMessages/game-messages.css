@@ -117,6 +117,14 @@
     margin-left: 50px;
 }
 
+.hideSpectators label {
+    display: inline-block;
+}
+
+.hideSpectators input {
+    display: inline-block;
+}
+
 .notification a {
     color: black;
 }

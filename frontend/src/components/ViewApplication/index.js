@@ -88,8 +88,8 @@ function ViewApplication() {
       };
 
     return (
-        <div class="container">
-          <div class="gray-backdrop">
+        <div className="container">
+          <div className="gray-backdrop">
         {console.log('app', application)}
         {data !== undefined && Object.keys(application).length !== 0 && (<div><Link to={`/game/${application.Games[0].id}/gameroom`}>Back to Game: {application.Games[0].title}</Link>
         <h2><Link to={`/${application.applicationOwner[0].id}/bio`}>{application.applicationOwner[0].userName}'s</Link> Application</h2>

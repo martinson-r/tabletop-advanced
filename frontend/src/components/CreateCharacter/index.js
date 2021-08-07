@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams, Link, useHistory } from "react-router-dom";
-import { PubSub } from 'graphql-subscriptions';
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useParams, useHistory } from "react-router-dom";
 import {
-    useLazyQuery, useMutation, useSubscription, InMemoryCache
+    useMutation
   } from "@apollo/client";
   import { SUBMIT_CHARACTER_CREATION  } from "../../gql";
 
@@ -15,14 +14,14 @@ const [name, setName] = useState("");
 const [bio, setBio] = useState("");
 const [imageUrl, setImageUrl] = useState("");
 const { gameId } = useParams();
-const [errors, setErrors] = useState([]);
+// const [errors, setErrors] = useState([]);
 const history = useHistory();
 
 const [submitCharacterCreation] = useMutation(SUBMIT_CHARACTER_CREATION, { variables: { userId, name, bio, imageUrl, gameId }, onCompleted: submitCharacterCreation => {  history.push(`/characters/${submitCharacterCreation.submitCharacterCreation.id}`) } } );
 
 const handleSubmit = (e) => {
     e.preventDefault();
-    setErrors([]);
+    // setErrors([]);
     submitCharacterCreation(userId, gameId, name, bio, imageUrl);
   };
 

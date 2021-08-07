@@ -14,8 +14,8 @@ a {
     text-decoration: none;
 }
 
-label {
-    margin-left: 5px;
+.newest-games-container label {
+    display: inline-block;
 }
 
 .main-container {
@@ -34,7 +34,11 @@ label {
 .game-filters {
     display: flex;
     max-width: 100%;
+    color: white;
+}
 
+.game-filters-heading {
+    color: white;
 }
 
 .bottom-game-display-container {

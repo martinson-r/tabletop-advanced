@@ -34,8 +34,6 @@ function MessageBox(props) {
     const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
     const { loading, error, data } = useQuery(GET_CHARACTER, { variables: { userId: message.sender.id, gameId } });
 
-    console.log('user', userId, 'game', gameId, 'CHAR DATA', data);
-
    useEffect(() => {
     //  If there's no gameId, it's not a game
     if (gameId === undefined) {
@@ -134,9 +132,9 @@ function MessageBox(props) {
 
 
             {userId !== null && message.sender.id === userId.toString() && (
-            <div class="dropdown" >
-              <div class="btncontainer" onClick={displayEditCancel} ref={dropdownButton}>
-                <p class="dropbtn" >...</p></div>
+            <div className="dropdown" >
+              <div className="btncontainer" onClick={displayEditCancel} ref={dropdownButton}>
+                <p className="dropbtn" >...</p></div>
               <div ref={editDropdown} className="dropdown-content-hidden dropdown-box">
                <span><p id={message.id} onClick={editMessageBox(message.messageText)}>edit</p></span>
                 <p onClick={deleteMessageBox(message.id, userId)}>delete</p>

@@ -1,9 +1,6 @@
-import logo from './logo.svg';
-// import './App.css';
-import { BrowserRouter, Route, Switch, NavLink } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { Route, Switch, } from "react-router-dom";
+import React, { useState, useEffect} from "react";
+import { useDispatch } from "react-redux";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
@@ -15,7 +12,6 @@ import Navigation from "./components/Navigation";
 import Dashboard from "./components/Dashboard";
 import Account from "./components/Account";
 import SearchResults from "./components/SearchResults";
-import GameMessages from "./components/GameMessages";
 import Bio from "./components/Bio";
 import Conversation from "./components/Conversation";
 import Character from "./components/Character";
@@ -26,19 +22,11 @@ import * as sessionActions from "./store/session";
 
 function App() {
   const dispatch = useDispatch();
-  const history = useHistory();
   const [isLoaded, setIsLoaded] = useState(false);
-  const sessionUser = useSelector(state => state.session.user);
 
   useEffect(() => {
     dispatch(sessionActions.restoreUser()).then(() => setIsLoaded(true));
   }, [dispatch]);
-
-  const logout = (e) => {
-    e.preventDefault();
-    dispatch(sessionActions.logout());
-    history.push('/login');
-  };
 
   return (
     <div className="App">

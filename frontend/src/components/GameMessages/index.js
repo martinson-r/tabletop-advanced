@@ -255,8 +255,10 @@ function GameMessages(props) {
     return (
       <div>
         <div className="gameDetails">
-          <div><input type="checkbox" name="hideSpectatorChat" checked={hideSpectatorChat} onChange={toggleHideSpectatorChat} />
-          <label for="hideSpectatorChat">Hide spectator chat</label></div>
+          <div className="hideSpectators">
+            <input type="checkbox" name="hideSpectatorChat" checked={hideSpectatorChat} onChange={toggleHideSpectatorChat} />
+            <label>Hide spectator chat</label>
+          </div>
           {gameData !== undefined && (<div><p><Link to={`/game/${gameData.game.id}`}>{gameData.game.title}</Link> presented by {gameData.game.host.userName}</p>
           <p><i>{gameData.game.blurb}</i></p>
           </div>)}
@@ -271,7 +273,7 @@ function GameMessages(props) {
         <div ref={messageBoxRef} className="messageBox game">
 
           {/* Hack to get flexbox to space items properly */}
-          <div class="spacer"></div>
+          <div className="spacer"></div>
 
           {/* Behaves very strangely if not passed a key. */}
           {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
@@ -297,7 +299,7 @@ function GameMessages(props) {
     {hideSpectatorChat.toString() === "false" && (<div className="messageListing">
 
     <div ref={messageBoxRef} className="messageBox game">
-        <div class="spacer"></div>
+        <div className="spacer"></div>
         {/* Behaves very strangely if not passed a key. */}
 
         {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>

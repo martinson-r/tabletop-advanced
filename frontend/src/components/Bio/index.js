@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useParams, Link, useHistory } from "react-router-dom";
-import { PubSub } from 'graphql-subscriptions';
 import {
-    useLazyQuery, useMutation, useSubscription, InMemoryCache
+    useLazyQuery, useMutation
   } from "@apollo/client";
-import { GET_USER, GET_ABOUT,START_NEW_PRIVATE_CHAT } from "../../gql"
+import { GET_ABOUT,START_NEW_PRIVATE_CHAT } from "../../gql"
 import './bio.css';
 
 function Bio() {
@@ -21,9 +20,9 @@ useEffect(() => {
     if (sessionUser !== undefined && sessionUser !== null) {
         setCurrentUserId(sessionUser.id);
     }
-})
+},[sessionUser])
 
-const [getAbout, { data, error, loading }] = useLazyQuery(GET_ABOUT);
+const [getAbout, { data }] = useLazyQuery(GET_ABOUT);
 
 const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipients }, onCompleted: startNewNonGameConversation => { history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)} } );
 
@@ -38,7 +37,7 @@ useEffect(() => {
     if (userId !== null && userId !== undefined) {
         getAbout({ variables: { userId }})
     }
-},[userId]);
+},[userId, getAbout]);
 
 useEffect(() => {
  if (data !== undefined) {
@@ -46,12 +45,11 @@ useEffect(() => {
      setRecipients([data.about[0].User.userName]);
     }
  }
-},[data]);
+},[data, userId]);
 
 return (
     <div className="container">
     <div className="gray-backdrop">
-        {console.log(data)}
     {data !== undefined && data.about[0] !== undefined &&
     (<div><p>About {data.about[0].User.userName}:</p>
     {/* Conditional edit buttons based on whether user or not */}

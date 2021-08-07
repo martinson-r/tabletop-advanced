@@ -79,6 +79,7 @@ margin-bottom: 0;
     flex-direction: column;
     flex-flow: row wrap;
     margin-left: 10px;
+    flex-shrink: 0;
 }
 
 .avatarBox {

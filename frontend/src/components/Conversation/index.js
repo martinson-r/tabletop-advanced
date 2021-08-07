@@ -1,21 +1,21 @@
 import { useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import MessageBox from "../MessageBox";
 import { v4 as uuidv4 } from 'uuid';
 import './conversation.css';
 
 import {
-    useQuery, useMutation, useSubscription
+    useQuery, useMutation
   } from "@apollo/client";
 import { ADD_RECIPIENT, GET_NON_GAME_NON_SPEC_MESSAGES, GAME_MESSAGES_SUBSCRIPTION, SEND_NON_GAME_NON_SPEC_MESSAGES } from "../../gql"
 
 function Conversation() {
     const sessionUser = useSelector((state) => state.session.user);
 
-    const [accounts, setAccount] = useState([]);
-    const [loadingData, setLoading] = useState([]);
-    const [errorData, setError] = useState([]);
+    // const [accounts, setAccount] = useState([]);
+    // const [loadingData, setLoading] = useState([]);
+    // const [errorData, setError] = useState([]);
     const [recipientName, setRecipientName] = useState("");
 
     const {conversationId} = useParams();
@@ -35,7 +35,7 @@ function Conversation() {
 
     //const { loading: convosLoading, error: convosError, data: convosData } = useQuery(GET_NON_GAME_NON_SPEC_CONVO, { variables: { conversationId } });
 
-    let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
+    let { subscribeToMore, fetchMore, data } = useQuery(
       //add offset
       GET_NON_GAME_NON_SPEC_MESSAGES,
       { variables: { conversationId, offset } }
@@ -47,21 +47,19 @@ function Conversation() {
     useEffect(() => {
         //Make sure we have ALL of our data
 
-        if (loadConvos) {
-            setLoading(loadConvos);
-        }
-        if (nonGameConvosError) {
-            setError(nonGameConvosError);
-        }
-        if (nonGameConvosData) {
-            setAccount(nonGameConvosData);
-        }
+        // if (loadConvos) {
+        //     setLoading(loadConvos);
+        // }
+        // if (nonGameConvosError) {
+        //     setError(nonGameConvosError);
+        // }
+        // if (nonGameConvosData) {
+        //     setAccount(nonGameConvosData);
+        // }
         if (sessionUser) {
             setUserId(sessionUser.id);
-            console.log(sessionUser.id)
-            console.log('USERID:', userId)
         }
-    }, []);
+    }, [sessionUser]);
 
 
     useEffect(() => {
@@ -116,7 +114,7 @@ function Conversation() {
       setSortedConvos([...convosRemoved]);
        }
     }
-    },[data, newMessage]);
+    },[data, newMessage, sortedConvos]);
 
     useEffect(() => {
       if ( offset !== undefined && offset === 0 ) {
@@ -125,7 +123,7 @@ function Conversation() {
       }
         }
 
-    },[sortedConvos])
+    },[sortedConvos, offset])
 
     //Subscription for messages
     //This hopefully covers all, edits and deletions included
@@ -138,7 +136,6 @@ function Conversation() {
         variables: { conversationId },
         updateQuery: (prev, { subscriptionData }) => {
           if (!subscriptionData.data) return prev;
-          console.log(subscriptionData.data)
           const newFeedItem = subscriptionData.data.messageSent;
           setNewMessage(newFeedItem)
 
@@ -148,9 +145,9 @@ function Conversation() {
             });
           }
       })
-    },[]);
+    },[conversationId, subscribeToMore]);
 
-    const [errors, setErrors] = useState([]);
+    // const [errors, setErrors] = useState([]);
     useEffect(() => {
       if (sessionUser !== undefined && sessionUser !== null) {
         setUserId(sessionUser.id);
@@ -213,7 +210,7 @@ function Conversation() {
   });
     }
 
-},[sortedConvos])
+},[sortedConvos, conversationId, data, fetchMore, isScrolling, offset])
 
     useEffect(()=> {
 
@@ -236,11 +233,11 @@ function Conversation() {
         messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
       }
         setSubmittedMessage(false)
-  },[sortedConvos])
+  },[sortedConvos, submittedMessage, offset])
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      setErrors([]);
+      // setErrors([]);
 
         //Offset is fine at this point. No need to do anything with it.
         sendNonGameMessage(conversationId, userId, messageText);
@@ -249,7 +246,7 @@ function Conversation() {
 
     const addRecipientName = (e) => {
       e.preventDefault();
-      setErrors([]);
+      // setErrors([]);
       addRecipient(recipientName);
     }
 

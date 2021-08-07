@@ -46,15 +46,15 @@ return (
 <GameMessages gameId={gameId} />
 <div className="details">
 {/* {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p> */}
-        <div class="game-content-block">
+        <div className="game-content-block">
             <h2>More About This Game</h2>
             {data !== undefined && (<span>{data.game.description}</span>)}
         </div>
 
-        <div class="game-content-block">
+        <div className="game-content-block">
         <h2>Playing In This Game</h2>
             {/* This feels a little backwards, but we're grabbing the player associated with the character */}
-            {data !== undefined && data.game.Characters.map((character) => <span><Link to={`/${character.User.id}/bio`}>{character.User.userName}</Link> as <Link to={`/characters/${character.id}`}>{character.name}</Link></span>)}
+            {data !== undefined && data.game.Characters.map((character) => <span key={uuidv4()}><Link to={`/${character.User.id}/bio`}>{character.User.userName}</Link> as <Link to={`/characters/${character.id}`}>{character.name}</Link></span>)}
 
             {/* Player is able to join waitlist */}
             {data !== undefined && userId !== null && userId !== undefined && data.game.host.id.toString() !== userId.toString() && data.game.waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Submit a Character to the Waitlist</Link><br /></>)}
@@ -73,11 +73,11 @@ return (
             <h2>Applications:</h2>
             <div className="toggle-flex">
                 <div className="toggle">
-                    <label for="ignored">Show ignored</label>
+                    <label >Show ignored</label>
                     <input type="checkbox" name="ignored" checked={displayIgnored} onChange={changeDisplayIgnored}/>
                 </div>
                 <div className="toggle">
-                    <label for="accepted">Show accepted</label>
+                    <label >Show accepted</label>
                     <input type="checkbox" name="accepted" checked={displayAccepted} onChange={changeDisplayAccepted}/>
                 </div>
             </div>

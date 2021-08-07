@@ -13,8 +13,6 @@ const rolldice = (number, sides) => {
         return Math.floor((Math.random() * (sides - 1))  + 1);
     };
 
-    console.log('roll', getRandomRoll);
-
     const diceMultiplier = (accumulator, currentValue) => accumulator + currentValue;
 
     const diceArray = [];
@@ -22,7 +20,7 @@ const rolldice = (number, sides) => {
     for (let i = 0; i < number; i++) {
         diceArray.push(getRandomRoll(sides))
     }
-    console.log('Dice array', diceArray);
+
     return diceArray.reduce(diceMultiplier);
 
 };
@@ -35,7 +33,7 @@ const resolvers = {
             return User.findAll({})
           },
         user:(obj, args, context, info) => {
-            console.log(args);
+
             const {id} = args
             return User.findByPk(id);
         },
@@ -46,7 +44,7 @@ const resolvers = {
 
         },
         rulesets: (obj, args, context, info) => {
-            console.log(Ruleset.findAll())
+
             return Ruleset.findAll();
         },
         game:(obj, args, context, info) => {
@@ -74,14 +72,13 @@ const resolvers = {
         },
         about: (obj, args, context, info) => {
             const { id } = args;
-            console.log(args)
+
             return AboutMe.findAll({where: {userId: id}, include: User})
         },
         //Get all non game conversations for a specific user
         getNonGameConvos: (obj, args, context, info) => {
             const { userId } = args;
 
-            console.log('ID', userId)
 
             //find all individual conversations involving this user somehow
 
@@ -108,7 +105,7 @@ const resolvers = {
             //Get all applications for this specific game associated with this specific user.
             const { gameId, applicationId } = args;
             const app = await Application.findAll({where: {id: applicationId}, include: [{model: User, through: "Waitlists", as: "applicationOwner"}, {model: Game, through: "Waitlists", include: { model: User, as: "host"}}]});
-            console.log(app)
+
             return app;
             //return User.findAll({where: {id: applicantId}, include: {model: Game, through: "Waitlists", as: "applicant", where: { id: gameId }, include: {model: Application, through: "Waitlists", include: {model: User, as: "applicationOwner"}}}});
         },
@@ -130,16 +127,12 @@ const resolvers = {
         checkApplied: async (obj, args, context, info) => {
             const { gameId, userId } = args;
 
-            console.log('ARGS', gameId, userId)
-
-            console.log(gameId, userId);
-
             //check if this user has applied to this game before. Must match both game _id and
             //userId in waitlist.
             //Users can apply multiple times, hence findAll.
             const list = await Waitlist.findAll({ where: {gameId, userId}});
             return list;
-            // console.log(list);
+
         },
 
         getWaitlistGames: async (obj, args, context, info) => {
@@ -150,7 +143,7 @@ const resolvers = {
             const game = await Game.findAll({include: [{model: User, as: "host"},
             {model: User, through: "Waitlists", as: "applicant", where: { id: userId },
             include: { model: Application, through: "Waitlists", as: "applicationOwner" }}]})
-            console.log(game);
+
             return game;
         },
 
@@ -173,12 +166,6 @@ const resolvers = {
             const { text } = args;
             const words = text.split(' ');
             const wordsArray = [];
-            // console.log('WORDS', words);
-
-            console.log('WORDS 2', words);
-
-            // const test = await Game.findAll({where: { title: {[Op.iLike]: '%' + sentence + '%'} }})
-            // console.log('TEST', test);
 
                     for (word in words) {
                         wordsArray.push(await Game.findAll({where: { title: {[Op.iLike]: '%' + words[word] + '%'} }}));
@@ -186,14 +173,6 @@ const resolvers = {
 
             return { wordsArray: wordsArray }
 
-            // console.log('RESULT', wordsArray);
-
-
-            // return {wordsArray};
-
-            // return Game.findAll({where: { title: {
-            //     [Sequelize.Op.iLike]: '%' + text + '%'
-            // } }})
         },
     },
     Mutation: {
@@ -229,19 +208,6 @@ const resolvers = {
         }
     },
 
-    // sendSpectatorMessages: async(root,args) => {
-
-    //     //Is there a better way to do this, such as flag it Spectator?
-    //     const { conversationId, messageText, userId, offset } = args;
-    //     const senderId = userId;
-    //         await Message.create({conversationId,gameId,messageText,senderId});
-
-    //         const conversation = await Message.findAndCountAll({ where: { gameId, conversationId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
-    //         //console.log('CONVO', conversation.rows[0].conversationId)
-    //         pubsub.publish('NEW_MESSAGE', {spectatorMessageSent: conversation});
-    //         return conversation;
-    // },
-
     sendNonGameMessages: async(root,args) => {
 
         const { conversationId, messageText, userId, offset } = args;
@@ -249,7 +215,7 @@ const resolvers = {
             await Message.create({conversationId,messageText,senderId});
 
             const conversation = await Message.findAndCountAll({ where: { conversationId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
-            //console.log('CONVO', conversation.rows[0].conversationId)
+
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
             return conversation;
 
@@ -266,8 +232,6 @@ const resolvers = {
         //But it works right now.
         //Refactor - maybe a findAll on Conversation where recipients include op.and recipients,
         //Then select on that's the correct length.
-
-        console.log('RECIPIENTS ARG', recipients)
 
         const createNewConversation = async(recipients) => {
             //Create new Conversation, basically an empty container for tracking
@@ -295,7 +259,6 @@ const resolvers = {
         });
 
         //return the new conversation so we can grab the ID and redirect
-        console.log("new convo to return", newConvo);
         return newConvo;
 
         }
@@ -314,25 +277,20 @@ const resolvers = {
         for await (let recipient of recipients) {
             let users = await User.findAll( { where: { userName: { [Op.iLike]: recipient } } });
             arrayOfUsers.push(...users);
-            console.log('Array of users', arrayOfUsers)
 
             //Find all existing conversations with each user, push into array
-            console.log('USERID FOREACH', users[0].id)
             const findConversations = await Recipient.findAll({ where: { userId: users[0].id }});
 
-            console.log('FINDCONVERSATIONS', findConversations)
 
             arrayOfConversations.push(...findConversations);
         }
 
-        console.log('ARRAYOFCONVERSATIONS', arrayOfConversations);
 
         //Edge case: no Recipient with this userId exists at all.
         //If that's the case, we know this IS a new conversation
         //We still need the rest of the recipients, though...
-        console.log('ARRAYLENGTH', arrayOfConversations.length)
         if (arrayOfConversations.length === 0) {
-            console.log('found no conversations')
+
             return await createNewConversation(recipients);
         } else {
 
@@ -342,8 +300,6 @@ const resolvers = {
             //Find existing Conversations with each of these users
             const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, currentUserId]}}});
 
-
-            console.log('look for all', lookForAllRecipients)
             //Now need to match up Recipients with conversationId somehow without making 50 database queries
 
             const conversationObjects = {};
@@ -377,12 +333,6 @@ const resolvers = {
                     //It doesn't contain MORE recipients
                     const potentialDuplication = await Conversation.findByPk(conversation, { include: { model: User, as: "recipient"}})
                     potentialDuplicates.push(potentialDuplication)
-                    //This comes back true for things where it should not
-                    //because newUser is set to true whenever it just doesn't match
-                    // if (potentialDuplication.recipient.length === includeSender.length) {
-                    //     console.log('DUPLICATE')
-                    //     newUser = false;
-                    // }
                 }
             }
 
@@ -456,7 +406,6 @@ const resolvers = {
 
         editMessage: async(root, args) => {
             const { messageId, editMessageText, userId } = args;
-            console.log(args);
             await Message.update({ messageText: editMessageText }, { where: { id: messageId, senderId: userId }});
 
             //findAndCountAll seems weird, but our subscription expects something with rows and a count.
@@ -466,7 +415,6 @@ const resolvers = {
 
         deleteMessage: async(root, args) => {
             const { messageId, userId } = args;
-            console.log(args);
             await Message.update({ deleted: true }, { where: { id: messageId, senderId: userId }});
             const message = await Message.findAndCountAll({where: { id: messageId}, include: [{model: User, as: "sender"}], limit: 1 });
             pubsub.publish('NEW_MESSAGE', {messageSent: message});
@@ -508,7 +456,6 @@ const resolvers = {
                 //Update user password with hashed version of new password
                 //they provided
                 await user.update({hashedPassword: bcrypt.hashSync(newPassword)});
-                console.log("Update successful.")
               } else {
                 //Provide an Apollo error that the user cannot do this.
                 throw new UserInputError('Please enter correct account password.');
@@ -534,7 +481,6 @@ const resolvers = {
 
         submitCharacterCreation: async(root, args) => {
             const { userId, gameId, bio, name, imageUrl } = args;
-            console.log('ARGS', args)
             const character = await Character.create({userId, gameId, bio, name, imageUrl});
             return character;
         },
@@ -579,7 +525,6 @@ const resolvers = {
             messageSent: {
                 //Filter so we only broadcast/update game or conversation this applies to
                 subscribe: withFilter(() => pubsub.asyncIterator('NEW_MESSAGE'), (payload, variables) => {
-                    console.log('VARS', variables)
                     //Structure is the same for both games and non-games; no need for a second subscription.
                     //We'll see if this is a game or conversation, first.
                     //If it has a gameId at all, it's a game.
@@ -587,7 +532,6 @@ const resolvers = {
                         //Yes, you have to cast it to a string...
                         return payload.messageSent.rows[0].gameId.toString() === variables.gameId;
                     }
-                        console.log('PAYLOAD', payload, 'VARS', variables)
                         return payload.messageSent.rows[0].conversationId.toString() === variables.conversationId;
                 }),
             },
