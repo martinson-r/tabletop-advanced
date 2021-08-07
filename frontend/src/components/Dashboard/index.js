@@ -102,7 +102,7 @@ function Home() {
                 <div className="container">
                 <div className="hosting">
                 <p>Games I'm Hosting:</p>
-                {dataHosted !== undefined && (dataHosted.getGamesHosting.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link> - {openApps} open applications</p>))}
+                {dataHosted !== undefined && (dataHosted.getGamesHosting.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link> - {openApps} open applications</p>))}
                 </div>
                 <div className="playingIn">
                     {/* REFACTOR. Rework how you pull this data. This is not maintainable. */}
@@ -110,7 +110,7 @@ function Home() {
                 <p>Games I'm Playing In:</p>
                 {/* Link to character info from character name */}
                 {/* Use lazy query */}
-                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}, as {game.player[0].Characters[0] === undefined && (<span><Link to={`/game/${game.id}/create-character`}>Create a character now</Link></span>)}{game.player[0].Characters[0] !== undefined && (<Link to={`/characters/${game.player[0].Characters[0].id}`}>{game.player[0].Characters[0].name}</Link>)}</p>))}
+                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}, as {game.player[0].Characters[0] === undefined && (<span><Link to={`/game/${game.id}/create-character`}>Create a character now</Link></span>)}{game.player[0].Characters[0] !== undefined && (<Link to={`/characters/${game.player[0].Characters[0].id}`}>{game.player[0].Characters[0].name}</Link>)}</p>))}
 
                 {/* TODO: create a character for a game if one doesn't exist */}
 

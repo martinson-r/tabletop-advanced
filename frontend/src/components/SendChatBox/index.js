@@ -23,6 +23,12 @@ function SendChatBox(props){
     const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat } } );
     const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText } } );
 
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        handleSpectatorSubmit(e);
+      }
+    }
+
     const handleSpectatorSubmit = (e) => {
         e.preventDefault();
         setErrors([]);
@@ -60,6 +66,7 @@ function SendChatBox(props){
              value={messageText}
              placeholder="Type your message here"
              onChange={(e) => setMessage(e.target.value)}
+             onKeyDown={handleKeyDown}
              required
            ></textarea>
          <button className="submitButton" type="submit">Send</button>

@@ -99,11 +99,11 @@ function Conversation() {
       }
     },[data, newMessage]);
 
-    useEffect(() => {
-      if ( offset !== undefined && offset === 0 && messageBoxRef.current !== null && messageBoxRef.current !== undefined ) {
-        messageBoxRef.current.scrollTop = 580;
-      }
-    },[sortedConvos])
+    // useEffect(() => {
+    //   if ( offset !== undefined && offset === 0 && messageBoxRef.current !== null && messageBoxRef.current !== undefined ) {
+    //     messageBoxRef.current.scrollTop = 580;
+    //   }
+    // },[sortedConvos])
 
     //Subscription for messages
     //This hopefully covers all, edits and deletions included
@@ -138,103 +138,105 @@ function Conversation() {
       }
     },[sessionUser])
 
-    useEffect(() => {
-      //Listen for scroll and provide more chat
-        messageBoxRef.current.addEventListener('wheel', function scrolled() {
-          setIsScrolling(true);
+  //   useEffect(() => {
+  //     //Listen for scroll and provide more chat
+  //     console.log('REF', messageBoxRef.current)
+  //       messageBoxRef.current.addEventListener('wheel', function scrolled() {
+  //         setIsScrolling(true);
 
-          //This could be DRYed up.
-          if (messageBoxRef.current.scrollTop === 0) {
-            //setTimeout so we don't flood the server with requests.
-            setTimeout(() => {
-              if (sortedConvos && data !== undefined) {
-                if (sortedConvos.length < data.getNonGameMessages.count) {
-                  setOffset(offset + 20)
-                  fetchMore({
-                    variables: {
-                      conversationId,
-                      offset
-                    }
-                  });
-             }
-          }
-        },300);
-        if (sortedConvos && data !== undefined) {
-          messageBoxRef.current.scroll({ top: 0, left: 0, behavior: 'smooth'});
+  //         //This could be DRYed up.
+  //         if (messageBoxRef.current.scrollTop === 0) {
+  //           //setTimeout so we don't flood the server with requests.
+  //           setTimeout(() => {
+  //             if (sortedConvos && data !== undefined) {
+  //               if (sortedConvos.length < data.getNonGameMessages.count) {
+  //                 setOffset(offset + 20)
+  //                 fetchMore({
+  //                   variables: {
+  //                     conversationId,
+  //                     offset
+  //                   }
+  //                 });
+  //            }
+  //         }
+  //       },300);
+  //       if (sortedConvos && data !== undefined) {
+  //         messageBoxRef.current.scroll({ top: 0, left: 0, behavior: 'smooth'});
 
-          //clean up event listener and getter after repositioning the scrollbar.
-          messageBoxRef.current.removeEventListener("wheel", scrolled, false);
-          setIsScrolling(false);
-          }
-      }
-    }, {passive: true});
+  //         //clean up event listener and getter after repositioning the scrollbar.
+  //         messageBoxRef.current.removeEventListener("wheel", scrolled, false);
+  //         setIsScrolling(false);
+  //         }
+  //     }
+  //   }, {passive: true});
 
-    //Alternatively, users may just drag the scrollbar up to the top...
-    //If we don't check if they're scrolling instead of using the wheel,
-    //the server goes nuts.
-    messageBoxRef.current.addEventListener('scroll', () => {
-      if (isScrolling === false && messageBoxRef.current !== null) {
-        //Checking for 0 for now. Eventually check for a higher value
-        //and maybe use setTimeout
-        if (messageBoxRef.current.scrollTop === 0) {
-        if (sortedConvos && data !== undefined) {
-            if (sortedConvos.length < data.getNonGameMessages.count) {
-              setOffset(offset + 20)
-              fetchMore({
-                variables: {
-                  conversationId,
-                  offset
-                }
-              });
-            }
-         }
-        }
-      }
-    });
-  },[sortedConvos])
+  //   //Alternatively, users may just drag the scrollbar up to the top...
+  //   //If we don't check if they're scrolling instead of using the wheel,
+  //   //the server goes nuts.
+  //   messageBoxRef.current.addEventListener('scroll', () => {
+  //     if (isScrolling === false && messageBoxRef.current !== null) {
+  //       //Checking for 0 for now. Eventually check for a higher value
+  //       //and maybe use setTimeout
+  //       if (messageBoxRef.current.scrollTop === 0) {
+  //       if (sortedConvos && data !== undefined) {
+  //           if (sortedConvos.length < data.getNonGameMessages.count) {
+  //             setOffset(offset + 20)
+  //             fetchMore({
+  //               variables: {
+  //                 conversationId,
+  //                 offset
+  //               }
+  //             });
+  //           }
+  //        }
+  //       }
+  //     }
+  //   });
+  // },[sortedConvos])
 
-    useEffect(()=> {
+  //   useEffect(()=> {
 
-      //If offset is 0, we haven't loaded any more info.
-      //We don't want to keep forcing the scrollbar to the bottom every time new
-      //info loads, but we DO need all of sortedConvos to load before we set
-      //scrollTop.
-      if (offset === 0) {
-        messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
-      }
+  //     //If offset is 0, we haven't loaded any more info.
+  //     //We don't want to keep forcing the scrollbar to the bottom every time new
+  //     //info loads, but we DO need all of sortedConvos to load before we set
+  //     //scrollTop.
+  //     if (offset === 0) {
+  //       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+  //     }
 
-      //This is weird, but it works.
-      //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
-      //Then, check to see if this is a case where a message has been submitted.
-      //If a message was just submitted, force scroll to bottom and reset submittedMessage status.
-      if (submittedMessage === true) {
-        messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
-      }
-        setSubmittedMessage(false)
-  },[sortedConvos])
+  //     //This is weird, but it works.
+  //     //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
+  //     //Then, check to see if this is a case where a message has been submitted.
+  //     //If a message was just submitted, force scroll to bottom and reset submittedMessage status.
+  //     if (submittedMessage === true) {
+  //       messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
+  //     }
+  //       setSubmittedMessage(false)
+  // },[sortedConvos])
 
-    useEffect(()=> {
+    // useEffect(()=> {
 
-      //If offset is 0, we haven't loaded any more info.
-      //We don't want to keep forcing the scrollbar to the bottom every time new
-      //info loads, but we DO need all of sortedConvos to load before we set
-      //scrollTop.
-      if (offset === 0) {
-        if (messageBoxRef.current !== null) {
-          messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
-        }
+    //   //If offset is 0, we haven't loaded any more info.
+    //   //We don't want to keep forcing the scrollbar to the bottom every time new
+    //   //info loads, but we DO need all of sortedConvos to load before we set
+    //   //scrollTop.
+    //   if (offset === 0) {
 
-      }
+    //     if (messageBoxRef.current !== null) {
+    //       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+    //     }
 
-      //This is weird, but it works.
-      //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
-      //Then, check to see if this is a case where a message has been submitted.
-      //If a message was just submitted, force scroll to bottom and reset submittedMessage status.
-      if (submittedMessage === true) {
-        messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
-      }
-        setSubmittedMessage(false)
-  },[sortedConvos])
+    //   }
+
+  //     //This is weird, but it works.
+  //     //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
+  //     //Then, check to see if this is a case where a message has been submitted.
+  //     //If a message was just submitted, force scroll to bottom and reset submittedMessage status.
+  //     if (submittedMessage === true) {
+  //       messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
+  //     }
+  //       setSubmittedMessage(false)
+  // },[sortedConvos])
 
     // const addRecipients = (e) => {
     //   e.preventDefault();
@@ -259,7 +261,7 @@ function Conversation() {
     return (
       <div className="nonGameMessagesContainer">
 
-      <div ref={messageBoxRef} className="nonGamesMessageBox game">
+      <div className="nonGamesMessageBox game">
        {/* Behaves very strangely if not passed a key. */}
       {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId} conversationId={conversationId}/>)}
       </div>
