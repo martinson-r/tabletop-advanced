@@ -16,7 +16,8 @@ const { characterId } = useParams();
 // see what user plays them and game they are in
 const { loading, error, data } = useQuery(GET_CHARACTER_BY_ID, { variables: { characterId } });
     return (
-        <div>
+        <div className="gray-backdrop">
+            <div className="container">
             {(data !== undefined && !data.characterById) && (
                 <div><p>Sorry, it looks like that character doesn't exist.</p></div>
             )}
@@ -27,6 +28,7 @@ const { loading, error, data } = useQuery(GET_CHARACTER_BY_ID, { variables: { ch
             </div>)}
 
 
+        </div>
         </div>
     )
 
