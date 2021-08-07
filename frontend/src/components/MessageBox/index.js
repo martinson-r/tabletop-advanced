@@ -71,7 +71,6 @@ function MessageBox(props) {
       //attempting to pass in more than one variable breaks this.
       const deleteMessageBox = (messageToDeleteId) => (e) => {
           setMessageToDelete(messageToDeleteId);
-          console.log('TO DELETE', messageToDelete)
       }
 
       const displayEditCancel = (e) => {
@@ -80,15 +79,6 @@ function MessageBox(props) {
         } else {
           editDropdown.current.classList.add('dropdown-content-hidden')
         }
-        // if (e.target.firstChild.classList.contains('dropdown-content-hidden')) {
-        //   console.log('click')
-        //   e.target.firstChild.classList.remove('dropdown-content-hidden');
-        //   e.target.firstChild.classList.add('dropdown-content-shown');
-        // } else {
-        //   e.target.firstChild.classList.remove('dropdown-content-hidden');
-        //   e.target.firstChild.classList.add('dropdown-content-shown');
-        // }
-
       }
 
       if (editDisplay === true && sessionUser !== undefined) return (
@@ -138,15 +128,15 @@ function MessageBox(props) {
         {userId !== null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
 
           <span key={uuidv4()} className="indivMessage">
-            <span><Link to={`/${message.sender.id}/bio`}>{data !== undefined && data.character !== null && (<span>{data.character.name} &#40;</span>)}
-            {message.sender.userName}
-            {data !== undefined && data.character !== null && (<span>&#41;</span>)}</Link>:</span>
+          {data !== undefined && data.character !== null && (<span className="character-box"><span>{data.character.name}:</span>
+            <p className="sender-name">{message.sender.userName}</p></span>)}
+            {data !== undefined && data.character === null && (<span>{message.sender.userName}:</span>)}
 
 
             {userId !== null && message.sender.id === userId.toString() && (
-            <div class="dropdown">
-              <div class="btncontainer">
-                <p class="dropbtn" ref={dropdownButton} onClick={displayEditCancel}>...</p></div>
+            <div class="dropdown" >
+              <div class="btncontainer" onClick={displayEditCancel} ref={dropdownButton}>
+                <p class="dropbtn" >...</p></div>
               <div ref={editDropdown} className="dropdown-content-hidden dropdown-box">
                <span><p id={message.id} onClick={editMessageBox(message.messageText)}>edit</p></span>
                 <p onClick={deleteMessageBox(message.id, userId)}>delete</p>

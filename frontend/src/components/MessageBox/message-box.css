@@ -25,6 +25,7 @@ margin-bottom: 0;
     color: black;
     border-radius: 5px;
     max-width: 60%;
+    min-width: 200px;
 }
 
 .indivMessageBox span {
@@ -134,15 +135,12 @@ margin-bottom: 0;
     padding-top:8px;
   }
 
-
-
   .btncontainer {
     height: 32px;
     width: 32px;
     border-radius: 6px;
     margin-right: 5px;
     margin-top: 5px;
-
   }
 
   .btncontainer:hover {
@@ -188,7 +186,7 @@ margin-bottom: 0;
 
   .dropdown-box {
       position: absolute;
-      left: 10px;
+      left: 30px;
       background: white;
       border: 1px solid #e7e7e7;
       border-radius: 6px;
@@ -203,3 +201,21 @@ margin-bottom: 0;
       resize: vertical;
       height: 100px;
   }
+.character-box {
+    display: block;
+}
+
+.sender-name {
+    display: none;
+}
+
+.character-box:hover .sender-name {
+    display: block;
+    border: 1px solid gray;
+    border-radius: 6px;
+    color: gray;
+    background: white;
+    position: absolute;
+    top: -20px;
+    padding: 5px;
+}
