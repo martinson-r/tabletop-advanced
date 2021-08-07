@@ -42,8 +42,10 @@ function GamePage() {
 
 
 return (
-<div className="container">
+
+  <div className="container">
 <GameMessages gameId={gameId} />
+<div className="gray-backdrop">
 <div className="details">
 {/* {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p> */}
         <div className="game-content-block">
@@ -88,9 +90,10 @@ return (
             {displayIgnored.toString() === 'true' &&(<div><p>Ignored Applications:</p>
             {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
           </div>
+
         )}
       </div>
-
+      </div>
       );
 }
 

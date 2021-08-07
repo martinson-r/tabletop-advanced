@@ -11,25 +11,34 @@ import * as sessionActions from "../../store/session";
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, GAME_MESSAGES_SUBSCRIPTION, SPECTATOR_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_MESSAGES, GAME_MESSAGES_SUBSCRIPTION, SPECTATOR_MESSAGES_SUBSCRIPTION } from "../../gql";
 
 function SendChatBox(props){
 
     const [messageText, setMessage] = useState("");
-    const {gameId, userId, spectatorChat} = props;
+    const {gameId, conversationId, userId, spectatorChat} = props;
     const [errors, setErrors] = useState([]);
     const [submittedMessage, setSubmittedMessage] = useState(false);
 
     const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat } } );
+    const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText } } );
 
     const handleSpectatorSubmit = (e) => {
         e.preventDefault();
         setErrors([]);
 
           //Offset is fine at this point. No need to do anything with it.
+          if (gameId !== undefined) {
           updateMessages(gameId, userId, messageText, spectatorChat);
           setSubmittedMessage(true);
           setMessage('');
+          }
+          else if (conversationId !== undefined) {
+          sendNonGameMessage(conversationId, userId, messageText);
+          setSubmittedMessage(true);
+          setMessage('');
+          }
+
       }
 
  return (

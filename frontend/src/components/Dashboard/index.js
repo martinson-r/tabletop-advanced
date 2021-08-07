@@ -59,7 +59,7 @@ function Home() {
         if (sessionUser) {
             setUserId(sessionUser.id);
         }
-    }, [error, loading, nonGameError, nonGameLoading, sessionUser]);
+    }, [sessionUser]);
 
     useEffect(() => {
         if (userId !== undefined && userId !== null) {
@@ -68,7 +68,7 @@ function Home() {
             getWaitlistGames({ variables: { userId }});
             getGamesPlayingIn({ variables: { userId }});
         }
-    },[userId, history, getCurrentNonGameConvos, getGamesPlayingIn, getHosting, getWaitlistGames]);
+    },[userId, history]);
 
    //Calculate number of apps that have not been accepted or ignored (open apps) & set to our variable.
    //data object is non-extensible, so we can't set it as a key on there.
@@ -130,11 +130,6 @@ function Home() {
                 <p>Games I'm Following:</p>
                 {/* TODO: ability to follow games */}
                 </div>
-                <p>Private Conversations:</p>
-                <p><Link to={'/newmessage'}>Start new conversation</Link></p>
-                {/* TODO: Add multiple users to private convos */}
-                {/* We need unique keys for mapped elements so React can keep track of what is what */}
-                {nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversations => <div key={uuidv4()} className="convos-box" >{conversations.recipient.map(conversation => (<p key={uuidv4()} className="private-convo" onClick={() => history.push(`/conversation/${conversation.id}`)}>{conversation.recipient.map(recipient => recipient.userName + ", ")}</p>))}</div>))}
             </div>
             </div>
         )

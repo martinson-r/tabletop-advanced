@@ -10,15 +10,12 @@ import {
   } from "@apollo/client";
 import { EDIT_MESSAGE, DELETE_MESSAGE, GET_CHARACTER, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
 
-//Behavior is very unreliable right now in both Chrome and Safari.
-
 function MessageBox(props) {
 
-    const sessionUser = useSelector(state => state.session.user);
     const message = props.message;
     const userId = props.userId;
     const gameId = props.gameId;
-    const gameData = props.gameData;
+    const conversationId = props.conversationId;
 
     const [messageId, setMessageId] = useState(null);
     const [messageToDelete, setMessageToDelete] = useState(null);
@@ -79,7 +76,7 @@ function MessageBox(props) {
         }
       }
 
-      if (editDisplay === true && sessionUser !== undefined) return (
+      if (editDisplay === true && userId !== undefined && userId !== null) return (
         <div className="indivMessageBox">
         <p key={uuidv4()} className="indivMessage">{message.sender.userName}: </p>
         <form className="edit-message-form" onSubmit={editMessageSubmit}>

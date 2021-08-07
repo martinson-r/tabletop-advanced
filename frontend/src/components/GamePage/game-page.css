@@ -1,9 +1,14 @@
-.game-content-block h2 {
-    color: white;
-}
 
 .game-content-block span {
     display: block;
+}
+
+.game-content-block div p, .game-content-block span, .game-content-block .toggle-flex .toggle label, .game-content-block .toggle-flex h3 {
+    color: black;
+}
+
+.game-content-block .toggle-flex h3 {
+    color: black;
 }
 
 .game-content-block {
@@ -19,4 +24,8 @@ label:first-of-type {
     display: flex;
     width: 40%;
     justify-content: space-between;
+}
+
+.gray-backdrop {
+    margin-top: 10px;
 }

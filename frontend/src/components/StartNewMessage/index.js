@@ -7,6 +7,7 @@ import {
     useLazyQuery, useMutation, useSubscription, InMemoryCache
   } from "@apollo/client";
 import { START_NEW_PRIVATE_CHAT } from "../../gql"
+import { v4 as uuidv4 } from 'uuid';
 
 function StartNewMessage() {
 
@@ -18,7 +19,6 @@ function StartNewMessage() {
 
     const history = useHistory();
 
-    console.log('recipients', recipients)
     const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipients }, onCompleted: startNewNonGameConversation => { history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)} } );
 
     const sendNewMessage = () => {
@@ -31,13 +31,11 @@ function StartNewMessage() {
             //comma with space
            if (recipient.includes(', ')) {
                 const separatedRecipients = recipient.split(', ');
-                console.log('separated', separatedRecipients);
                 setRecipients([...recipients, ...separatedRecipients]);
             }
             //comma without space
             else if (recipient.includes(',')) {
                 const separatedRecipients = recipient.split(',');
-                console.log('separated', separatedRecipients);
                 setRecipients([...recipients, ...separatedRecipients]);
             }
             //just in case they add a space afterward
@@ -48,7 +46,6 @@ function StartNewMessage() {
         }
 
         const removeRecipient = (e) => {
-            console.log('target', e.target.id);
             const recipientIndex = recipients.indexOf(e.target.id);
             recipients.splice(recipientIndex, 1);
             setRecipients([...recipients])
@@ -64,7 +61,7 @@ function StartNewMessage() {
             <p><i>Recipients can be separated by commas</i></p>
             {/* TODO: autosuggest users from Contact List */}
             {/* TODO: validation - userNames should not contain commas */}
-            {recipients.map(recipient => <p>{recipient} <span id={recipient} onClick={removeRecipient}>x</span></p>)}
+            {recipients.map(recipient => <p key={uuidv4}>{recipient} <span id={recipient} onClick={removeRecipient}>x</span></p>)}
             <form onSubmit = {addRecipient}>
             <textarea name="recipient" value={recipient} onChange={(e) => setRecipient(e.target.value)}></textarea>
             <button>Add recipient</button>
