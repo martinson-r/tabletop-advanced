@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, prevState, useState } from 'react';
 import { NavLink, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 // import SimpleSearch from "../SimpleSearch";
@@ -23,14 +23,18 @@ function SendChatBox(props){
     const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat } } );
     const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText } } );
 
+    //Submit messages when user presses Enter
     const handleKeyDown = (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !e.shiftKey) {
         handleSpectatorSubmit(e);
       }
     }
 
     const handleSpectatorSubmit = (e) => {
         e.preventDefault();
+        console.log('text', messageText)
+
+        //   this.input.selectionStart = this.input.selectionEnd = start + 1;
         setErrors([]);
 
           //Offset is fine at this point. No need to do anything with it.

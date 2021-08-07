@@ -30,6 +30,7 @@ margin-bottom: 0;
 
 .indivMessageBox span {
     word-wrap: break-word;
+    white-space: pre-wrap;
  }
 
 .indivMessageBox::before {
