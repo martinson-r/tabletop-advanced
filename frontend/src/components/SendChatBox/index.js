@@ -16,7 +16,7 @@ import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC
 function SendChatBox(props){
 
     const [messageText, setMessage] = useState("");
-    const {gameId, conversationId, userId, spectatorChat} = props;
+const {gameId, conversationId, userId, spectatorChat} = props;
     const [errors, setErrors] = useState([]);
     const [submittedMessage, setSubmittedMessage] = useState(false);
 
@@ -44,6 +44,7 @@ function SendChatBox(props){
           setMessage('');
           }
           else if (conversationId !== undefined) {
+            console.log('conversationid', conversationId)
           sendNonGameMessage(conversationId, userId, messageText);
           setSubmittedMessage(true);
           setMessage('');
@@ -53,7 +54,7 @@ function SendChatBox(props){
 
  return (
      <>
-     <form onSubmit={handleSpectatorSubmit}>
+     {(<form onSubmit={handleSpectatorSubmit}>
          {/* <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>
@@ -74,7 +75,7 @@ function SendChatBox(props){
              required
            ></textarea>
          <button className="submitButton" type="submit">Send</button>
-       </form>
+       </form>)}
       </>
  )
 }

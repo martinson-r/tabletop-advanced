@@ -6,40 +6,56 @@ import { v4 as uuidv4 } from 'uuid';
 import './message-box.css';
 
 import {
-    useQuery, useMutation, useSubscription
+    useQuery, useMutation, useLazyQuery, useSubscription
   } from "@apollo/client";
 import { EDIT_MESSAGE, DELETE_MESSAGE, GET_CHARACTER, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
 
 function MessageBox(props) {
 
-    const message = props.message;
-    const userId = props.userId;
-    const gameId = props.gameId;
-    const conversationId = props.conversationId;
+  const { message, userId, gameId, conversationId } = props;
 
     const [messageId, setMessageId] = useState(null);
     const [messageToDelete, setMessageToDelete] = useState(null);
     const [messageText, setMessage] = useState("");
     const [newMessage, setNewMessage] = useState(null);
+    const [senderId, setSenderId] = useState(null);
     const [editDisplay, setEditDisplay] = useState(false);
     const [editMessageText, setEditMessageText] = useState("");
     const [isGame, setIsGame] = useState(true);
     const dropdownButton = useRef(null);
     const editDropdown = useRef(null);
+    const isMounted = useRef(true);
 
     const [editMessage] = useMutation(EDIT_MESSAGE, { variables: { messageId, userId, editMessageText } } );
     const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
-    const { loading, error, data } = useQuery(GET_CHARACTER, { variables: { userId: message.sender.id, gameId } });
+    // const { loading, error, data } = useQuery(GET_CHARACTER, { variables: { userId: message.sender.id, gameId } });
+
+
+const [character, { data }] = useLazyQuery(GET_CHARACTER);
+
+useEffect(() => {
+  character({ variables: { userId: message.sender.id, gameId } });
+},[])
 
    useEffect(() => {
     //  If there's no gameId, it's not a game
     if (gameId === undefined) {
       setIsGame(false);
     }
-   },[gameId])
+   },[gameId]);
+
+  //  useEffect(() => {
+  //    setSenderId(message.sender.id);
+  //  },[messageId]);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    }
+  },[])
 
     const editMessageSubmit = (e) => {
-        if (editMessageText) {
+        if (editMessageText !== "") {
           editMessage(userId, messageId, editMessageText);
         }
         setEditDisplay(false);
@@ -50,6 +66,7 @@ function MessageBox(props) {
       }
 
       const editMessageBox = (messageText) => (e) => {
+        isMounted = true;
         setMessageId(e.target.id)
         setEditMessageText(messageText)
         setEditDisplay(true);
@@ -58,6 +75,7 @@ function MessageBox(props) {
     //Have to set this in a setter and listen to it due to race condition.
     useEffect(() => {
         if (messageToDelete !== null) {
+          isMounted = true;
           deleteMessage(messageToDelete, userId);
         }
       },[messageToDelete])
@@ -76,7 +94,7 @@ function MessageBox(props) {
         }
       }
 
-      if (editDisplay === true && userId !== undefined && userId !== null) return (
+      if (isMounted.current && message !== undefined && message !== null && editDisplay === true && userId !== undefined && userId !== null) return (
         <div className="indivMessageBox">
         <p key={uuidv4()} className="indivMessage">{message.sender.userName}: </p>
         <form className="edit-message-form" onSubmit={editMessageSubmit}>
@@ -96,7 +114,7 @@ function MessageBox(props) {
        </div>
       )
 
-    return (
+      if (isMounted.current &&  message !== undefined && message !== null && userId !== undefined && userId !== null) return (
       <div className="avatarAndMessages">
           <div className="avatarBox">
             <div className="avatar-position">
@@ -120,7 +138,7 @@ function MessageBox(props) {
             {data !== undefined && data.character !== null && (<div className="avatar" style={{backgroundImage: "url(" + data.character.imageUrl + ")"}}>
             </div>)}
         </div>
-        {userId !== null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
+        { isMounted.current && message !== null && message !==undefined && userId !== null && message.sender.id !== null && message.sender.id !== undefined && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
 
           <span key={uuidv4()} className="indivMessage">
           {data !== undefined && data.character !== null && (<span className="character-box"><span>{data.character.name}:</span>
@@ -128,7 +146,7 @@ function MessageBox(props) {
             {data !== undefined && data.character === null && (<span>{message.sender.userName}:</span>)}
 
 
-            {userId !== null && message.sender.id === userId.toString() && (
+            {isMounted.current && message !== null && message !==undefined && userId !== null && message.sender.id === userId.toString() && (
             <div className="dropdown" >
               <div className="btncontainer" onClick={displayEditCancel} ref={dropdownButton}>
                 <p className="dropbtn" >...</p></div>
@@ -138,7 +156,7 @@ function MessageBox(props) {
               </div>
             </div>)}
 
-            {message.deleted !== true &&
+            {isMounted.current &&  message.deleted !== true &&
             (<span className="message-text">{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</span></div>)}
             {userId === null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={false}>
           <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{data !== undefined && data.character !== null && (<span>{data.character.name} &#40;</span>)}{message.sender.userName}{data !== undefined && data.character !== null && (<span>&#41;</span>)}</Link>:<br /> {message.deleted !== true &&

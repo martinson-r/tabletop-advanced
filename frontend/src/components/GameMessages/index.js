@@ -295,7 +295,7 @@ function GameMessages(props) {
 
         {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
           message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message}
-          userId={userId} gameId={gameId} gameData={gameData}/>))}
+          userId={userId} gameId={gameId}/>))}
 
       </div>
 
