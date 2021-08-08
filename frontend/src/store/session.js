@@ -14,7 +14,6 @@ const removeUser = () => ({
 });
 
 export const login = ({ userName, password }) => async (dispatch) => {
-console.log('Hit login')
   const res = await fetch('/api/session/login', {
     method: 'POST',
     body: JSON.stringify({ userName, password })
@@ -40,8 +39,6 @@ export const signup = (user) => async (dispatch) => {
       confirmPassword
     })
   });
-
-  console.log('RES DATA', response.data)
 
   dispatch(setUser(response.data.user));
   return response;

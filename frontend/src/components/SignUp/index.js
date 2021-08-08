@@ -34,7 +34,6 @@ function SignUp() {
       <div className="login-form--body">
         <h1>Log In</h1>
         <form onSubmit={handleSubmit}>
-          {console.log('errors', errors)}
           <ul>
             {errors.map((error, idx) => (
               <li key={idx}>{error}</li>

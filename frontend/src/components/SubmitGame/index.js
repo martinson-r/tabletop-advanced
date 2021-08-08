@@ -36,8 +36,6 @@ function SubmitGame() {
      //grab available gameType, language, etc info from database
      const { loading, error, data } = useQuery(GET_GAME_CREATION_INFO);
 
-     console.log('data', data)
-
      //We also need to grab the data GraphQL returns.
      //We have to use a callback to get that sweet, sweet data out.
      //Then, we redirect the user to their new game.
@@ -96,7 +94,6 @@ function SubmitGame() {
          <label>
            Game Type:
            </label>
-           {/* {console.log('TYPES', gameTypes)} */}
            <select value={gameTypeId} onChange={updateGameTypeId}>
             {gameTypes.map(gameType => <option key={uuidv4()} value={gameType.id}>{gameType.type}</option>)}
             </select>

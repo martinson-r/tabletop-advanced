@@ -32,7 +32,6 @@ const {gameId, conversationId, userId, spectatorChat} = props;
 
     const handleSpectatorSubmit = (e) => {
         e.preventDefault();
-        console.log('text', messageText)
 
         //   this.input.selectionStart = this.input.selectionEnd = start + 1;
         setErrors([]);
@@ -44,7 +43,6 @@ const {gameId, conversationId, userId, spectatorChat} = props;
           setMessage('');
           }
           else if (conversationId !== undefined) {
-            console.log('conversationid', conversationId)
           sendNonGameMessage(conversationId, userId, messageText);
           setSubmittedMessage(true);
           setMessage('');

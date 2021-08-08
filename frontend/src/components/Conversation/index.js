@@ -40,14 +40,12 @@ function Conversation() {
 
     const handleSpectatorSubmit = (e) => {
         e.preventDefault();
-        console.log('text', messageText)
 
         //   this.input.selectionStart = this.input.selectionEnd = start + 1;
         setErrors([]);
 
           //Offset is fine at this point. No need to do anything with it.
           if (conversationId !== undefined) {
-            console.log('conversationid', conversationId)
           sendNonGameMessage(conversationId, userId, messageText);
           setSubmittedMessage(true);
           setMessage('');
@@ -304,11 +302,6 @@ function Conversation() {
       {sessionUser !== undefined && sessionUser !== null && userId !==undefined && conversationId !== undefined && (
         <div>
       <SendChatBox conversationId={conversationId} userId={userId}/>
-         {/* <ul>
-           {errors.map((error, idx) => (
-             <li key={idx}>{error}</li>
-           ))}
-         </ul> */}
          {/* TODO: error message for no blank messages */}
          {/* TODO: messages sent from this chat box are marked Spectator chats */}
        {/* <form onSubmit = {addRecipients}>
