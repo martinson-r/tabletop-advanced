@@ -194,25 +194,25 @@ function GameMessages(props) {
       }
     }, {passive: true});
 
-    //Alternatively, users may just drag the scrollbar up to the top...
-    //If we don't check if they're scrolling instead of using the wheel,
-    //the server goes nuts.
+    // Alternatively, users may just drag the scrollbar up to the top...
+    // If we don't check if they're scrolling instead of using the wheel,
+    // the server goes nuts.
     messageBoxRef.current !== null && messageBoxRef.current.addEventListener('scroll', () => {
       if (isScrolling === false && messageBoxRef.current !== null) {
         //Checking for 0 for now. Eventually check for a higher value
         //and maybe use setTimeout
         if (messageBoxRef.current.scrollTop === 0) {
-        if (sortedConvos && data !== undefined) {
-            if (sortedConvos.length < data.convos.count) {
-              setOffset(offset + 20)
-              fetchMore({
-                variables: {
-                  gameId,
-                  offset
-                }
-              });
-            }
-         }
+          if (sortedConvos && data !== undefined) {
+              if (sortedConvos.length < data.convos.count) {
+                setOffset(offset + 20)
+                fetchMore({
+                  variables: {
+                    gameId,
+                    offset
+                  }
+                });
+              }
+          }
         }
       }
     });

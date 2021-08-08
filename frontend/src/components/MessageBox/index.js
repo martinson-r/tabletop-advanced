@@ -9,6 +9,7 @@ import {
     useQuery, useMutation, useLazyQuery, useSubscription
   } from "@apollo/client";
 import { EDIT_MESSAGE, DELETE_MESSAGE, GET_CHARACTER, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC_CONVOS, GAME_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { MessageTypes } from "subscriptions-transport-ws";
 
 function MessageBox(props) {
 
@@ -31,11 +32,11 @@ function MessageBox(props) {
     // const { loading, error, data } = useQuery(GET_CHARACTER, { variables: { userId: message.sender.id, gameId } });
 
 
-const [character, { data }] = useLazyQuery(GET_CHARACTER);
+// const [character, { data }] = useLazyQuery(GET_CHARACTER);
 
-useEffect(() => {
-  character({ variables: { userId: message.sender.id, gameId } });
-},[])
+// useEffect(() => {
+//     character({ variables: { userId: message.sender.id, gameId } });
+// },[isMounted])
 
    useEffect(() => {
     //  If there's no gameId, it's not a game
@@ -126,27 +127,31 @@ useEffect(() => {
 
             {/* Display default DM avatar (DM has no character). DM will have a userId and be able to chat,
             but will not have a character. */}
-            {data !== undefined && userId !== null && data.character === null && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
+            {userId !== null && message.sender.Characters.length === 0 && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
             </div>)}
 
             {/* Display default DM avatar if there is no user at all.
             This is just to keep it from crapping out if there's a null userId. */}
-            {data !== undefined && userId === null && data.character === null && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
+            {userId === null && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
             </div>)}
 
             {/* Display character avatars by character */}
-            {data !== undefined && data.character !== null && (<div className="avatar" style={{backgroundImage: "url(" + data.character.imageUrl + ")"}}>
+            {message.sender.Characters.length > 0 && (<div className="avatar" style={{backgroundImage: "url(" + message.sender.Characters[0].imageUrl + ")"}}>
             </div>)}
         </div>
-        { isMounted.current && message !== null && message !==undefined && userId !== null && message.sender.id !== null && message.sender.id !== undefined && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
+        {message !== null && message !==undefined && userId !== null && message.sender.id !== null && message.sender.id !== undefined && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
 
           <span key={uuidv4()} className="indivMessage">
-          {data !== undefined && data.character !== null && (<span className="character-box"><span>{data.character.name}:</span>
-            <p className="sender-name">{message.sender.userName}</p></span>)}
-            {data !== undefined && data.character === null && (<span>{message.sender.userName}:</span>)}
+          <span className="character-box">
 
+              {/* Display character name only if sender has a character */}
+              {message.sender.Characters.length > 0 && (<span>{console.log('boo')}{message.sender.Characters[0].name}:</span>)}
 
-            {isMounted.current && message !== null && message !==undefined && userId !== null && message.sender.id === userId.toString() && (
+              {/* Display sender name regardless */}
+              <p className="sender-name">{message.sender.userName}</p>
+          </span>
+           <span>{message.sender.userName}:</span>
+            {message !== null && message !==undefined && userId !== null && message.sender.id === userId.toString() && (
             <div className="dropdown" >
               <div className="btncontainer" onClick={displayEditCancel} ref={dropdownButton}>
                 <p className="dropbtn" >...</p></div>
@@ -156,10 +161,10 @@ useEffect(() => {
               </div>
             </div>)}
 
-            {isMounted.current &&  message.deleted !== true &&
+            {message.deleted !== true &&
             (<span className="message-text">{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</span></div>)}
             {userId === null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={false}>
-          <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{data !== undefined && data.character !== null && (<span>{data.character.name} &#40;</span>)}{message.sender.userName}{data !== undefined && data.character !== null && (<span>&#41;</span>)}</Link>:<br /> {message.deleted !== true &&
+          <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{message !== undefined && message.Characters !== undefined && (<span>{message.Characters[0].name} &#40;</span>)}{message.sender.userName}{message !== undefined && message.Characters !== undefined && (<span>&#41;</span>)}</Link>:<br /> {message.deleted !== true &&
             (<span>{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>)}
         </div>
             )

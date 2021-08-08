@@ -267,6 +267,11 @@ const GET_GAME_CONVOS = gql`
             sender {
                 id
                 userName
+                Characters {
+                    id
+                    name
+                    imageUrl
+                }
             }
             id
             messageText

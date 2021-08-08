@@ -68,7 +68,22 @@ const resolvers = {
         },
 
         convos: async (obj, args, context, info) => {
-            return Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
+            return Message.findAndCountAll({ where: { gameId: args.gameId }, include: [
+                {model: User, as: "sender",
+                include: {model: Character, where: {
+                    [Op.and]:
+                         [
+                         {userId: { [Op.col]: "sender.id"}},
+                         {gameId: args.gameId}
+                     ]
+                    },
+                    required: false
+
+                }
+
+                }
+
+            ], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
         },
         about: (obj, args, context, info) => {
             const { id } = args;
