@@ -7,6 +7,7 @@ import {
 import { GET_GAMES, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITING_LIST_GAMES,
     GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES } from "../../gql"
 import { v4 as uuidv4 } from 'uuid';
+import './conversation-list.css';
 
 function ConversationList() {
     const [getCurrentNonGameConvos, { loading: nonGameLoading, error: nonGameError, data: nonGameData }] = useLazyQuery(GET_USER_NON_GAME_CONVOS);

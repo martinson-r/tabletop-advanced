@@ -287,17 +287,23 @@ const resolvers = {
         const findSenderConversations = await Recipient.findAll({ where: { userId: currentUserId }});
         arrayOfConversations.push(...findSenderConversations);
 
-        //TODO: DEBUG
-        //Not working for multiple recipients
         for await (let recipient of recipients) {
+            console.log('recipient', recipient)
             let users = await User.findAll( { where: { userName: { [Op.iLike]: recipient } } });
             arrayOfUsers.push(...users);
 
-            //Find all existing conversations with each user, push into array
+            //If the user exists...
+            if (users[0] !== undefined) {
+                //Find all existing conversations with each user, push into array
             const findConversations = await Recipient.findAll({ where: { userId: users[0].id }});
 
 
             arrayOfConversations.push(...findConversations);
+            } else {
+                //Otherwise, throw error
+                throw new UserInputError('A user with that user name does not exist.');
+            }
+
         }
 
 
@@ -400,7 +406,8 @@ const resolvers = {
             }
 
             //Find the conversation and return it
-            const conversationToReturn = Conversation.findByPk(conversationLookingForId);
+            const conversationToReturn = await Conversation.findByPk(conversationLookingForId);
+            // console.log('returned', conversationToReturn)
             return conversationToReturn;
 
 
