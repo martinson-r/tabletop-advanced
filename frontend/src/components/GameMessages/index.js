@@ -18,7 +18,6 @@ function GameMessages(props) {
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
     const [isPlayer, setIsPlayer] = useState(false);
-    const [messageText, setMessage] = useState("");
     const [newMessage, setNewMessage] = useState(null);
     const [newSpectatorMessage, setNewSpectatorMessage] = useState(null);
     const [sortedConvos, setSortedConvos] = useState([]);
@@ -49,9 +48,6 @@ function GameMessages(props) {
       GET_GAME_CONVOS,
       { variables: { gameId, offset } }
     );
-
-
-    const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat } } );
 
     useEffect(() => {
 
@@ -108,7 +104,7 @@ function GameMessages(props) {
     },[data, newMessage]);
 
     useEffect(() => {
-      if ( offset !== undefined && offset === 0 ) {
+      if ( offset !== undefined && offset === 0 && messageBoxRef.current !== null && messageBoxRef.current !== undefined ) {
         messageBoxRef.current.scrollTop = 580;
       }
     },[sortedConvos])
@@ -117,12 +113,13 @@ function GameMessages(props) {
     //This hopefully covers all, edits and deletions included
     useEffect(() => {
 
-      subscribeToMore({
+      let unsubscribe;
+
+      unsubscribe = subscribeToMore({
         document: GAME_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
         updateQuery: (prev, { subscriptionData }) => {
           if (!subscriptionData.data) return prev;
-          console.log(subscriptionData.data)
           const newFeedItem = subscriptionData.data.messageSent;
           setNewMessage(newFeedItem)
 
@@ -134,12 +131,15 @@ function GameMessages(props) {
           }
       });
 
-      subscribeToMore({
+      if (unsubscribe) return () => unsubscribe()
+
+      let unsubscribeSpectator
+
+      unsubscribeSpectator = subscribeToMore({
         document: SPECTATOR_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
         updateQuery: (prev, { subscriptionData }) => {
           if (!subscriptionData.data) return prev;
-          console.log(subscriptionData.data)
           const newFeedItem = subscriptionData.data.messageSent;
           setNewSpectatorMessage(newFeedItem)
 
@@ -151,7 +151,9 @@ function GameMessages(props) {
           }
       });
 
-    },[]);
+      if (unsubscribeSpectator) return () => unsubscribe()
+
+    },[subscribeToMore]);
 
     const [errors, setErrors] = useState([]);
     useEffect(() => {
@@ -162,6 +164,7 @@ function GameMessages(props) {
 
     useEffect(() => {
       //Listen for scroll and provide more chat
+      if (messageBoxRef.current !== null )
         messageBoxRef.current.addEventListener('wheel', function scrolled() {
           setIsScrolling(true);
 
@@ -191,25 +194,25 @@ function GameMessages(props) {
       }
     }, {passive: true});
 
-    //Alternatively, users may just drag the scrollbar up to the top...
-    //If we don't check if they're scrolling instead of using the wheel,
-    //the server goes nuts.
-    messageBoxRef.current.addEventListener('scroll', () => {
+    // Alternatively, users may just drag the scrollbar up to the top...
+    // If we don't check if they're scrolling instead of using the wheel,
+    // the server goes nuts.
+    messageBoxRef.current !== null && messageBoxRef.current.addEventListener('scroll', () => {
       if (isScrolling === false && messageBoxRef.current !== null) {
         //Checking for 0 for now. Eventually check for a higher value
         //and maybe use setTimeout
         if (messageBoxRef.current.scrollTop === 0) {
-        if (sortedConvos && data !== undefined) {
-            if (sortedConvos.length < data.convos.count) {
-              setOffset(offset + 20)
-              fetchMore({
-                variables: {
-                  gameId,
-                  offset
-                }
-              });
-            }
-         }
+          if (sortedConvos && data !== undefined) {
+              if (sortedConvos.length < data.convos.count) {
+                setOffset(offset + 20)
+                fetchMore({
+                  variables: {
+                    gameId,
+                    offset
+                  }
+                });
+              }
+          }
         }
       }
     });
@@ -221,7 +224,7 @@ function GameMessages(props) {
       //We don't want to keep forcing the scrollbar to the bottom every time new
       //info loads, but we DO need all of sortedConvos to load before we set
       //scrollTop.
-      if (offset === 0) {
+      if (messageBoxRef.current !== null && offset === 0) {
         messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
       }
 
@@ -229,23 +232,11 @@ function GameMessages(props) {
       //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
       //Then, check to see if this is a case where a message has been submitted.
       //If a message was just submitted, force scroll to bottom and reset submittedMessage status.
-      if (submittedMessage === true) {
+      if (messageBoxRef.current !== null && submittedMessage === true ) {
         messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
       }
         setSubmittedMessage(false)
   },[sortedConvos])
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      setErrors([]);
-      setSpectatorChat(false);
-      console.log('non spectator', spectatorChat)
-
-        //Offset is fine at this point. No need to do anything with it.
-        updateMessages(gameId, userId, messageText, spectatorChat);
-        setSubmittedMessage(true);
-    }
-
 
     const toggleHideSpectatorChat = () => {
       setHideSpectatorChat(!hideSpectatorChat);
@@ -255,23 +246,25 @@ function GameMessages(props) {
     return (
       <div>
         <div className="gameDetails">
-          <div><input type="checkbox" name="hideSpectatorChat" checked={hideSpectatorChat} onChange={toggleHideSpectatorChat} />
-          <label for="hideSpectatorChat">Hide spectator chat</label></div>
+          <div className="hideSpectators">
+            <input type="checkbox" name="hideSpectatorChat" checked={hideSpectatorChat} onChange={toggleHideSpectatorChat} />
+            <label>Hide spectator chat</label>
+          </div>
           {gameData !== undefined && (<div><p><Link to={`/game/${gameData.game.id}`}>{gameData.game.title}</Link> presented by {gameData.game.host.userName}</p>
           <p><i>{gameData.game.blurb}</i></p>
           </div>)}
         </div>
 
-      <div className="messagesContainer">
+      <div ref={messageBoxRef} className="messagesContainer">
       {/* TODO: Query to see if player is in game */}
       <div className="messageListing" data-status={hideSpectatorChat}>
       {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
           <div className="notification spectator">You are a spectator</div>)}
 
-        <div ref={messageBoxRef} className="messageBox game">
+        <div className="messageBox game">
 
           {/* Hack to get flexbox to space items properly */}
-          <div class="spacer"></div>
+          <div className="spacer"></div>
 
           {/* Behaves very strangely if not passed a key. */}
           {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
@@ -296,13 +289,13 @@ function GameMessages(props) {
 
     {hideSpectatorChat.toString() === "false" && (<div className="messageListing">
 
-    <div ref={messageBoxRef} className="messageBox game">
-        <div class="spacer"></div>
+    <div className="messageBox game">
+        <div className="spacer"></div>
         {/* Behaves very strangely if not passed a key. */}
 
         {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
           message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message}
-          userId={userId} gameId={gameId} gameData={gameData}/>))}
+          userId={userId} gameId={gameId}/>))}
 
       </div>
 
@@ -321,7 +314,7 @@ function GameMessages(props) {
          <p>This game is no longer active.</p>
        )} */}
 
-      {sessionUser !== undefined && sessionUser !== null && gameData !== undefined && (<div className="sendChatBox">{console.log('userId',sessionUser)}
+      {sessionUser !== undefined && sessionUser !== null && gameData !== undefined && (<div className="sendChatBox">
       <SendChatBox gameId={gameId} userId={userId} spectatorChat={true} /></div>)}
 
       {!sessionUser && (

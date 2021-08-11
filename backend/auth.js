@@ -29,7 +29,6 @@ const restoreUser = async (req, res, next) => {
 };
 
 const logoutUser = (req, res) => {
-  console.log('AUTH', req.session.auth)
   delete req.session.auth;
 };
 

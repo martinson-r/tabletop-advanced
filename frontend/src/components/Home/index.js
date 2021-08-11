@@ -28,7 +28,6 @@ function Home() {
     //TODO: Grab most recent/popular game and feed it into GameMessages
 
     //TODO: Grab rulesets for display
-    console.log('rulesets', rulesetsData)
 
     //This needs to be more complicated than simple toggles since
     //multiple conditions can exist
@@ -97,13 +96,13 @@ function Home() {
 
                     {/* <p>Active Games:</p> */}
                     {gameData && (gameData.map((game) =>
-                    (game.active === true && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, presented by {game.host.userName}<br /><span className="premise"><i>{game.blurb}</i></span></p></div>))
+                    (game.active === true && (<div key={uuidv4()} className="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, presented by {game.host.userName}<br /><span className="premise"><i>{game.blurb}</i></span></p></div>))
                     ))}
 
                     {/* Show inactive games conditionally */}
                     {displayInactive === true && (<span><p>Inactive Games:</p>
                     {gameData.map((game) =>
-                    (game.active === false && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}<br />Premise: {game.blurb}</p></div>))
+                    (game.active === false && (<div key={uuidv4()} className="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}<br />Premise: {game.blurb}</p></div>))
                     )}</span>)}
 
                     {/* Show closed waitlist games conditionally */}
@@ -121,10 +120,10 @@ function Home() {
             <div className="game-filters">
                  {/* TODO: a component that fetches/displays by category fed in */}
                 <div>
-                        <h2>Games by Ruleset:</h2>
+                        <h2 className="game-filters-heading">Games by Ruleset:</h2>
                     {/* TODO: fetch all rulesets from database and map containers */}
                     <div className="game-cards-container">
-                       {rulesetsData !==undefined && (rulesetsData.rulesets.map((ruleset) =>  <div className="game-card">
+                       {rulesetsData !==undefined && (rulesetsData.rulesets.map((ruleset) =>  <div key={uuidv4()} className="game-card">
                             <p>{ruleset.ruleset}</p>
                         </div>))}
                     </div>

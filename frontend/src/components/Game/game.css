@@ -1,3 +1,7 @@
-p {
+p, .toggle label, .game-content-block h3, div {
+    color: white;
+}
+
+.game-content-block div p {
     color: white;
 }

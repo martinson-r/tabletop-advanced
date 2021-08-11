@@ -14,8 +14,8 @@ a {
     text-decoration: none;
 }
 
-label {
-    margin-left: 5px;
+.newest-games-container label {
+    display: inline-block;
 }
 
 .main-container {
@@ -34,7 +34,11 @@ label {
 .game-filters {
     display: flex;
     max-width: 100%;
+    color: white;
+}
 
+.game-filters-heading {
+    color: white;
 }
 
 .bottom-game-display-container {
@@ -104,6 +108,23 @@ not alter text opacity */
     background-color: var(--cardBackgroundColor);
     opacity: .75;
     z-index: -1;
+}
+
+.game-card:hover.game-card::before {
+    background:
+    linear-gradient(  rgba(123, 97, 255, 1) 0%,
+    rgba(204, 97, 255, 1) 14.2%,
+    rgba(108, 179, 244, 1) 28.4%,
+    rgba(150, 236, 210, 1) 42.6%,
+    rgba(178, 236, 150, 1) 56.8%,
+    rgba(236, 227, 150, 1) 71%,
+    rgba(236, 181, 150, 1) 85.2%,
+    rgba(236, 150, 150, 1) 100%),
+    url("../../media/dragon-face.png") 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+  background-blend-mode: multiply;
 }
 
 .newest-games-container {

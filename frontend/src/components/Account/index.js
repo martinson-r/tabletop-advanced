@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams, Link, useHistory } from "react-router-dom";
-import { PubSub } from 'graphql-subscriptions';
+import { useSelector } from "react-redux";
 import {
-    useQuery, useMutation, useLazyQuery, useSubscription, InMemoryCache
+    useMutation, useLazyQuery
   } from "@apollo/client";
 import { GET_USER, CHANGE_EMAIL, CHANGE_PASSWORD } from "../../gql"
 import './account.css';
@@ -11,8 +9,6 @@ import './account.css';
 function Account() {
     // Grab our session user
 const sessionUser = useSelector((state) => state.session.user);
-
-const history = useHistory();
 
 const [email, setEmail] = useState("");
 const [userName, setUserName] = useState("");
@@ -30,7 +26,7 @@ useEffect(() => {
   }
 }, [sessionUser]);
 
-const [getUser, { loading, data }] = useLazyQuery(GET_USER);
+const [getUser, { data }] = useLazyQuery(GET_USER);
 
 const [changeEmail, {error: emailError}] = useMutation(CHANGE_EMAIL, { variables: { userId, newEmail, changeEmailPassword }, errorPolicy: 'all'});
 
@@ -59,7 +55,7 @@ useEffect(() => {
       if (userId !== undefined && userId !== null) {
         getUser({ variables: { userId } });
       }
-    },[userId])
+    },[userId, getUser])
 
 const handleEmailSubmit = (e) => {
   e.preventDefault();
@@ -72,7 +68,6 @@ const handleNewPasswordSubmit = (e) => {
             changePassword(userId, newPassword, oldPassword);
     } else {
         setInputErrors([{message: "Password confirmation must match."}]);
-        console.log("Password confirmation must match.")
     }
 }
 

@@ -106,7 +106,6 @@ const router = express.Router();
       const { userName, email, password, confirmPassword } = req.body;
       const user = User.build({ userName, email });
       const validatorErrors = validationResult(req);
-      console.log('ERRORS', validatorErrors)
       if (validatorErrors.isEmpty()) {
         const hashedPassword = await bcrypt.hash(password, 10);
         user.hashedPassword = hashedPassword;
@@ -156,7 +155,6 @@ const router = express.Router();
 
   // Logout
   router.delete("/logout", (req, res) => {
-    console.log(req)
     logoutUser(req, res);
     res.json({
       message: "Logout successful",
@@ -169,7 +167,6 @@ const router = express.Router();
         restoreUser,
         (req, res, next) => {
           const { user } = res.locals;
-          console.log('user after restore', user)
           if (user) {
             return res.json({
               user: {userName: user.userName, email: user.email, id: user.id}

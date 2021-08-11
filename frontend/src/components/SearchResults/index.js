@@ -21,7 +21,6 @@ function SearchResults() {
 
 
     useEffect(() => {
-       console.log('TEXT', text)
        simpleSearch( { variables: { text } } );
     },[text]);
 
@@ -40,7 +39,6 @@ function SearchResults() {
     return (
         <>
         <div className="container">
-        {console.log('RESULTS', data)}
         {dedupedResults !== undefined && (dedupedResults.map(results => results.map(indivResult => <div><Link to={`/game/${indivResult.id}/gameroom`}>{indivResult.title}</Link> - {indivResult.blurb}</div>)))}
         </div>
         </>

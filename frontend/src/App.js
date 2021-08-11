@@ -1,9 +1,6 @@
-import logo from './logo.svg';
-// import './App.css';
-import { BrowserRouter, Route, Switch, NavLink } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { Route, Switch, } from "react-router-dom";
+import React, { useState, useEffect} from "react";
+import { useDispatch } from "react-redux";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
@@ -15,9 +12,9 @@ import Navigation from "./components/Navigation";
 import Dashboard from "./components/Dashboard";
 import Account from "./components/Account";
 import SearchResults from "./components/SearchResults";
-import GameMessages from "./components/GameMessages";
 import Bio from "./components/Bio";
 import Conversation from "./components/Conversation";
+import ConversationList from "./components/ConversationList";
 import Character from "./components/Character";
 import CreateCharacter from "./components/CreateCharacter";
 import ViewApplication from "./components/ViewApplication";
@@ -26,19 +23,11 @@ import * as sessionActions from "./store/session";
 
 function App() {
   const dispatch = useDispatch();
-  const history = useHistory();
   const [isLoaded, setIsLoaded] = useState(false);
-  const sessionUser = useSelector(state => state.session.user);
 
   useEffect(() => {
     dispatch(sessionActions.restoreUser()).then(() => setIsLoaded(true));
   }, [dispatch]);
-
-  const logout = (e) => {
-    e.preventDefault();
-    dispatch(sessionActions.logout());
-    history.push('/login');
-  };
 
   return (
     <div className="App">
@@ -62,6 +51,7 @@ function App() {
         <Route path="/game/:gameId/application/:applicationId" component={ViewApplication} exact={true}></Route>
         <Route path="/game/:gameId/create-character" component={CreateCharacter} exact={true}></Route>
         <Route path="/search/:text" component={SearchResults} exact={true}></Route>
+        <Route path="/conversations" component={ConversationList}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

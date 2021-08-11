@@ -28,7 +28,7 @@ const SimpleSearch = () => {
       <form onSubmit={submitForm}>
         <div className="search-bar-container">
         <input type="text" value={query} onChange={updateQuery} required></input>
-          <button className="search-button"><i class="fas fa-search"></i></button>
+          <button className="search-button"><i className="fas fa-search"></i></button>
         </div>
       </form>
     </div>

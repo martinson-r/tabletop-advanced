@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { PubSub } from 'graphql-subscriptions';
 import { v4 as uuidv4 } from 'uuid';
 import {
-    useQuery, useSubscription, InMemoryCache
+    useQuery
   } from "@apollo/client";
 import { GET_GAME, GET_WAITLIST_APPLIED } from "../../gql"
 import { DateTime } from "../../utils/luxon";
@@ -41,7 +41,7 @@ function Game() {
     setDisplayAccepted(!displayAccepted)
 }
 
-    const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } });
+    const { data } = useQuery(GET_GAME, { variables: { gameId } });
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
 
 
@@ -53,7 +53,7 @@ function Game() {
         <p>{data.game.description}</p>
         <p>Players:</p>
         {/* This feels a little backwards, but we're grabbing the player associated with the character */}
-        {data.game.Characters.map((character) => <p><Link to={`/${character.User.id}/bio`}>{character.User.userName}</Link> as <Link to={`/characters/${character.id}`}>{character.name}</Link></p>)}
+        {data.game.Characters.map((character) => <p key={uuidv4()}><Link to={`/${character.User.id}/bio`}>{character.User.userName}</Link> as <Link to={`/characters/${character.id}`}>{character.name}</Link></p>)}
         </>)}
 
         {/* Player is able to join waitlist */}
@@ -77,9 +77,9 @@ function Game() {
 
           <>
             <p>Applications:</p>
-            <label for="ignored">Show ignored</label>
+            <label >Show ignored</label>
             <input type="checkbox" name="ignored" checked={displayIgnored} onChange={changeDisplayIgnored}/>
-            <label for="accepted">Show accepted</label>
+            <label >Show accepted</label>
             <input type="checkbox" name="accepted" checked={displayAccepted} onChange={changeDisplayAccepted}/>
             <p>Open Applications:</p>
             {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() !== 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}

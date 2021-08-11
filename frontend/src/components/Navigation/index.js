@@ -23,7 +23,6 @@ function Navigation({ isLoaded }){
   useEffect(() => {
     if (sessionUser !== null && sessionUser !== undefined ) {
       setUserId(sessionUser.id);
-      console.log('user', sessionUser);
     }
 
   },[sessionUser])

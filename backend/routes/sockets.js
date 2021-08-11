@@ -13,17 +13,6 @@ if (!isProduction) {
 let connectedUsers = {};
 
 io.on('connection', function (socket) {
-  console.log(socket);
-  //This all needs to be reworked. Old code for reference.
-
-  // console.log("Socket connected >>>>> :"+socket.id);
-
-  // socket.on('private-chat', function(data){
-
-  //   let jsonMessageData = JSON.parse(data);
-  //   connectedUsers[jsonMessageData.data.User.id] = socket.id;
-
-  // });
 
   socket.on('send-chat-message', function (data) {
 
