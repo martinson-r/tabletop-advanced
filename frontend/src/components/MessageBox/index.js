@@ -13,7 +13,7 @@ import { MessageTypes } from "subscriptions-transport-ws";
 
 function MessageBox(props) {
 
-  const { message, userId, gameId, conversationId } = props;
+  const { message, userId, gameId, gameData, conversationId } = props;
 
     const [messageId, setMessageId] = useState(null);
     const [messageToDelete, setMessageToDelete] = useState(null);
@@ -139,19 +139,30 @@ function MessageBox(props) {
             {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<div className="avatar" style={{backgroundImage: "url(" + message.sender.Characters[0].imageUrl + ")"}}>
             </div>)}
         </div>
-        {message !== null && userId !== null && message !==undefined && message.sender.id !== null && message.sender.id !== undefined && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
+
+        {message !== null && message !==undefined && message.sender.id !== null && message.sender.id !== undefined &&
+        (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={parseInt(message.sender.id)===userId}>
 
           <span key={uuidv4()} className="indivMessage">
           <span className="character-box">
 
               {/* Display character name only if sender has a character */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{message.sender.Characters[0].name}:</span>)}
+              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{message.sender.Characters[0].name}</span>)}
 
-              {/* Display sender name regardless */}
-              <p className="sender-name">{message.sender.userName}</p>
+              {/* Display DM user name (they have no character) */}
+              {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && (<span>{message.sender.userName}</span>)}
+
+              {/* Display sender name if they have a character */}
+              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<p className="sender-name">{message.sender.userName}</p>)}
+
+              {/* Display tool tip if they are Game Master */}
+              {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && message.sender.id === gameData.game.host.id && (<p className="sender-name">Game Master</p>)}
+
+              {/* Display spectator hover tool tip if they are a spectator */}
+              {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && message.sender.id !== gameData.game.host.id && (<p className="sender-name">Spectator</p>)}
+
           </span>
-           <span>{message.sender.userName}:</span>
-            {message !== null && message !==undefined && message.sender.id === userId.toString() && (
+            {message !== null && message !==undefined && parseInt(message.sender.id) === userId && (
             <div className="dropdown" >
               <div className="btncontainer" onClick={displayEditCancel} ref={dropdownButton}>
                 <p className="dropbtn" >...</p></div>
@@ -161,11 +172,15 @@ function MessageBox(props) {
               </div>
             </div>)}
 
+            {/* Display message content */}
             {message.deleted !== true &&
-            (<span className="message-text">{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</span></div>)}
-            {userId === null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={false}>
+            (<span className="message-text">{message.messageText} </span>)}
+            {message.deleted === true && (<i>message deleted</i>)}</span></div>)}
+            {/* {userId === null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={false}>
+
+
           <p key={uuidv4()} className="indivMessage"><Link to={`/${message.sender.id}/bio`}>{message !== undefined && message.Characters !== undefined && (<span>{message.Characters[0].name} &#40;</span>)}{message.sender.userName}{message !== undefined && message.Characters !== undefined && (<span>&#41;</span>)}</Link>:<br /> {message.deleted !== true &&
-            (<span>{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>)}
+            (<span>{message.messageText} </span>)} {message.deleted === true && (<i>message deleted</i>)}</p></div>)} */}
         </div>
             )
 
