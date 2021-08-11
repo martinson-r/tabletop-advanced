@@ -31,11 +31,8 @@ function JoinWaitList({...props}) {
 
     const [errors, setErrors] = useState([]);
 
-    console.log('WAITLIST', waitlistStatus);
-
     useEffect(() => {
       if (gameData !== undefined) {
-        console.log('host', gameData.game.host.id)
         setHostId(gameData.game.host.id);
       }
     },[gameData])
@@ -55,7 +52,6 @@ function JoinWaitList({...props}) {
     {/* Right now, this shows if ANYBODY has applied. Include Players and match ids, or else just
         use a completely different query. */}
     if (waitlistStatus !== undefined && waitlistStatus.checkApplied.length) {
-      console.log(waitlistStatus.checkApplied.length);
         return (
             <p>You have already applied for this game and are on the waitlist.</p>
         )

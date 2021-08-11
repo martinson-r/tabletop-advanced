@@ -115,7 +115,7 @@ function MessageBox(props) {
        </div>
       )
 
-      if (isMounted.current &&  message !== undefined && message !== null && userId !== undefined && userId !== null) return (
+      if (isMounted.current &&  message !== undefined && message !== null) return (
       <div className="avatarAndMessages">
           <div className="avatarBox">
             <div className="avatar-position">
@@ -127,31 +127,31 @@ function MessageBox(props) {
 
             {/* Display default DM avatar (DM has no character). DM will have a userId and be able to chat,
             but will not have a character. */}
-            {message.sender.Characters !== undefined && userId !== null && message.sender.Characters.length === 0 && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
+            {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
             </div>)}
 
             {/* Display default DM avatar if there is no user at all.
             This is just to keep it from crapping out if there's a null userId. */}
-            {userId === null && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
+            {userId === null || userId === undefined && (<div className="avatar" style={{backgroundImage: "url(" + "../../images/dragon-face.png"+ ")"}}>
             </div>)}
 
             {/* Display character avatars by character */}
             {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<div className="avatar" style={{backgroundImage: "url(" + message.sender.Characters[0].imageUrl + ")"}}>
             </div>)}
         </div>
-        {message !== null && message !==undefined && userId !== null && message.sender.id !== null && message.sender.id !== undefined && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
+        {message !== null && userId !== null && message !==undefined && message.sender.id !== null && message.sender.id !== undefined && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={message.sender.id.toString()===userId.toString()}>
 
           <span key={uuidv4()} className="indivMessage">
           <span className="character-box">
 
               {/* Display character name only if sender has a character */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{console.log('boo')}{message.sender.Characters[0].name}:</span>)}
+              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{message.sender.Characters[0].name}:</span>)}
 
               {/* Display sender name regardless */}
               <p className="sender-name">{message.sender.userName}</p>
           </span>
            <span>{message.sender.userName}:</span>
-            {message !== null && message !==undefined && userId !== null && message.sender.id === userId.toString() && (
+            {message !== null && message !==undefined && message.sender.id === userId.toString() && (
             <div className="dropdown" >
               <div className="btncontainer" onClick={displayEditCancel} ref={dropdownButton}>
                 <p className="dropbtn" >...</p></div>
