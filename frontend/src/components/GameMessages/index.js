@@ -209,7 +209,7 @@ const fetchAndOffset = () => {
   <InfiniteScroll
     dataLength={sortedConvos.length}
     next={fetchAndOffset}
-    style={{ display: 'flex', flexDirection: 'column' }} //To put endMessage and loader to the top.
+    style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }} //To put endMessage and loader to the top.
     inverse={true} //
     hasMore={true}
     // loader={<h4>Loading...</h4>}
@@ -251,7 +251,7 @@ const fetchAndOffset = () => {
   <InfiniteScroll
     dataLength={sortedConvos.length}
     next={fetchAndOffset}
-    style={{ display: 'flex', flexDirection: 'column' }} //To put endMessage and loader to the top.
+    style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }} //To put endMessage and loader to the top.
     inverse={true} //
     hasMore={true}
     // loader={<h4>Loading...</h4>}

@@ -147,19 +147,19 @@ function MessageBox(props) {
           <span className="character-box">
 
               {/* Display character name only if sender has a character */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{message.sender.Characters[0].name}</span>)}
+              {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{message.sender.Characters[0].name}</span>)}
 
               {/* Display DM user name (they have no character) */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && (<span>{message.sender.userName}</span>)}
+              {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length === 0 && (<span>{message.sender.userName}</span>)}
 
               {/* Display sender name if they have a character */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<p className="sender-name">{message.sender.userName}</p>)}
+              {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<p className="sender-name">{message.sender.userName}</p>)}
 
               {/* Display tool tip if they are Game Master */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && message.sender.id === gameData.game.host.id && (<p className="sender-name">Game Master</p>)}
+              {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length === 0 && message.sender.id === gameData.game.host.id && (<p className="sender-name">Game Master</p>)}
 
               {/* Display spectator hover tool tip if they are a spectator */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && message.sender.id !== gameData.game.host.id && (<p className="sender-name">Spectator</p>)}
+              {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length === 0 && message.sender.id !== gameData.game.host.id && (<p className="sender-name">Spectator</p>)}
 
           </span>
             {message !== null && message !==undefined && parseInt(message.sender.id) === userId && (
