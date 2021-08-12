@@ -150,6 +150,6 @@ textarea
     /* margin: 10px; */
 }
 
-.scrollableDivGameChat, .scrollableDiv {
-    flex-grow: 2;
+.infinite-scroll-component.infinite-scroll-window {
+    overflow: hidden;
 }
