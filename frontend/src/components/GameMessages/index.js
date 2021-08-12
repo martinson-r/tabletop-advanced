@@ -6,6 +6,7 @@ import "./game-messages.css";
 import MessageBox from "../MessageBox";
 import SendChatBox from "../SendChatBox";
 import { v4 as uuidv4 } from 'uuid';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 
 import {
@@ -26,6 +27,7 @@ function GameMessages(props) {
     const [isScrolling, setIsScrolling] = useState(false);
     const [spectatorChat, setSpectatorChat] = useState(false);
     const [hideSpectatorChat, setHideSpectatorChat] = useState(false);
+    // const [itemLength, setItemLength] = (0);
 
     const messageBoxRef = useRef(null);
 
@@ -103,12 +105,6 @@ function GameMessages(props) {
     }
     },[data, newMessage]);
 
-    useEffect(() => {
-      if ( offset !== undefined && offset === 0 && messageBoxRef.current !== null && messageBoxRef.current !== undefined ) {
-        messageBoxRef.current.scrollTop = 580;
-      }
-    },[sortedConvos])
-
     //Subscription for messages
     //This hopefully covers all, edits and deletions included
     useEffect(() => {
@@ -153,7 +149,7 @@ function GameMessages(props) {
 
       if (unsubscribeSpectator) return () => unsubscribe()
 
-    },[subscribeToMore]);
+    },[]);
 
     const [errors, setErrors] = useState([]);
     useEffect(() => {
@@ -161,82 +157,6 @@ function GameMessages(props) {
         setUserId(sessionUser.id);
       }
     },[sessionUser])
-
-    useEffect(() => {
-      //Listen for scroll and provide more chat
-      if (messageBoxRef.current !== null )
-        messageBoxRef.current.addEventListener('wheel', function scrolled() {
-          setIsScrolling(true);
-
-          //This could be DRYed up.
-          if (messageBoxRef.current.scrollTop === 0) {
-            //setTimeout so we don't flood the server with requests.
-            setTimeout(() => {
-              if (sortedConvos && data !== undefined) {
-                if (sortedConvos.length < data.convos.count) {
-                  setOffset(offset + 20)
-                  fetchMore({
-                    variables: {
-                      gameId,
-                      offset
-                    }
-                  });
-             }
-          }
-        },300);
-        if (sortedConvos && data !== undefined) {
-          messageBoxRef.current.scroll({ top: 0, left: 0, behavior: 'smooth'});
-
-          //clean up event listener and getter after repositioning the scrollbar.
-          messageBoxRef.current.removeEventListener("wheel", scrolled, false);
-          setIsScrolling(false);
-          }
-      }
-    }, {passive: true});
-
-    // Alternatively, users may just drag the scrollbar up to the top...
-    // If we don't check if they're scrolling instead of using the wheel,
-    // the server goes nuts.
-    messageBoxRef.current !== null && messageBoxRef.current.addEventListener('scroll', () => {
-      if (isScrolling === false && messageBoxRef.current !== null) {
-        //Checking for 0 for now. Eventually check for a higher value
-        //and maybe use setTimeout
-        if (messageBoxRef.current.scrollTop === 0) {
-          if (sortedConvos && data !== undefined) {
-              if (sortedConvos.length < data.convos.count) {
-                setOffset(offset + 20)
-                fetchMore({
-                  variables: {
-                    gameId,
-                    offset
-                  }
-                });
-              }
-          }
-        }
-      }
-    });
-  },[sortedConvos])
-
-    useEffect(()=> {
-
-      //If offset is 0, we haven't loaded any more info.
-      //We don't want to keep forcing the scrollbar to the bottom every time new
-      //info loads, but we DO need all of sortedConvos to load before we set
-      //scrollTop.
-      if (messageBoxRef.current !== null && offset === 0) {
-        messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
-      }
-
-      //This is weird, but it works.
-      //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
-      //Then, check to see if this is a case where a message has been submitted.
-      //If a message was just submitted, force scroll to bottom and reset submittedMessage status.
-      if (messageBoxRef.current !== null && submittedMessage === true ) {
-        messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
-      }
-        setSubmittedMessage(false)
-  },[sortedConvos])
 
     const toggleHideSpectatorChat = () => {
       setHideSpectatorChat(!hideSpectatorChat);
@@ -255,25 +175,39 @@ function GameMessages(props) {
           </div>)}
         </div>
 
-      <div ref={messageBoxRef} className="messagesContainer">
-      {/* TODO: Query to see if player is in game */}
-      <div className="messageListing" data-status={hideSpectatorChat}>
-      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
+      <div className="messagesContainer">
+      <div className="messageListing"  data-status={hideSpectatorChat}>
+      <div
+  id="scrollableDivGameChat"
+
+  // className="messageBox game"
+  style={{
+    height: 300,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+  }}
+>
+
+{sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
           <div className="notification spectator">You are a spectator</div>)}
 
-        <div className="messageBox game">
-
-          {/* Hack to get flexbox to space items properly */}
-          <div className="spacer"></div>
-
-          {/* Behaves very strangely if not passed a key. */}
-          {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
+  {/*Put the scroll bar always on the bottom*/}
+  <InfiniteScroll
+    dataLength={sortedConvos.length}
+    next={fetchMore}
+    style={{ display: 'flex', flexDirection: 'column' }} //To put endMessage and loader to the top.
+    inverse={true} //
+    hasMore={true}
+    loader={<h4>Loading...</h4>}
+    scrollableTarget="scrollableDivGameChat"
+  >
+    {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
             message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message}
             userId={userId} gameId={gameId} gameData={gameData}/>)}
+  </InfiniteScroll>
+</div>
 
-        </div>
-
-        {/* <div className="sendChatBoxes"> */}
           {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
           <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
 
@@ -289,15 +223,31 @@ function GameMessages(props) {
 
     {hideSpectatorChat.toString() === "false" && (<div className="messageListing">
 
-    <div className="messageBox game">
-        <div className="spacer"></div>
-        {/* Behaves very strangely if not passed a key. */}
-
-        {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
+      <div
+  id="scrollableDiv"
+  // className="messageBox game"
+  style={{
+    height: 300,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+  }}
+>
+  {/*Put the scroll bar always on the bottom*/}
+  <InfiniteScroll
+    dataLength={sortedConvos.length}
+    next={fetchMore}
+    style={{ display: 'flex', flexDirection: 'column' }} //To put endMessage and loader to the top.
+    inverse={true} //
+    hasMore={true}
+    loader={<h4>Loading...</h4>}
+    scrollableTarget="scrollableDiv"
+  >
+    {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
           message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message}
           userId={userId} gameId={gameId} gameData={gameData} />))}
-
-      </div>
+  </InfiniteScroll>
+</div>
 
       {/* <div className="sendChatBoxes"> */}
 
