@@ -18,7 +18,7 @@ is an app that connects tabletop RPG hosts with potential players.
 
 ## Installation
 1. Clone the repo:<br />
-`git clone https://github.com/martinson-r/Tabletopr.git`
+`git clone https://github.com/martinson-r/tabletop-advanced.git`
 1. cd to the root project directory and npm install:<br />
 `npm install`
 1. cd into the frontend and backend folders, respectively, and npm install
