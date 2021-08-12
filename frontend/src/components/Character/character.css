@@ -1,3 +1,11 @@
 img {
     border-radius: 100%;
 }
+
+.edit-form-hidden {
+    display: none;
+}
+
+.character-description-hidden {
+    display: none;
+}

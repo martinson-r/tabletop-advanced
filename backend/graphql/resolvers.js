@@ -528,6 +528,13 @@ const resolvers = {
             const character = await Character.create({userId, gameId, bio, name, imageUrl});
             return character;
         },
+        updateCharacter: async(root, args) => {
+            const {characterId, bio, name, imageUrl} = args;
+            const characterToUpdate = await Character.findByPk(characterId);
+            await characterToUpdate.update({bio, name, imageUrl});
+            const updatedCharacter = await Character.findByPk(characterId);
+            return updatedCharacter;
+        },
 
         editWaitlistApp: async(root, args) => {
             const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
