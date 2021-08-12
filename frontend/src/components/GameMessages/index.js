@@ -162,6 +162,20 @@ function GameMessages(props) {
       setHideSpectatorChat(!hideSpectatorChat);
     }
 
+const fetchAndOffset = () => {
+  setOffset(offset + 20);
+
+  console.log(offset);
+
+  fetchMore({
+    variables: {
+      gameId,
+      offset
+    }
+  });
+
+}
+
 
     return (
       <div>
@@ -177,6 +191,8 @@ function GameMessages(props) {
 
       <div className="messagesContainer">
       <div className="messageListing"  data-status={hideSpectatorChat}>
+      {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
+          <div className="notification spectator">You are a spectator</div>)}
       <div
   id="scrollableDivGameChat"
 
@@ -186,20 +202,17 @@ function GameMessages(props) {
     overflow: 'auto',
     display: 'flex',
     flexDirection: 'column-reverse',
+    flexGrow: 2
   }}
 >
-
-{sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
-          <div className="notification spectator">You are a spectator</div>)}
-
   {/*Put the scroll bar always on the bottom*/}
   <InfiniteScroll
     dataLength={sortedConvos.length}
-    next={fetchMore}
+    next={fetchAndOffset}
     style={{ display: 'flex', flexDirection: 'column' }} //To put endMessage and loader to the top.
     inverse={true} //
     hasMore={true}
-    loader={<h4>Loading...</h4>}
+    // loader={<h4>Loading...</h4>}
     scrollableTarget="scrollableDivGameChat"
   >
     {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
@@ -231,16 +244,17 @@ function GameMessages(props) {
     overflow: 'auto',
     display: 'flex',
     flexDirection: 'column-reverse',
+    flexGrow: 2
   }}
 >
   {/*Put the scroll bar always on the bottom*/}
   <InfiniteScroll
     dataLength={sortedConvos.length}
-    next={fetchMore}
+    next={fetchAndOffset}
     style={{ display: 'flex', flexDirection: 'column' }} //To put endMessage and loader to the top.
     inverse={true} //
     hasMore={true}
-    loader={<h4>Loading...</h4>}
+    // loader={<h4>Loading...</h4>}
     scrollableTarget="scrollableDiv"
   >
     {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>

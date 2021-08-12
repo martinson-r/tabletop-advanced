@@ -23,8 +23,9 @@
 .messageListing {
     display: flex;
     flex-flow:column;
-    justify-content:space-between;
+    /* justify-content:space-between; */
     width: 50%;
+    flex-grow: 2;
 
 }
 
@@ -147,4 +148,8 @@ textarea
     display: block;
     width: 90%;
     /* margin: 10px; */
+}
+
+.scrollableDivGameChat, .scrollableDiv {
+    flex-grow: 2;
 }
