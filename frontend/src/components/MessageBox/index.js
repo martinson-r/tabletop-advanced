@@ -25,18 +25,10 @@ function MessageBox(props) {
     const [isGame, setIsGame] = useState(true);
     const dropdownButton = useRef(null);
     const editDropdown = useRef(null);
-    const isMounted = useRef(true);
 
     const [editMessage] = useMutation(EDIT_MESSAGE, { variables: { messageId, userId, editMessageText } } );
     const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
     // const { loading, error, data } = useQuery(GET_CHARACTER, { variables: { userId: message.sender.id, gameId } });
-
-
-// const [character, { data }] = useLazyQuery(GET_CHARACTER);
-
-// useEffect(() => {
-//     character({ variables: { userId: message.sender.id, gameId } });
-// },[isMounted])
 
    useEffect(() => {
     //  If there's no gameId, it's not a game
@@ -44,16 +36,6 @@ function MessageBox(props) {
       setIsGame(false);
     }
    },[gameId]);
-
-  //  useEffect(() => {
-  //    setSenderId(message.sender.id);
-  //  },[messageId]);
-
-  useEffect(() => {
-    return () => {
-      isMounted.current = false;
-    }
-  },[])
 
     const editMessageSubmit = (e) => {
         if (editMessageText !== "") {
@@ -67,7 +49,6 @@ function MessageBox(props) {
       }
 
       const editMessageBox = (messageText) => (e) => {
-        isMounted = true;
         setMessageId(e.target.id)
         setEditMessageText(messageText)
         setEditDisplay(true);
@@ -76,7 +57,6 @@ function MessageBox(props) {
     //Have to set this in a setter and listen to it due to race condition.
     useEffect(() => {
         if (messageToDelete !== null) {
-          isMounted = true;
           deleteMessage(messageToDelete, userId);
         }
       },[messageToDelete])
@@ -95,7 +75,7 @@ function MessageBox(props) {
         }
       }
 
-      if (isMounted.current && message !== undefined && message !== null && editDisplay === true && userId !== undefined && userId !== null) return (
+      if (message !== undefined && message !== null && editDisplay === true && userId !== undefined && userId !== null) return (
         <div className="indivMessageBox">
         <p key={uuidv4()} className="indivMessage">{message.sender.userName}: </p>
         <form className="edit-message-form" onSubmit={editMessageSubmit}>
@@ -115,7 +95,7 @@ function MessageBox(props) {
        </div>
       )
 
-      if (isMounted.current &&  message !== undefined && message !== null) return (
+      if (message !== undefined && message !== null) return (
       <div className="avatarAndMessages">
           <div className="avatarBox">
             <div className="avatar-position">
@@ -146,14 +126,17 @@ function MessageBox(props) {
           <span key={uuidv4()} className="indivMessage">
           <span className="character-box">
 
+              {/* Display usernames in non game chats */}
+              {isGame === false && message.conversationId !== null && (<span>{message.sender.userName}</span>)}
+
               {/* Display character name only if sender has a character */}
-              {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{message.sender.Characters[0].name}</span>)}
+              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{message.sender.Characters[0].name}</span>)}
 
               {/* Display DM user name (they have no character) */}
-              {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length === 0 && (<span>{message.sender.userName}</span>)}
+              {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && (<span>{message.sender.userName}</span>)}
 
               {/* Display sender name if they have a character */}
-              {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<p className="sender-name">{message.sender.userName}</p>)}
+              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<p className="sender-name">{message.sender.userName}</p>)}
 
               {/* Display tool tip if they are Game Master */}
               {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length === 0 && message.sender.id === gameData.game.host.id && (<p className="sender-name">Game Master</p>)}

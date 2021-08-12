@@ -4,7 +4,9 @@ import { useParams } from "react-router-dom";
 import MessageBox from "../MessageBox";
 import SendChatBox from "../SendChatBox";
 import { v4 as uuidv4 } from 'uuid';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import './conversation.css';
+
 
 import {
     useQuery, useMutation
@@ -121,22 +123,15 @@ function Conversation() {
       }
     },[data]);
 
-    // useEffect(() => {
-    //   if ( offset !== undefined && offset === 0 && messageBoxRef.current !== null && messageBoxRef.current !== undefined ) {
-    //     messageBoxRef.current.scrollTop = 580;
-    //   }
-    // },[sortedConvos])
-
     //Subscription for messages
     //This hopefully covers all, edits and deletions included
     useEffect(() => {
       let cancel = false;
 
-      if (!loading && data) {
+      if (!loading && data !== undefined && conversationId !== undefined) {
       subscribeToMore({
         //Name's now confusing - this subscribes to ALL new messages matching
         //filter criteria on backend.
-
         document: GAME_MESSAGES_SUBSCRIPTION,
         variables: { conversationId },
         updateQuery: (prev, { subscriptionData }) => {
@@ -156,7 +151,7 @@ function Conversation() {
       }
     }
       // if (unsubscribe) return () => unsubscribe()
-    },[data]);
+    },[data, subscribeToMore]);
 
     // const [errors, setErrors] = useState([]);
     useEffect(() => {
@@ -166,110 +161,7 @@ function Conversation() {
       }
     },[sessionUser])
 
-    useEffect(() => {
-      //Listen for scroll and provide more chat
-        messageBoxRef.current.addEventListener('wheel', function scrolled() {
-          setIsScrolling(true);
 
-          //This could be DRYed up.
-          if (messageBoxRef.current.scrollTop === 0) {
-            //setTimeout so we don't flood the server with requests.
-            setTimeout(() => {
-              if (sortedConvos && data !== undefined) {
-                if (sortedConvos.length < data.getNonGameMessages.count) {
-                  setOffset(offset + 20)
-                  fetchMore({
-                    variables: {
-                      conversationId,
-                      offset
-                    }
-                  });
-             }
-          }
-        },300);
-        if (sortedConvos && data !== undefined) {
-          messageBoxRef.current.scroll({ top: 0, left: 0, behavior: 'smooth'});
-
-          //clean up event listener and getter after repositioning the scrollbar.
-          messageBoxRef.current.removeEventListener("wheel", scrolled, false);
-          setIsScrolling(false);
-          }
-      }
-      return () => {
-        messageBoxRef.current.removeEventListener('wheel', () => {})
-      }
-    }, {passive: true});
-
-    //Alternatively, users may just drag the scrollbar up to the top...
-    //If we don't check if they're scrolling instead of using the wheel,
-    //the server goes nuts.
-    messageBoxRef.current.addEventListener('scroll', () => {
-      if (isScrolling === false && messageBoxRef.current !== null) {
-        //Checking for 0 for now. Eventually check for a higher value
-        //and maybe use setTimeout
-        if (messageBoxRef.current.scrollTop === 0) {
-        if (sortedConvos && data !== undefined) {
-            if (sortedConvos.length < data.getNonGameMessages.count) {
-              setOffset(offset + 20)
-              fetchMore({
-                variables: {
-                  conversationId,
-                  offset
-                }
-              });
-            }
-         }
-        }
-      }
-    });
-    return () => {
-      messageBoxRef.current.removeEventListener('scroll', () => {})
-    }
-  },[sortedConvos, messageBoxRef])
-
-    useEffect(()=> {
-
-      //If offset is 0, we haven't loaded any more info.
-      //We don't want to keep forcing the scrollbar to the bottom every time new
-      //info loads, but we DO need all of sortedConvos to load before we set
-      //scrollTop.
-      if (offset === 0) {
-        messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
-      }
-
-      //This is weird, but it works.
-      //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
-      //Then, check to see if this is a case where a message has been submitted.
-      //If a message was just submitted, force scroll to bottom and reset submittedMessage status.
-      if (submittedMessage === true) {
-        messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
-      }
-        setSubmittedMessage(false)
-  },[sortedConvos, messageBoxRef])
-
-    useEffect(()=> {
-
-      //If offset is 0, we haven't loaded any more info.
-      //We don't want to keep forcing the scrollbar to the bottom every time new
-      //info loads, but we DO need all of sortedConvos to load before we set
-      //scrollTop.
-      if (offset === 0) {
-
-        if (messageBoxRef.current !== null) {
-          messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
-        }
-
-      }
-
-      //This is weird, but it works.
-      //Check if there are new sortedConvos that have been rendered (so that I don't get the old messageBox size)
-      //Then, check to see if this is a case where a message has been submitted.
-      //If a message was just submitted, force scroll to bottom and reset submittedMessage status.
-      if (submittedMessage === true) {
-        messageBoxRef.current.scroll({ top: (messageBoxRef.current.offsetTop + messageBoxRef.current.scrollHeight*100), left: 0, behavior: 'smooth' });
-      }
-        setSubmittedMessage(false)
-  },[sortedConvos, messageBoxRef])
 
     // const addRecipients = (e) => {
     //   e.preventDefault();
@@ -291,13 +183,50 @@ function Conversation() {
     // }
 
 
+const fetchAndOffset = () => {
+  setOffset(offset + 20);
+
+  fetchMore({
+    variables: {
+      conversationId,
+      offset
+    }
+  });
+
+}
+
+
     return (
       <div className="nonGameMessagesContainer">
 
-      <div ref={messageBoxRef} className="nonGamesMessageBox game">
-       {/* Behaves very strangely if not passed a key. */}
-      {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message => <MessageBox key={uuidv4()} message={message} userId={userId}/>)}
-      </div>
+<div
+  id="scrollableDivGameChat"
+
+  // className="messageBox game"
+  style={{
+    height: 300,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    flexGrow: 2
+  }}
+>
+  {/*Put the scroll bar always on the bottom*/}
+  <InfiniteScroll
+    dataLength={sortedConvos.length}
+    next={fetchAndOffset}
+    style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }} //To put endMessage and loader to the top.
+    inverse={true} //
+    hasMore={true}
+    // loader={<h4>Loading...</h4>}
+    scrollableTarget="scrollableDivGameChat"
+  >
+    {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
+            message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message}
+            userId={userId}/>)}
+            <div className="spacer">&nbsp;</div>
+  </InfiniteScroll>
+</div>
 
       {sessionUser !== undefined && sessionUser !== null && userId !==undefined && conversationId !== undefined && (
         <div>
