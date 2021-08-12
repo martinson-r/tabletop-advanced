@@ -28,23 +28,26 @@ function GameMessages(props) {
     const [isScrolling, setIsScrolling] = useState(false);
     const [spectatorChat, setSpectatorChat] = useState(false);
     const [hideSpectatorChat, setHideSpectatorChat] = useState(false);
-    // const [itemLength, setItemLength] = (0);
 
-    const messageBoxRef = useRef(null);
-
-    const gameId = props.gameId;
+    const { gameId } = props;
 
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
 
     useEffect(() => {
-      if (gameData !== undefined && userId !== null) {
-        gameData.game.player.forEach((player) => {
-          if (player.id.toString() === userId.toString()) {
-              setIsPlayer(true);
-          }
-        });
-      }
-    },[gameData, userId]);
+      setUserId(sessionUser.id);
+    },[sessionUser]);
+
+    useEffect(() => {
+        try {
+          gameData.game.player.forEach((player) => {
+            if (parseInt(player.id) === userId) {
+                setIsPlayer(true);
+            }
+          });
+        } catch {
+          return ( <div>Loading...</div>)
+        }
+    },[gameId, gameData, userId]);
 
     let { subscribeToMore, fetchMore, data, loading, error } = useQuery(
       //add offset
@@ -283,6 +286,7 @@ const spectatorFetchAndOffset = () => {
     {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
             message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message}
             userId={userId} gameId={gameId} gameData={gameData}/>)}
+            <div className="spacer">&nbsp;</div>
   </InfiniteScroll>
 </div>
 
@@ -325,6 +329,7 @@ const spectatorFetchAndOffset = () => {
     {sortedSpectatorConvos && sortedSpectatorConvos.length !== 0 && sortedSpectatorConvos.map(message =>
           message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message}
           userId={userId} gameId={gameId} gameData={gameData} />))}
+          <div className="spacer">&nbsp;</div>
   </InfiniteScroll>
 </div>
 
