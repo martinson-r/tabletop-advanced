@@ -7,7 +7,7 @@ is an app that connects tabletop RPG hosts with potential players.
 * [Node.js](https://nodejs.org/en/)
 * [Express](https://expressjs.com/)
 * [GraphQL](https://graphql.org/)
-* [Apollo GraphQL Client] (https://www.apollographql.com/)
+* [Apollo GraphQL Client] (https://apollographql.com)
 * [React](https://reactjs.org/)
 * [React-Redux](https://react-redux.js.org/)
 
