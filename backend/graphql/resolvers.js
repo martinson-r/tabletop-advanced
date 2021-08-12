@@ -261,9 +261,15 @@ const resolvers = {
     startNewNonGameConversation: async(root,args) => {
 
         const { currentUserId, recipients, messageText } = args;
+
+        console.log('RECIPIENTS', recipients)
         const arrayOfConversations = [];
         const arrayOfUsers = [];
         let newUser = false;
+
+        if (recipients === undefined || recipients.length === 0) {
+            throw new UserInputError("There must be at least one recipient.")
+        }
 
         //This is silly, and I know it's silly.
         //But it works right now.
@@ -442,10 +448,16 @@ const resolvers = {
     addRecipient: async(root, args) => {
         const { recipientName, conversationId } = args;
 
-        const recipientToAdd = await User.findAll({where: { userName: {[Op.iLike]: recipientName }}})
+        if (recipientName !== undefined) {
+            const recipientToAdd = await User.findAll({where: { userName: {[Op.iLike]: recipientName }}})
         await Recipient.create({userId: recipientToAdd[0].id, conversationId})
         const sendBackRecipient = await Recipient.findByPk(recipientToAdd.id);
         return sendBackRecipient;
+        } else {
+            throw new UserInputError("Recipients field cannot be blank.")
+        }
+
+
     },
 
         editMessage: async(root, args) => {

@@ -53,6 +53,8 @@ if (startNewNonGameConversation.startNewNonGameConversation) {
             else {
                 setRecipients([...recipients, recipient]);
             }
+
+            setRecipient('');
         }
 
         const removeRecipient = (e) => {
@@ -76,7 +78,7 @@ if (startNewNonGameConversation.startNewNonGameConversation) {
             {/* TODO: validation - userNames should not contain commas */}
             {recipients.map(recipient => <p key={uuidv4}>{recipient} <span id={recipient} onClick={removeRecipient}>x</span></p>)}
             <form onSubmit = {addRecipient}>
-            <textarea name="recipient" value={recipient} onChange={(e) => setRecipient(e.target.value)}></textarea>
+            <textarea name="recipient" value={recipient} onChange={(e) => setRecipient(e.target.value)} required></textarea>
             <button>Add recipient</button>
             </form>
         </div>
