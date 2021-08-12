@@ -51,7 +51,7 @@ useEffect(() => {
     }
     if (data !== undefined) {
         setFirstName(data.about[0].firstName);
-        setPronouns(data.about[0].prounouns);
+        setPronouns(data.about[0].pronouns);
         setBio(data.about[0].bio);
         setAvatarUrl(data.about[0].avatarUrl);
     }
@@ -88,16 +88,19 @@ return (
     <div className="container">
     <div className="gray-backdrop">
     {data !== undefined &&
-    (<div className="user-description"><p>About {data.about[0].User.userName}:</p>
+    (<div id="user-description"><p>About {data.about[0].User.userName}:</p>
+    {avatarUrl && (<div><img className="avatarUrl" src={avatarUrl} /></div>)}
     {/* Conditional edit buttons based on whether user or not */}
     {/* Edit form fields directly */}
     {/* Toggle public display of information */}
     <p>Name: {firstName}</p>
     {pronouns && (<p>Pronouns: {pronouns}</p>)}
     <p>A Little Bit About Me: {bio}</p>
+    {console.log('userId', userId, 'current', currentUserId, currentUserId === userId)}
     </div>)}
-    {currentUserId !== null && parseInt(currentUserId) !== userId && (<button onClick={sendNewMessage}>Send this user a private message</button>)}
-    {currentUserId !== null && parseInt(currentUserId) === userId && (<div>
+    {currentUserId !== null && parseInt(currentUserId) !==  parseInt(userId) && (<button onClick={sendNewMessage}>Send this user a private message</button>)}
+    {currentUserId !== null &&  parseInt(currentUserId) ===  parseInt(userId) && (<div>
+
         <button id="edit-button" onClick={edit}>Edit</button>
         <div id="edit-form" className="edit-hidden">
         <form onSubmit={handleSubmit}>
