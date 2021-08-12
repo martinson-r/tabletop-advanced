@@ -98,12 +98,13 @@ const typeDefs = gql`
     recipient: User
   }
   type AboutMe {
+    id: ID,
     bio: String,
     userId: ID,
     User: User,
     pronouns: String,
     firstName: String,
-    imageUrl: String
+    avatarUrl: String
   }
   type Language {
       id: ID,
@@ -249,6 +250,7 @@ const typeDefs = gql`
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     submitCharacterCreation(userId: ID, gameId: ID, bio: String, name: String, imageUrl: String): Character
     updateCharacter(characterId: ID, bio: String, imageUrl: String, name: String): Character
+    updateBio(currentUserId: ID, userId: ID, bio: String, avatarUrl: String, pronouns: String, firstName: String): AboutMe
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
     joinWaitlist(hostId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application

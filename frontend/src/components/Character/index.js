@@ -86,7 +86,7 @@ if (form.classList.contains("edit-form-hidden")) {
 
             {(data !== undefined &&
                 (data.characterById !== null && data.characterById !== undefined) && (<div><div id="character-description">
-                    <img src={imageUrl} alt="Character portrait" />
+                    <img className="portrait" src={imageUrl} alt="Character portrait" />
 
                 <p>{name}, played by {data.characterById.User.userName} in {data.characterById.Game.title}</p>
             <p>{bio}</p>

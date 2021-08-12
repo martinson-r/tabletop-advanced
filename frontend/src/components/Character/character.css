@@ -9,3 +9,7 @@ img {
 .character-description-hidden {
     display: none;
 }
+
+.portrait {
+    max-width: 300px;
+}
