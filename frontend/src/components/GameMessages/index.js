@@ -114,7 +114,6 @@ function GameMessages(props) {
     //Double check to make sure data is not undefined.
     if (spectatorData !== undefined) {
 
-      console.log('SPECTATORDATA', spectatorData)
 
       //Don't forget to add your old sorted conversations back in,
       //or you lose them... but you need to dedupe.
@@ -127,7 +126,6 @@ function GameMessages(props) {
       //working.
 
       if (spectatorData.spectatorConvos.rows.length) {
-console.log('got spec data')
         //Basic dedupe.
         const toDedupe = new Set([...sortedSpectatorConvos,...spectatorData.spectatorConvos.rows]);
 
@@ -176,7 +174,6 @@ console.log('got spec data')
         document: GAME_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
         updateQuery: (prev, { subscriptionData }) => {
-          console.log('GAMEDATA', subscriptionData)
           if (!subscriptionData.data) return prev;
           const newFeedItem = subscriptionData.data.messageSent;
           setNewMessage(newFeedItem)
@@ -193,10 +190,8 @@ console.log('got spec data')
         document: SPECTATOR_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
         updateQuery: (prev, { subscriptionData }) => {
-          console.log('DATA', subscriptionData);
           if (!subscriptionData.data) return prev;
           const newFeedItem = subscriptionData.data.spectatorMessageSent;
-          console.log('ITEM', newFeedItem)
           setNewSpectatorMessage(newFeedItem)
 
           //This part is broken.
@@ -222,8 +217,6 @@ console.log('got spec data')
 
 const fetchAndOffset = () => {
   setOffset(offset + 20);
-
-  console.log(offset);
 
   fetchMore({
     variables: {
