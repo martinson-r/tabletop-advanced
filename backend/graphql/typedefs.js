@@ -12,6 +12,7 @@ const typeDefs = gql`
     game(gameId: ID!): Game
     messages: [Message]
     convos(gameId: ID, offset: Int): CountAll
+    spectatorConvos(gameId: ID, offset: Int): CountAll
     getNonGameConvos(userId: ID!): [User]
     getNonGameMessages(conversationId: ID, offset: Int): CountAll
     checkWaitList(id: ID, userId: ID!): [Game]
@@ -178,7 +179,8 @@ const typeDefs = gql`
     player: [User],
     Characters: [Character],
     Applications: [Application],
-    blurb: String
+    blurb: String,
+    spectatorChat: Boolean
   }
   type Application {
     id: ID
@@ -203,6 +205,7 @@ const typeDefs = gql`
     id: ID,
     userId: ID,
     senderId: ID,
+    gameId: ID,
     messageText: String,
     createdAt: String,
     deleted: Boolean,
@@ -258,6 +261,7 @@ const typeDefs = gql`
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,
+    spectatorMessageSent(gameId: ID, conversationId: ID): CountAll
   }
   schema {
     query: Query

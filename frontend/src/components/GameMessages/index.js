@@ -12,7 +12,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
-import { GET_GAME, GET_WAITLIST_APPLIED, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, GAME_MESSAGES_SUBSCRIPTION, SPECTATOR_MESSAGES_SUBSCRIPTION } from "../../gql";
+import { GET_GAME, GET_WAITLIST_APPLIED, GET_GAME_CONVOS, GET_SPECTATOR_CONVOS, SEND_MESSAGE_TO_GAME, GAME_MESSAGES_SUBSCRIPTION, SPECTATOR_MESSAGES_SUBSCRIPTION } from "../../gql";
 import { DateTime } from "../../utils/luxon";
 
 function GameMessages(props) {
@@ -22,6 +22,7 @@ function GameMessages(props) {
     const [newMessage, setNewMessage] = useState(null);
     const [newSpectatorMessage, setNewSpectatorMessage] = useState(null);
     const [sortedConvos, setSortedConvos] = useState([]);
+    const [sortedSpectatorConvos, setSortedSpectatorConvos] = useState([]);
     const [offset, setOffset] = useState(0)
     const [submittedMessage, setSubmittedMessage] = useState(false);
     const [isScrolling, setIsScrolling] = useState(false);
@@ -51,6 +52,12 @@ function GameMessages(props) {
       { variables: { gameId, offset } }
     );
 
+    let { subscribeToMore: spectatorSubscribe, fetchMore: spectatorFetchMore, data: spectatorData, loading: spectatorLoading, error: spectatorError } = useQuery(
+      //add offset
+      GET_SPECTATOR_CONVOS,
+      { variables: { gameId, offset } }
+    );
+
     useEffect(() => {
 
       //Double check to make sure data is not undefined.
@@ -67,7 +74,6 @@ function GameMessages(props) {
         //working.
 
         if (data.convos.rows.length) {
-
           //Basic dedupe.
           const toDedupe = new Set([...sortedConvos,...data.convos.rows]);
 
@@ -103,18 +109,74 @@ function GameMessages(props) {
       setSortedConvos([...convosRemoved]);
        }
     }
-    },[data, newMessage]);
+
+
+    //Double check to make sure data is not undefined.
+    if (spectatorData !== undefined) {
+
+      console.log('SPECTATORDATA', spectatorData)
+
+      //Don't forget to add your old sorted conversations back in,
+      //or you lose them... but you need to dedupe.
+
+      //Also, check to see that your data.convos.rows isn't empty, or you'll
+      //blank out your whole array.
+
+      //Ideally, deduping would be done in the cache, but I'm
+      //having a hard time with that and want to get this
+      //working.
+
+      if (spectatorData.spectatorConvos.rows.length) {
+console.log('got spec data')
+        //Basic dedupe.
+        const toDedupe = new Set([...sortedSpectatorConvos,...spectatorData.spectatorConvos.rows]);
+
+        //Sort it. Sets are unsorted. Must turn it into an array first.
+        const convosToSort = [...toDedupe];
+
+        convosToSort.sort(function(x, y){
+         return x.createdAt - y.createdAt;
+     });
+
+    //I should probably do this with the cache once I figure that out.
+    //I'd like to get it working, though.
+
+    //Code below is much more performant than my last solution, although
+    //it still flashes briefly on Safari.
+
+    //Find items in array only with unique ids.
+    //It's not working for deleted items, though.
+
+    //Make a copy
+    const convosRemoved = convosToSort.slice()
+    //flip it
+    .reverse()
+    //filter it. i is index.
+    .filter((message,i,convosToSort)=>
+    //returns the index of the first element in the array that
+    //satisfies the provided testing function
+    //(in this case, the first index where the ids match)
+    convosToSort.findIndex(messageToCompare=>(messageToCompare.id === message.id))===i)
+    //flip it back
+    .reverse()
+
+    setSortedSpectatorConvos([...convosRemoved]);
+     }
+  }
+
+
+    },[data, spectatorData, newMessage]);
 
     //Subscription for messages
     //This hopefully covers all, edits and deletions included
     useEffect(() => {
 
-      let unsubscribe;
 
-      unsubscribe = subscribeToMore({
+      subscribeToMore({
         document: GAME_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
         updateQuery: (prev, { subscriptionData }) => {
+          console.log('GAMEDATA', subscriptionData)
           if (!subscriptionData.data) return prev;
           const newFeedItem = subscriptionData.data.messageSent;
           setNewMessage(newFeedItem)
@@ -127,29 +189,25 @@ function GameMessages(props) {
           }
       });
 
-      if (unsubscribe) return () => unsubscribe()
-
-      let unsubscribeSpectator
-
-      unsubscribeSpectator = subscribeToMore({
+        spectatorSubscribe({
         document: SPECTATOR_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
         updateQuery: (prev, { subscriptionData }) => {
+          console.log('DATA', subscriptionData);
           if (!subscriptionData.data) return prev;
-          const newFeedItem = subscriptionData.data.messageSent;
+          const newFeedItem = subscriptionData.data.spectatorMessageSent;
+          console.log('ITEM', newFeedItem)
           setNewSpectatorMessage(newFeedItem)
 
           //This part is broken.
           //This really should be done in cache.
             return Object.assign({}, prev, {
-              convos: {...prev.rows, ...newFeedItem}
+              spectatorConvos: {...prev.rows, ...newFeedItem}
             });
           }
       });
 
-      if (unsubscribeSpectator) return () => unsubscribe()
-
-    },[]);
+    },[data, spectatorData]);
 
     const [errors, setErrors] = useState([]);
     useEffect(() => {
@@ -168,6 +226,20 @@ const fetchAndOffset = () => {
   console.log(offset);
 
   fetchMore({
+    variables: {
+      gameId,
+      offset
+    }
+  });
+
+}
+
+const spectatorFetchAndOffset = () => {
+  setOffset(offset + 20);
+
+  console.log('spec offset', offset);
+
+  spectatorFetchMore({
     variables: {
       gameId,
       offset
@@ -249,15 +321,15 @@ const fetchAndOffset = () => {
 >
   {/*Put the scroll bar always on the bottom*/}
   <InfiniteScroll
-    dataLength={sortedConvos.length}
-    next={fetchAndOffset}
+    dataLength={sortedSpectatorConvos.length}
+    next={spectatorFetchAndOffset}
     style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }} //To put endMessage and loader to the top.
     inverse={true} //
     hasMore={true}
     // loader={<h4>Loading...</h4>}
     scrollableTarget="scrollableDiv"
   >
-    {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
+    {sortedSpectatorConvos && sortedSpectatorConvos.length !== 0 && sortedSpectatorConvos.map(message =>
           message.spectatorChat === true && (<MessageBox key={uuidv4()} message={message}
           userId={userId} gameId={gameId} gameData={gameData} />))}
   </InfiniteScroll>
@@ -286,7 +358,6 @@ const fetchAndOffset = () => {
         &nbsp;
         </div>
       )}
-      {/* </div> */}
       </div>)}
       </div>
       </div>

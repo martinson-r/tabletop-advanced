@@ -283,6 +283,31 @@ const GET_GAME_CONVOS = gql`
 }
 `;
 
+const GET_SPECTATOR_CONVOS = gql`
+    query GetGameConvos($gameId: ID, $offset: Int) {
+       spectatorConvos(gameId: $gameId, offset: $offset){
+        count
+        rows {
+            id
+            sender {
+                id
+                userName
+                Characters {
+                    id
+                    name
+                    imageUrl
+                }
+            }
+            id
+            messageText
+            spectatorChat
+            createdAt
+            deleted
+       }
+    }
+}
+`;
+
 //Get non-game conversations associated with user
 const GET_USER_NON_GAME_CONVOS = gql`
 query GetNonGameConvos($userId: ID!) {
@@ -575,8 +600,8 @@ subscription OnMessageSent($gameId: ID, $conversationId: ID) {
 `;
 
 const SPECTATOR_MESSAGES_SUBSCRIPTION = gql`
-subscription OnMessageSent($gameId: ID, $conversationId: ID) {
-    messageSent(gameId: $gameId, conversationId: $conversationId) {
+subscription OnSpectatorMessageSent($gameId: ID, $conversationId: ID) {
+    spectatorMessageSent(gameId: $gameId, conversationId: $conversationId) {
         count
         rows {
             id
@@ -635,6 +660,7 @@ export { GET_ACCOUNTS,
         DECLINE_OFFER,
         GET_HOSTED_GAMES,
         GET_GAME_CONVOS,
+        GET_SPECTATOR_CONVOS,
         SEND_MESSAGE_TO_GAME,
         ADD_RECIPIENT,
         EDIT_MESSAGE,
