@@ -68,7 +68,26 @@ const resolvers = {
         },
 
         convos: async (obj, args, context, info) => {
-            return Message.findAndCountAll({ where: { gameId: args.gameId }, include: [
+            return Message.findAndCountAll({ where: {[Op.and]: [{ gameId: args.gameId, spectatorChat: false }]}, include: [
+                {model: User, as: "sender",
+                include: {model: Character, where: {
+                    [Op.and]:
+                         [
+                         {userId: { [Op.col]: "sender.id"}},
+                         {gameId: args.gameId}
+                     ]
+                    },
+                    required: false
+
+                }
+
+                }
+
+            ], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
+        },
+        spectatorConvos: async (obj, args, context, info) => {
+            console.log('hit spectatorConvos')
+            return Message.findAndCountAll({ where: {[Op.and]: [{ gameId: args.gameId, spectatorChat: true }]}, include: [
                 {model: User, as: "sender",
                 include: {model: Character, where: {
                     [Op.and]:
@@ -219,7 +238,10 @@ const resolvers = {
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 
-            pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
+            if (spectatorChat === false) {
+                pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
+            }
+                pubsub.publish('NEW_SPECTATOR_MESSAGE', {spectatorMessageSent: conversation});
         }
     },
 
@@ -544,6 +566,17 @@ const resolvers = {
         }
     },
     Subscription: {
+        spectatorMessageSent: {
+            subscribe: withFilter(() => pubsub.asyncIterator('NEW_SPECTATOR_MESSAGE'), (payload, variables) => {
+                //Structure is the same for both games and non-games; no need for a second subscription.
+                //We'll see if this is a game or conversation, first.
+                //If it has a gameId at all, it's a game.
+                if (variables.gameId !== null && variables.gameId !== undefined) {
+                    //Yes, you have to cast it to a string...
+                    return payload.spectatorMessageSent.rows[0].gameId.toString() === variables.gameId}
+            }),
+    },
+
             messageSent: {
                 //Filter so we only broadcast/update game or conversation this applies to
                 subscribe: withFilter(() => pubsub.asyncIterator('NEW_MESSAGE'), (payload, variables) => {
@@ -557,7 +590,8 @@ const resolvers = {
                         return payload.messageSent.rows[0].conversationId.toString() === variables.conversationId;
                 }),
             },
-        },
+
+    },
 }
 
 
