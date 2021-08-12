@@ -1,4 +1,4 @@
-# tabletop-advanced
+# Tabletop Advanced
 Tabletop Advanced provides a platform for users to play and watch play-by-post and live chat tabletop role playing games
 
 [tabletop-advanced.herokuapp.com](https://tabletop-advanced.herokuapp.com/)
