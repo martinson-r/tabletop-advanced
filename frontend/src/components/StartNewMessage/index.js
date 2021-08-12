@@ -8,6 +8,7 @@ import {
   } from "@apollo/client";
 import { START_NEW_PRIVATE_CHAT } from "../../gql"
 import { v4 as uuidv4 } from 'uuid';
+import './start-new-message.css';
 
 function StartNewMessage() {
 
@@ -19,10 +20,19 @@ function StartNewMessage() {
 
     const history = useHistory();
 
-    const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipients }, onCompleted: startNewNonGameConversation => { history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)} } );
+    const [startNewNonGameConversation, {error}] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipients }, onCompleted: startNewNonGameConversation => {
+if (startNewNonGameConversation.startNewNonGameConversation) {
+
+        history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)
+
+}
+ }, errorPolicy: 'all'
+     } );
 
     const sendNewMessage = () => {
         //TODO: Refactor for multiple recipients in an array
+        console.log(recipients);
+        console.log(currentUserId);
         startNewNonGameConversation({recipients, currentUserId});
         }
 
@@ -59,6 +69,9 @@ function StartNewMessage() {
         <div>
             <p>Recipients:</p>
             <p><i>Recipients can be separated by commas</i></p>
+            {error && error.graphQLErrors !== undefined && error.graphQLErrors.map(({ message }, i) => (
+        <span key={i}>{message}</span>
+           ))}
             {/* TODO: autosuggest users from Contact List */}
             {/* TODO: validation - userNames should not contain commas */}
             {recipients.map(recipient => <p key={uuidv4}>{recipient} <span id={recipient} onClick={removeRecipient}>x</span></p>)}
