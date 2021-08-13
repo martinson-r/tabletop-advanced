@@ -26,6 +26,7 @@ const GET_USER = gql`
             firstName
             pronouns
             bio
+            avatarUrl
             User {
                 id
                 userName
@@ -529,6 +530,29 @@ const SUBMIT_CHARACTER_CREATION = gql`
 }
 `;
 
+const UPDATE_CHARACTER = gql`
+  mutation UpdateCharacter($characterId: ID, $bio: String, $imageUrl: String, $name: String) {
+    updateCharacter(characterId: $characterId, bio: $bio, imageUrl: $imageUrl, name: $name) {
+                id
+                bio
+                imageUrl
+                name
+    }
+}
+`;
+
+const UPDATE_BIO = gql`
+  mutation UpdateBio($currentUserId: ID, $userId: ID, $bio: String, $avatarUrl: String, $firstName: String, $pronouns: String) {
+    updateBio(userId: $userId, currentUserId: $currentUserId, bio: $bio, avatarUrl: $avatarUrl, firstName: $firstName, pronouns: $pronouns) {
+                id
+                bio
+                avatarUrl
+                firstName
+                pronouns
+    }
+}
+`;
+
 const EDIT_WAITLIST_APP = gql`
   mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
     editWaitlistApp(applicationId: $applicationId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
@@ -650,6 +674,8 @@ export { GET_ACCOUNTS,
         GET_GAME,
         GET_CHARACTER,
         GET_CHARACTER_BY_ID,
+        UPDATE_CHARACTER,
+        UPDATE_BIO,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,

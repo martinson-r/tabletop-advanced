@@ -20,6 +20,9 @@ function GamePage() {
     const { gameId } = useParams();
     const [displayIgnored, setDisplayIgnored] = useState(false);
     const [displayAccepted, setDisplayAccepted] = useState(true);
+    const [details, setDetails] = useState("");
+    const [title, setTitle] = useState("");
+    const [blurb, setBlurb] = useState("");
 
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
@@ -41,14 +44,39 @@ function GamePage() {
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
 
 
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      // setErrors([]);
+      // updateBio({ variables: { currentUserId, userId, firstName, bio, pronouns, avatarUrl } });
+
+      const description = document.getElementById("edit-details");
+      const form = document.getElementById("edit-form");
+      const button = document.getElementById("edit-button");
+      form.classList.add("edit-hidden");
+      button.classList.remove("edit-hidden");
+      description.classList.remove("edit-hidden");
+
+  }
+
+  const edit = () => {
+  const description = document.getElementById("edit-details");
+  const form = document.getElementById("edit-form");
+  const button = document.getElementById("edit-button");
+
+  if (form.classList.contains("edit-hidden")) {
+      form.classList.remove("edit-hidden");
+      button.classList.add("edit-hidden");
+      description.classList.add("edit-hidden");
+  }
+  }
+
 return (
 
   <div className="container">
 <GameMessages gameId={gameId} />
 <div className="gray-backdrop">
 <div className="details">
-{/* {data !== undefined && (<><p>{data.game.title} hosted by {data.game.host.userName}</p> */}
-        <div className="game-content-block">
+        <div id="edit-details" className="game-content-block">
             <h2>More About This Game</h2>
             {data !== undefined && (<span>{data.game.description}</span>)}
         </div>
@@ -66,12 +94,33 @@ return (
 
             {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
         </div>
+        <div className="edit-form">
+        <form onSubmit={handleSubmit}>
+                <label>Title</label>
+                <input type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required/>
+                <label>Details</label>
+                <input type="text"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                required/>
+                 <label>Blurb</label>
+                <input type="text"
+                value={blurb}
+                onChange={(e) => setBlurb(e.target.value)}
+                required/>
+                <button type="submit">Save</button>
+            </form>
+        </div>
 </div>
         {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (
 
         // TODO: Query to see if player is in game
 
           <div className="game-content-block">
+            <button id="edit-button">Edit Game Details</button>
             <h2>Applications:</h2>
             <div className="toggle-flex">
                 <div className="toggle">

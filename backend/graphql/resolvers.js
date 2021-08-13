@@ -528,6 +528,28 @@ const resolvers = {
             const character = await Character.create({userId, gameId, bio, name, imageUrl});
             return character;
         },
+        updateCharacter: async(root, args) => {
+            const {characterId, bio, name, imageUrl} = args;
+            const characterToUpdate = await Character.findByPk(characterId);
+            await characterToUpdate.update({bio, name, imageUrl});
+            const updatedCharacter = await Character.findByPk(characterId);
+            return updatedCharacter;
+        },
+
+        updateBio: async(root, args) => {
+            const {currentUserId, userId, bio, firstName, avatarUrl, pronouns} = args;
+
+            if (currentUserId === userId) {
+                const aboutMeToUpdate = await AboutMe.findByPk(userId);
+                await aboutMeToUpdate.update({bio, firstName, avatarUrl, pronouns});
+                const updatedAboutMe = await AboutMe.findByPk(userId);
+                return updatedAboutMe;
+            } else {
+                throw new UserInputError("Not authorized.")
+            }
+
+        },
+
 
         editWaitlistApp: async(root, args) => {
             const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
