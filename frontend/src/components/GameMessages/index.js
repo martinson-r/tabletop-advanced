@@ -34,7 +34,9 @@ function GameMessages(props) {
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
 
     useEffect(() => {
-      setUserId(sessionUser.id);
+      if (sessionUser !== undefined) {
+        setUserId(sessionUser.id);
+      }
     },[sessionUser]);
 
     useEffect(() => {
@@ -332,15 +334,6 @@ const spectatorFetchAndOffset = () => {
           <div className="spacer">&nbsp;</div>
   </InfiniteScroll>
 </div>
-
-      {/* <div className="sendChatBoxes"> */}
-
-       {/* {!sessionUser && (
-        <div className="notification">
-        <p>Please log in to send in-game messages.</p>
-        </div>
-      )} */}
-      {/* {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer !== true && gameData.game.host.id !== userId.toString()) && (<div>You must be a player to send an in-game chat</div>)} */}
 
 
 
