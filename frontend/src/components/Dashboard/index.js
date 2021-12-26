@@ -44,10 +44,7 @@ function Home() {
     const [errorData, setError] = useState([]);
     const [openApps, setOpenApps] = useState([]);
 
-    let acceptOfferFunction = (applicationId, userId, gameId) => {
-        const [acceptOffer, { data, error }] = useMutation(ACCEPT_OFFER, { variables: { applicationId, userId, gameId }});
-        return { acceptOffer, data, error };
-    }
+    const [acceptOffer] = useMutation(ACCEPT_OFFER, { variables: { applicationId, userId, gameId }});
 
     const [declineOffer] = useMutation(DECLINE_OFFER, { variables: { applicationId }});
 
@@ -78,6 +75,10 @@ function Home() {
             getGamesPlayingIn({ variables: { userId }});
         }
     },[userId, history]);
+
+    useEffect(() => {
+        getGamesPlayingIn({ variables: { userId }});
+    },[acceptDecline]);
 
    //Calculate number of apps that have not been accepted or ignored (open apps) & set to our variable.
    //data object is non-extensible, so we can't set it as a key on there.
@@ -131,7 +132,11 @@ function Home() {
                         {dataWaiting.getWaitlistGames.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}:</p>)}
                         {/* If offerAccepted is null, they haven't acted on the app */}
                         {/* TODO: Get this to update dynamically */}
-                        {dataWaiting.getWaitlistGames.map(game => game.applicant.map(apps => apps.applicationOwner.map(app => app.offerAccepted === null && (<div key={uuidv4()}><p><Link to={`/game/${game.id}/application/${app.id}`}>{app.charName}</Link> - {app.accepted.toString() === 'true' && (<span>Accepted <button onClick={(e) => {acceptOffer(app.id,game.id, userId)}}>Confirm participation</button><button onClick={(e) => {declineOffer({variables: { applicationId: app.id}})}}>Decline participation</button></span>)}{app.accepted.toString() === 'false' && (<span>Pending</span>)}</p></div>))))}
+                        {dataWaiting.getWaitlistGames.map(game => game.applicant.map(apps => apps.applicationOwner.map(app => app.offerAccepted === null && (<div key={uuidv4()}><p><Link to={`/game/${game.id}/application/${app.id}`}>{app.charName}</Link> - {app.accepted.toString() === 'true' && (<span>Accepted <button onClick={(e) =>
+                            {
+                                acceptOffer({variables: {applicationId: app.id, gameId: game.id, userId} });
+                                setAcceptDecline(true);
+                            }}>Confirm participation</button><button onClick={(e) => {declineOffer({variables: { applicationId: app.id}})}}>Decline participation</button></span>)}{app.accepted.toString() === 'false' && (<span>Pending</span>)}</p></div>))))}
                     </div>
                 )}
                 </div>
