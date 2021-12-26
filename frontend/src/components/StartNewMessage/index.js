@@ -21,7 +21,9 @@ function StartNewMessage() {
     const history = useHistory();
 
     const [startNewNonGameConversation, {error}] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipients }, onCompleted: startNewNonGameConversation => {
-if (startNewNonGameConversation.startNewNonGameConversation) {
+
+        //if a conversation with this recipient already exists, redirect to existing conversation
+        if (startNewNonGameConversation.startNewNonGameConversation) {
 
         history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)
 

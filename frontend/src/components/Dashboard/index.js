@@ -6,6 +6,7 @@ import {
   } from "@apollo/client";
 import { GET_GAMES, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITING_LIST_GAMES,
     GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES } from "../../gql"
+
 import "./dashboard.css";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -26,8 +27,12 @@ function Home() {
     //grab all games
     //TODO: Replace with query to grab games only relating to the user
     const { loading, error, data } = useQuery(GET_GAMES);
-    const [getHosting, { loading: loadingHosted, error: errorHosted, data: dataHosted}] = useLazyQuery(GET_HOSTED_GAMES);
-    const [getWaitlistGames, { loading: loadingWaiting, error: errorWaiting, data: dataWaiting}] = useLazyQuery(GET_WAITING_LIST_GAMES);
+    const [getHosting, { loading: loadingHosted, error: errorHosted, data: dataHosted}] = useLazyQuery(GET_HOSTED_GAMES, {
+        fetchPolicy: 'network-only'
+      });
+    const [getWaitlistGames, { loading: loadingWaiting, error: errorWaiting, data: dataWaiting}] = useLazyQuery(GET_WAITING_LIST_GAMES, {
+        fetchPolicy: 'network-only'
+      });
 
     // Force query to not use cache so that new characters show up right away
     const [getGamesPlayingIn, {loading: loadingPlayingIn, data: playingInData}] = useLazyQuery(GET_GAMES_PLAYING_IN, {
@@ -39,7 +44,9 @@ function Home() {
     const [errorData, setError] = useState([]);
     const [openApps, setOpenApps] = useState([]);
 
-    const [acceptOffer] = useMutation(ACCEPT_OFFER, { variables: { applicationId, userId, gameId }});
+    const [acceptOffer] = useMutation(ACCEPT_OFFER, { variables: { applicationId, userId, gameId }, refetchQueries: [
+        { query: GET_GAMES_PLAYING_IN }
+      ]});
     const [declineOffer] = useMutation(DECLINE_OFFER, { variables: { applicationId }});
 
     // const getchar = (userId, gameId) => {

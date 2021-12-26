@@ -10,13 +10,17 @@ import { v4 as uuidv4 } from 'uuid';
 import './conversation-list.css';
 
 function ConversationList() {
-    const [getCurrentNonGameConvos, { loading: nonGameLoading, error: nonGameError, data: nonGameData }] = useLazyQuery(GET_USER_NON_GAME_CONVOS);
+    //must set fetch policy to network-only so we get the latest data on the convo list
+    const [getCurrentNonGameConvos, { loading: nonGameLoading, error: nonGameError, data: nonGameData }] = useLazyQuery(GET_USER_NON_GAME_CONVOS, {
+        fetchPolicy: "network-only"
+      });
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
     const history = useHistory();
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
+    const [data, setData] = useState([]);
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -25,22 +29,23 @@ function ConversationList() {
         }
     }, [sessionUser]);
 
-useEffect(() => {
-    if (userId !== undefined && userId !== null) {
-        getCurrentNonGameConvos({ variables: { userId }});
+    useEffect(() => {
+        console.log("Ran!");
+        if (userId !== undefined && userId !== null) {
+            getCurrentNonGameConvos({ variables: { userId }});
+        }
+    },[userId]);
+
+    return (
+        <div className="gray-backdrop">
+    <p>Private Conversations:</p>
+    <p><Link to={'/newmessage'}>Start new conversation</Link></p>
+    {/* TODO: Add multiple users to private convos */}
+    {/* We need unique keys for mapped elements so React can keep track of what is what */}
+    {nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversations => <div key={uuidv4()} className="convos-box" >{conversations.recipient.map(conversation => (<p key={uuidv4()} className="private-convo" onClick={() => history.push(`/conversation/${conversation.id}`)}>{conversation.recipient.map(recipient => recipient.userName + ", ")}</p>))}</div>))}
+    </div>
+    )
+
     }
-},[userId, history]);
-
-return (
-    <div className="gray-backdrop">
-<p>Private Conversations:</p>
-<p><Link to={'/newmessage'}>Start new conversation</Link></p>
-{/* TODO: Add multiple users to private convos */}
-{/* We need unique keys for mapped elements so React can keep track of what is what */}
-{nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversations => <div key={uuidv4()} className="convos-box" >{conversations.recipient.map(conversation => (<p key={uuidv4()} className="private-convo" onClick={() => history.push(`/conversation/${conversation.id}`)}>{conversation.recipient.map(recipient => recipient.userName + ", ")}</p>))}</div>))}
-</div>
-)
-
-}
 
 export default ConversationList;
