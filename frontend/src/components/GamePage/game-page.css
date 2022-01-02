@@ -29,3 +29,7 @@ label:first-of-type {
 .gray-backdrop {
     margin-top: 10px;
 }
+
+.edit-hidden {
+    display: none;
+}
