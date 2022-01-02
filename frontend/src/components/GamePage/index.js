@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import GameMessages from "../GameMessages";
 import './game-page.css';
 
-import { EDIT_MESSAGE, GET_GAME, GET_WAITLIST_APPLIED } from "../../gql";
+import { GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
@@ -40,14 +40,14 @@ function GamePage() {
     setDisplayAccepted(!displayAccepted)
 }
 
-    const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } });
+    const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId }});
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
-
+    const [updateGame] = useMutation(UPDATE_GAME, { variables: { userId, gameId, title, blurb, details }, refetchQueries: ["GetSingleGame"] } );
 
     const handleSubmit = (e) => {
       e.preventDefault();
       // setErrors([]);
-      // updateBio({ variables: { currentUserId, userId, firstName, bio, pronouns, avatarUrl } });
+      updateGame({ variables: { gameId, userId, blurb, title, details } });
 
       const description = document.getElementById("edit-details");
       const form = document.getElementById("edit-form");
@@ -55,6 +55,8 @@ function GamePage() {
       form.classList.add("edit-hidden");
       button.classList.remove("edit-hidden");
       description.classList.remove("edit-hidden");
+
+      //TODO:Actually update the stuff
 
   }
 
@@ -125,7 +127,7 @@ return (
                 value={blurb}
                 onChange={(e) => setBlurb(e.target.value)}
                 required/>
-                <button type="submit" id="save-button" onClick={edit}>Save</button>
+                <button type="submit" id="save-button" onSubmit={handleSubmit}>Save</button>
             </form>
         </div>
             <h2>Applications:</h2>

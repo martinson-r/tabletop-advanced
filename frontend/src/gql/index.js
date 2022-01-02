@@ -553,6 +553,17 @@ const UPDATE_BIO = gql`
 }
 `;
 
+const UPDATE_GAME = gql`
+  mutation UpdateGame($userId: ID, $gameId: ID, $title: String, $blurb: String, $details: String) {
+    updateGame(userId: $userId, gameId: $gameId, title: $title, blurb: $blurb, details: $details) {
+                gameId
+                blurb
+                title
+                details
+    }
+}
+`;
+
 const EDIT_WAITLIST_APP = gql`
   mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
     editWaitlistApp(applicationId: $applicationId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
@@ -676,6 +687,7 @@ export { GET_ACCOUNTS,
         GET_CHARACTER_BY_ID,
         UPDATE_CHARACTER,
         UPDATE_BIO,
+        UPDATE_GAME,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,

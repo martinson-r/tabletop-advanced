@@ -158,8 +158,10 @@ const typeDefs = gql`
   }
   type Game {
     id: ID,
+    gameId: ID,
     title: String,
     description: String,
+    details: String,
     premium: Boolean,
     remote: Boolean,
     host: User,
@@ -251,7 +253,7 @@ const typeDefs = gql`
     submitCharacterCreation(userId: ID, gameId: ID, bio: String, name: String, imageUrl: String): Character
     updateCharacter(characterId: ID, bio: String, imageUrl: String, name: String): Character
     updateBio(currentUserId: ID, userId: ID, bio: String, avatarUrl: String, pronouns: String, firstName: String): AboutMe
-    updateGame(gameId: ID, userId: ID, title: String, blurb: String, description: String): Game
+    updateGame(gameId: ID, userId: ID, title: String, blurb: String, details: String): Game
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
     joinWaitlist(hostId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application

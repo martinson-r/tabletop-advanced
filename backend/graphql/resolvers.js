@@ -551,15 +551,21 @@ const resolvers = {
         },
 
         updateGame: async(root, args) => {
-            const {gameId, title, description, blurb} = args;
+            const {userId, gameId, title, details, blurb} = args;
+
+            console.log(args);
 
         //get the game's host id
-        const gameToUpdate = await Game.findByPk(id);
+        const gameToUpdate = await Game.findByPk(gameId);
         const hostId = gameToUpdate.hostId;
 
-            if (currentUserId === hostId) {
+        console.log("Host id ", hostId);
+        console.log("User id ", userId);
+        console.log(hostId.toString() === userId.toString());
+
+            if (userId.toString() === hostId.toString()) {
                 // const aboutMeToUpdate = await AboutMe.findByPk(userId);
-                await gameToUpdate.update({title, description, blurb});
+                await gameToUpdate.update({title, description: details, blurb});
                 const updatedGame = await Game.findByPk(gameId);
                 return updatedGame;
             } else {
@@ -567,8 +573,6 @@ const resolvers = {
             }
 
          },
-
-
 
         editWaitlistApp: async(root, args) => {
             const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
