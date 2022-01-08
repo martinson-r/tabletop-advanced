@@ -550,6 +550,29 @@ const resolvers = {
 
         },
 
+        updateGame: async(root, args) => {
+            const {userId, gameId, title, details, blurb} = args;
+
+            console.log(args);
+
+        //get the game's host id
+        const gameToUpdate = await Game.findByPk(gameId);
+        const hostId = gameToUpdate.hostId;
+
+        console.log("Host id ", hostId);
+        console.log("User id ", userId);
+        console.log(hostId.toString() === userId.toString());
+
+            if (userId.toString() === hostId.toString()) {
+                // const aboutMeToUpdate = await AboutMe.findByPk(userId);
+                await gameToUpdate.update({title, description: details, blurb});
+                const updatedGame = await Game.findByPk(gameId);
+                return updatedGame;
+            } else {
+                throw new UserInputError("Not authorized.")
+            }
+
+         },
 
         editWaitlistApp: async(root, args) => {
             const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;

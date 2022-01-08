@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import GameMessages from "../GameMessages";
 import './game-page.css';
 
-import { GET_GAME, GET_WAITLIST_APPLIED } from "../../gql";
+import { GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
@@ -40,14 +40,14 @@ function GamePage() {
     setDisplayAccepted(!displayAccepted)
 }
 
-    const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId } });
+    const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId }});
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
-
+    const [updateGame] = useMutation(UPDATE_GAME, { variables: { userId, gameId, title, blurb, details }, refetchQueries: ["GetSingleGame"] } );
 
     const handleSubmit = (e) => {
       e.preventDefault();
       // setErrors([]);
-      // updateBio({ variables: { currentUserId, userId, firstName, bio, pronouns, avatarUrl } });
+      updateGame({ variables: { gameId, userId, blurb, title, details } });
 
       const description = document.getElementById("edit-details");
       const form = document.getElementById("edit-form");
@@ -55,6 +55,8 @@ function GamePage() {
       form.classList.add("edit-hidden");
       button.classList.remove("edit-hidden");
       description.classList.remove("edit-hidden");
+
+      //TODO:Actually update the stuff
 
   }
 
@@ -67,6 +69,12 @@ function GamePage() {
       form.classList.remove("edit-hidden");
       button.classList.add("edit-hidden");
       description.classList.add("edit-hidden");
+  }
+
+  else {
+      form.classList.add("edit-hidden");
+      button.classList.remove("edit-hidden");
+      description.classList.remove("edit-hidden");
   }
   }
 
@@ -94,7 +102,15 @@ return (
 
             {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
         </div>
-        <div className="edit-form">
+
+</div>
+        {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (
+          <div>
+
+          <div className="game-content-block">
+
+            <button id="edit-button" onClick={edit}>Edit Game Details</button>
+            <div id="edit-form" className="edit-hidden">
         <form onSubmit={handleSubmit}>
                 <label>Title</label>
                 <input type="text"
@@ -111,16 +127,9 @@ return (
                 value={blurb}
                 onChange={(e) => setBlurb(e.target.value)}
                 required/>
-                <button type="submit">Save</button>
+                <button type="submit" id="save-button" onSubmit={handleSubmit}>Save</button>
             </form>
         </div>
-</div>
-        {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (
-
-        // TODO: Query to see if player is in game
-
-          <div className="game-content-block">
-            <button id="edit-button">Edit Game Details</button>
             <h2>Applications:</h2>
             <div className="toggle-flex">
                 <div className="toggle">
@@ -139,6 +148,8 @@ return (
             {displayIgnored.toString() === 'true' &&(<div><p>Ignored Applications:</p>
             {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
           </div>
+        </div>
+
 
         )}
       </div>
