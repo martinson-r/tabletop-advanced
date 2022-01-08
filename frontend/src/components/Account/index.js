@@ -83,9 +83,9 @@ const handleNewPasswordSubmit = (e) => {
            {emailError && emailError.graphQLErrors.map(({ message }, i) => (
          <li key={i}>{message}</li>
            ))}
-           {inputErrors && inputErrors.map(({ message }, i) => (
+           {/* {inputErrors && inputErrors.map(({ message }, i) => (
         <li key={i}>{message}</li>
-           ))}
+           ))} */}
          </ul>
          <label>
            New email address:

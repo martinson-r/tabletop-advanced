@@ -4,6 +4,7 @@ const asyncHandler = require('express-async-handler');
 const { loginUser } = require('../../auth');
 const bcrypt = require('bcryptjs');
 const { User, AboutMe } = require('/db/models');
+const { handleValidationErrors } = require('../../utils/validation');
 
 const router = express.Router();
 

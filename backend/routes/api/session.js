@@ -143,9 +143,11 @@ const router = express.Router();
           if (passwordMatch) {
             loginUser(req, res, user);
             res.json({user: {userName: user.userName, email: user.email, id: user.id}});
+          } else {
+            errors.push("Invalid credentials. Please double check user name and password and try again.");
+            res.json({errors})
           }
         }
-        errors.push("Invalid credentials. Please double check user name and password and try again.");
       } else {
         errors = validatorErrors.array().map((error) => error.msg);
         res.json({errors})

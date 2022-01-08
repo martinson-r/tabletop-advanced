@@ -53,11 +53,6 @@ const {gameId, conversationId, userId, spectatorChat} = props;
  return (
      <>
      {(<form onSubmit={handleSpectatorSubmit}>
-         {/* <ul>
-           {errors.map((error, idx) => (
-             <li key={idx}>{error}</li>
-           ))}
-         </ul> */}
          {/* TODO: error message for no blank messages */}
          {/* TODO: messages sent from this chat box are marked Spectator chats */}
          <label hidden>
