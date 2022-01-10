@@ -11,16 +11,19 @@ function Login() {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState([]);
+    const [inputErrors, setInputErrors] = useState([]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      return dispatch(sessionActions.login({ userName, password })).then((res) => {
-        history.push("/");
-      }).catch(
-        (res) => {
-          if (res.data && res.data.errors) setErrors(res.data.errors);
+      return dispatch(sessionActions.login({ userName, password }))
+      .then((res) => {
+          if (res.data.errors) {
+            setErrors(res.data.errors);
+        } else {
+          history.push('/')
         }
+      }
       );
     };
 

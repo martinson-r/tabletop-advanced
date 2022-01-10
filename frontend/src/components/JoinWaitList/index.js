@@ -34,6 +34,7 @@ function JoinWaitList({...props}) {
     useEffect(() => {
       if (gameData !== undefined) {
         setHostId(gameData.game.host.id);
+        console.log('gameData', gameData);
       }
     },[gameData])
 
@@ -51,14 +52,20 @@ function JoinWaitList({...props}) {
 
     {/* Right now, this shows if ANYBODY has applied. Include Players and match ids, or else just
         use a completely different query. */}
-    if (waitlistStatus !== undefined && waitlistStatus.checkApplied.length) {
+    if (waitlistStatus !== undefined && waitlistStatus.checkApplied.length && gameData !== undefined && gameData.game.multipleApplications === false) {
+      console.log('gameData', gameData);
         return (
+          <div className="gray-backdrop">
+            <div className="container">
             <p>You have already applied for this game and are on the waitlist.</p>
+            </div>
+            </div>
         )
     }
 
     return (
-      <div>
+      <div className="gray-backdrop">
+            <div className="container">
     {!userId && (
       //TODO: login link with history push back to initial game page they were
       //looking at
@@ -70,7 +77,12 @@ function JoinWaitList({...props}) {
     )}
     {/* Game Data query should return info on if this user has applied */}
 
-        {gameData && gameData.game.host.id !== userId.toString() && (<form onSubmit={handleSubmit}>
+        {gameData && gameData.game.host.id !== userId.toString() && (
+
+
+        <form onSubmit={handleSubmit}>
+
+
          <ul>
            {errors.map((error, idx) => (
              <li key={idx}>{error}</li>
@@ -113,8 +125,12 @@ function JoinWaitList({...props}) {
            />
          </label>
          <button type="submit">Send</button>
-       </form>)}
+       </form>
+
+       )}
        </div>
+       </div>
+
     )
 }
 

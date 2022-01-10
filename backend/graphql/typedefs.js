@@ -169,6 +169,7 @@ const typeDefs = gql`
     players: [User],
     spectators: [User],
     waitlist: [Waitlist],
+    multipleApplications: Boolean,
     ruleSetId: ID,
     languageId: ID,
     gameTypeId: ID,

@@ -233,6 +233,10 @@ const resolvers = {
 
                 pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
             } else if (numbers === null) {
+
+                if (messageText === '' || !messageText) {
+                    throw new UserInputError('Message cannot be blank.');
+                } else {
             const senderId = userId;
             await Message.create({gameId,messageText,senderId,spectatorChat});
 
@@ -243,11 +247,16 @@ const resolvers = {
             }
                 pubsub.publish('NEW_SPECTATOR_MESSAGE', {spectatorMessageSent: conversation});
         }
+    }
     },
 
     sendNonGameMessages: async(root,args) => {
 
         const { conversationId, messageText, userId, offset } = args;
+
+        if (messageText === '' || !messageText) {
+            throw new UserInputError('Message cannot be blank.');
+        } else {
         const senderId = userId;
             await Message.create({conversationId,messageText,senderId});
 
@@ -255,6 +264,7 @@ const resolvers = {
 
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
             return conversation;
+        }
 
     },
 

@@ -142,6 +142,7 @@ const GET_GAME = gql`
         waitListOpen,
         active,
         blurb,
+        multipleApplications,
         host {
             userName
             id
