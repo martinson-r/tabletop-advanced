@@ -480,8 +480,28 @@ const resolvers = {
 
         submitGame: async(root, args) => {
                         const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId } = args;
-                        const newGame = await Game.create({ hostId: userId, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
-                        return newGame;
+
+                        //Throw errors if information is missing.
+                        if (!title) {
+                            throw new UserInputError('Please add a title.');
+                        }
+                        if (!description) {
+                            throw new UserInputError('Please add a description.');
+                        }
+                        if (!gameLanguageId) {
+                            throw new UserInputError('Please select the language your game is played in.');
+                        }
+                        if (!gameRulesetId) {
+                            throw new UserInputError('Please select a ruleset for your game.');
+                        }
+                        if (!gameTypeId) {
+                            throw new UserInputError('Please select what type of game you are playing.');
+                        }
+
+                        else {
+                            const newGame = await Game.create({ hostId: userId, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
+                            return newGame;
+                        }
                     },
         changeEmail: async(root, args) => {
             const {userId, newEmail, changeEmailPassword} = args;
@@ -525,17 +545,40 @@ const resolvers = {
               return user;
         },
         joinWaitlist: async(root, args) => {
-            //TODO: If userId is hostId, do not allow & throw error.
-
-            //create app
+            //If userId is hostId, do not allow & throw error.
+            if (userId === hostId) {
+                throw new UserInputError('You cannot join the waitlist for your own game.');
+            } else {
+                //create app
             const { userId, gameId, whyJoin, charConcept, charName, experience, hostId } = args;
-            const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
+
+            if (!whyJoin) {
+                throw new UserInputError('Please explain why you would like to join this game.');
+            }
+
+            if (!charConcept) {
+                throw new UserInputError('Please explain your character concept or background.');
+            }
+
+            if (!charName) {
+                throw new UserInputError('Please provide a character name.');
+            }
+
+            if (!experience) {
+                throw new UserInputError('Please describe your level of experience playing tabletop RPGs and play by post games.');
+            } else {
+                const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
 
             //Add app to waitlist
             await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
             return newApp;
+            }
+            }
         },
 
+
+        //Note that character creation fields can be incomplete since
+        //creating a character can take time.
         submitCharacterCreation: async(root, args) => {
             const { userId, gameId, bio, name, imageUrl } = args;
             const character = await Character.create({userId, gameId, bio, name, imageUrl});
