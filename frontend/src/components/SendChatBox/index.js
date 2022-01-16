@@ -17,11 +17,10 @@ function SendChatBox(props){
 
     const [messageText, setMessage] = useState("");
 const {gameId, conversationId, userId, spectatorChat} = props;
-    const [errors, setErrors] = useState([]);
     const [submittedMessage, setSubmittedMessage] = useState(false);
 
-    const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat } } );
-    const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText } } );
+    const [updateMessages, {error: gameMessageError}] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat }, errorPolicy: 'all' } );
+    const [sendNonGameMessage, {error}] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText }, errorPolicy: 'all' } );
 
     //Submit messages when user presses Enter
     const handleKeyDown = (e) => {
@@ -33,27 +32,32 @@ const {gameId, conversationId, userId, spectatorChat} = props;
     const handleSpectatorSubmit = (e) => {
         e.preventDefault();
 
-        //   this.input.selectionStart = this.input.selectionEnd = start + 1;
-        setErrors([]);
-
           //Offset is fine at this point. No need to do anything with it.
           if (gameId !== undefined) {
           updateMessages(gameId, userId, messageText, spectatorChat);
           setSubmittedMessage(true);
           setMessage('');
+          console.log(gameMessageError);
           }
           else if (conversationId !== undefined) {
           sendNonGameMessage(conversationId, userId, messageText);
           setSubmittedMessage(true);
           setMessage('');
+
           }
 
       }
 
  return (
      <>
+
      {(<form onSubmit={handleSpectatorSubmit}>
+      {gameMessageError && gameMessageError !== undefined && (
+      <span>{gameMessageError.toString()}</span>)}
+      {error && error !== undefined && (
+      <span>{error.toString()}</span>)}
          {/* TODO: error message for no blank messages */}
+
          {/* TODO: messages sent from this chat box are marked Spectator chats */}
          <label hidden>
            Send Message

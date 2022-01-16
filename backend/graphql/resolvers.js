@@ -236,7 +236,8 @@ const resolvers = {
                 pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
             } else if (numbers === null) {
 
-                if (messageText === '' || !messageText) {
+                //check if string is empty or all whitespace
+                if (messageText === '' || !messageText || /^\s*$/.test(messageText)) {
                     throw new UserInputError('Message cannot be blank.');
                 } else {
             const senderId = userId;
@@ -256,7 +257,7 @@ const resolvers = {
 
         const { conversationId, messageText, userId, offset } = args;
 
-        if (messageText === '' || !messageText) {
+        if (messageText === '' || !messageText || /^\s*$/.test(messageText)) {
             throw new UserInputError('Message cannot be blank.');
         } else {
         const senderId = userId;

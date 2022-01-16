@@ -31,7 +31,7 @@ function Conversation() {
     // const [recipient, setRecipient] = useState("");
 
     // const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat } } );
-    const [sendNonGameMessage] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText } } );
+    const [sendNonGameMessage, {error}] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText }, errorPolicy: 'all' } );
 
     //Submit messages when user presses Enter
     const handleKeyDown = (e) => {
@@ -230,6 +230,8 @@ const fetchAndOffset = () => {
 
       {sessionUser !== undefined && sessionUser !== null && userId !==undefined && conversationId !== undefined && (
         <div>
+          {error && error !== undefined && (
+          <span>{error.toString()}</span>)}
       <SendChatBox conversationId={conversationId} userId={userId}/>
          {/* TODO: error message for no blank messages */}
          {/* TODO: messages sent from this chat box are marked Spectator chats */}
