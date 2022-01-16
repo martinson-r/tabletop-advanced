@@ -506,17 +506,22 @@ const resolvers = {
         changeEmail: async(root, args) => {
             const {userId, newEmail, changeEmailPassword} = args;
             const foundUser = await User.findByPk(userId);
+
+            //TODO: Make sure it is actually an email address.
+            //Throw error if not.
+
             const passwordMatch = await bcrypt.compare(
                 changeEmailPassword,
                 foundUser.hashedPassword.toString()
               );
-              if (passwordMatch) {
+            const checkIfEmail = newEmail.match(/([A-Z])*([a-z])*\w.+@+([A-Z])*([a-z])*\w\.([A-Z])*([a-z])*\w/);
+              if (passwordMatch && checkIfEmail) {
             foundUser.email = newEmail;
             await foundUser.save();
             return foundUser;
               } else {
                 //Provide an Apollo error that the user cannot do this.
-                throw new UserInputError('Please enter correct account password.');
+                throw new UserInputError('Please enter a valid email address.');
               }
         },
         changePassword: async(root, args) => {

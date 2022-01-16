@@ -80,9 +80,9 @@ const handleNewPasswordSubmit = (e) => {
     <form onSubmit={handleEmailSubmit}>
         <ul>
            {/* Make sure we have errors in order to avoid race conditions */}
-           {emailError && emailError.graphQLErrors.map(({ message }, i) => (
-         <li key={i}>{message}</li>
-           ))}
+           {emailError && (
+         <li>{emailError.toString()}</li>
+           )}
            {/* {inputErrors && inputErrors.map(({ message }, i) => (
         <li key={i}>{message}</li>
            ))} */}
@@ -111,12 +111,9 @@ const handleNewPasswordSubmit = (e) => {
     <form onSubmit={handleNewPasswordSubmit}>
         <ul>
            {/* Make sure we have errors in order to avoid race conditions */}
-           {error && error.graphQLErrors.map(({ message }, i) => (
-        <li key={i}>{message}</li>
-           ))}
-           {inputErrors && inputErrors.map(({ message }, i) => (
-        <li key={i}>{message}</li>
-           ))}
+           {error && (
+        <li>{error.toString()}</li>
+           )}
          </ul>
          <label className="confirm">
            Confirm old password:
