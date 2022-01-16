@@ -505,8 +505,8 @@ mutation DeclineOffer($applicationId: ID) {
 //Took me forever to troubleshoot this.
 
 const SUBMIT_GAME = gql`
-  mutation SubmitGame($userId: ID!, $title: String!, $description: String!, $gameRulesetId: ID!, $gameTypeId: ID!, $gameLanguageId: ID!) {
-    submitGame(userId: $userId, title: $title, description: $description, gameRulesetId: $gameRulesetId, gameTypeId: $gameTypeId, gameLanguageId: $gameLanguageId) {
+  mutation SubmitGame($userId: ID!, $title: String!, $blurb: String!, $description: String!, $gameRulesetId: ID!, $gameTypeId: ID!, $gameLanguageId: ID!) {
+    submitGame(userId: $userId, title: $title, blurb: $blurb, description: $description, gameRulesetId: $gameRulesetId, gameTypeId: $gameTypeId, gameLanguageId: $gameLanguageId) {
         id
         title
         description

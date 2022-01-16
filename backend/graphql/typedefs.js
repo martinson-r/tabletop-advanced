@@ -249,7 +249,7 @@ const typeDefs = gql`
     editMessage(messageId: ID, userId: ID, editMessageText: String):CountAll
     deleteMessage(messageId: ID, userId: ID): CountAll
     sendNonGameMessages(userId: ID!, messageText: String!, conversationId: ID): CountAll
-    submitGame(userId: ID!, title: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
+    submitGame(userId: ID!, title: String!, blurb: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     submitCharacterCreation(userId: ID, gameId: ID, bio: String, name: String, imageUrl: String): Character
     updateCharacter(characterId: ID, bio: String, imageUrl: String, name: String): Character

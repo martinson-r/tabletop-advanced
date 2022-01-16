@@ -479,29 +479,33 @@ const resolvers = {
         },
 
         submitGame: async(root, args) => {
-                        const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId } = args;
+                        const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId, blurb } = args;
 
-                        //Throw errors if information is missing.
-                        if (!title) {
-                            throw new UserInputError('Please add a title.');
+                        let errors = {};
+
+                        try {
+                        //generate errors if information is missing.
+                        if (!title || title === '' || /^\s*$/.test(title)) {
+                            errors.title = 'Please add a title.';
                         }
-                        if (!description) {
-                            throw new UserInputError('Please add a description.');
+                        if (!description || description === '' || /^\s*$/.test(description)) {
+                            errors.description = 'Please add a longer description.';
                         }
-                        if (!gameLanguageId) {
-                            throw new UserInputError('Please select the language your game is played in.');
-                        }
-                        if (!gameRulesetId) {
-                            throw new UserInputError('Please select a ruleset for your game.');
-                        }
-                        if (!gameTypeId) {
-                            throw new UserInputError('Please select what type of game you are playing.');
+                        if (!blurb || blurb === '' || /^\s*$/.test(blurb)) {
+                            errors.blurb = 'Please add a short blurb.';
                         }
 
-                        else {
-                            const newGame = await Game.create({ hostId: userId, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
+                        if (Object.keys(errors).length > 0) {
+                            // now `errors` will throw to the `catch` block
+                            throw errors;
+                          }
+
+                            const newGame = await Game.create({ hostId: userId, blurb, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
                             return newGame;
-                        }
+                    } catch (err) {
+                        throw new UserInputError('Bad User Input', { errors: err });
+                    }
+
                     },
         changeEmail: async(root, args) => {
             const {userId, newEmail, changeEmailPassword} = args;
