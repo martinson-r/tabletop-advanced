@@ -219,13 +219,15 @@ const resolvers = {
 
             //Check to see if this is a dice roll.
             //Fun with regex
-            const numbers = messageText.match(/(\d+)[Dd](\d+)/);
+            //const numbers = messageText.match(/(\d+)[Dd](\d+)/);
+            const numbers = messageText.match(/^(\/\/roll *)(\d+)[Dd](\d+)/);
 
             if (numbers !== null) {
-                const result = rolldice(numbers[1], numbers[2]);
+                console.log(numbers);
+                const result = rolldice(numbers[2], numbers[3]);
 
                 //push roll results into messageText
-                const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
+                const messageText = `Dice roll result of ${numbers[2]}D${numbers[3]}: ${result}`;
 
                 await Message.create({gameId, messageText, senderId: userId,spectatorChat});
 
