@@ -73,8 +73,9 @@ function SubmitGame() {
 
            {error !== undefined && (
               <ul>
-             <li>{error.graphQLErrors[0].extensions.errors.title}</li>
-             <li>{error.graphQLErrors[0].extensions.errors.blurb}</li>
+              <li>{error.graphQLErrors[0].extensions.errors.title}</li>
+              <li>{error.graphQLErrors[0].extensions.errors.blurb}</li>
+              <li>{error.graphQLErrors[0].extensions.errors.description}</li>
              </ul>
              )}
 

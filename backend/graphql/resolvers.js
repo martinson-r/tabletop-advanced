@@ -555,34 +555,44 @@ const resolvers = {
         },
         joinWaitlist: async(root, args) => {
             //If userId is hostId, do not allow & throw error.
-            if (userId === hostId) {
-                throw new UserInputError('You cannot join the waitlist for your own game.');
-            } else {
+        let errors = {}
+        try {
+
+                const { userId, gameId, whyJoin, charConcept, charName, experience, hostId } = args;
                 //create app
-            const { userId, gameId, whyJoin, charConcept, charName, experience, hostId } = args;
+                if (userId === hostId) {
+                    errors.user = 'You cannot join the waitlist for your own game.';
+                }
 
-            if (!whyJoin) {
-                throw new UserInputError('Please explain why you would like to join this game.');
-            }
+                if (!whyJoin || whyJoin === '' || /^\s*$/.test(whyJoin)) {
+                    errors.whyJoin = 'Please explain why you would like to join this game.';
+                }
 
-            if (!charConcept) {
-                throw new UserInputError('Please explain your character concept or background.');
-            }
+                if (!charConcept || charConcept === '' || /^\s*$/.test(charConcept)) {
+                    errors.charConcept = 'Please explain your character concept or background.';
+                }
 
-            if (!charName) {
-                throw new UserInputError('Please provide a character name.');
-            }
+                if (!charName || charName === '' || /^\s*$/.test(charName)) {
+                    errors.charName = 'Please provide a character name.';
+                }
 
-            if (!experience) {
-                throw new UserInputError('Please describe your level of experience playing tabletop RPGs and play by post games.');
-            } else {
+                if (!experience || experience === '' || /^\s*$/.test(experience)) {
+                    errors.experience = 'Please describe your level of experience playing tabletop RPGs and play by post games.';
+                }
+                if (Object.keys(errors).length > 0) {
+                    // now `errors` will throw to the `catch` block
+                    throw errors;
+                }
                 const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
 
-            //Add app to waitlist
-            await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
-            return newApp;
+                //Add app to waitlist
+                await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
+                return newApp;
+
+            } catch(err) {
+                throw new UserInputError('Bad User Input', { errors: err });
             }
-            }
+
         },
 
 
@@ -640,10 +650,36 @@ const resolvers = {
          },
 
         editWaitlistApp: async(root, args) => {
-            const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
-            await Application.update({gameId, whyJoin, charConcept, charName, experience}, {where: { id: applicationId }});
-            const returnApp = await Application.findByPk(applicationId);
-            return returnApp;
+            let errors = {};
+            try {
+                const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
+                if (!whyJoin || whyJoin === '' || /^\s*$/.test(whyJoin)) {
+                    errors.whyJoin = 'Please explain why you would like to join this game.';
+                }
+
+                if (!charConcept || charConcept === '' || /^\s*$/.test(charConcept)) {
+                    errors.charConcept = 'Please explain your character concept or background.';
+                }
+
+                if (!charName || charName === '' || /^\s*$/.test(charName)) {
+                    errors.charName = 'Please provide a character name.';
+                }
+
+                if (!experience || experience === '' || /^\s*$/.test(experience)) {
+                    errors.experience = 'Please describe your level of experience playing tabletop RPGs and play by post games.';
+                }
+                if (Object.keys(errors).length > 0) {
+                    // now `errors` will throw to the `catch` block
+                    throw errors;
+                }
+
+                await Application.update({gameId, whyJoin, charConcept, charName, experience}, {where: { id: applicationId }});
+                const returnApp = await Application.findByPk(applicationId);
+                return returnApp;
+            } catch(err) {
+                throw new UserInputError("Bad User Input", {errors: err})
+            }
+
         },
 
         approveApplication: async(root, args) => {

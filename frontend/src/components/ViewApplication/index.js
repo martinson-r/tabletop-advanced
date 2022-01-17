@@ -33,7 +33,7 @@ function ViewApplication() {
     const [getApplication, { error, loading, data }] = useLazyQuery(GET_APPLICATION);
     const [approveApplication, {data:approveData}] = useMutation(APPROVE_APPLICATION);
     const [ignoreApplication, {data:ignoreData}] = useMutation(IGNORE_APPLICATION);
-    const [editWaitlistApp, {data: editWaitlistData}] = useMutation(EDIT_WAITLIST_APP, { variables: { applicationId, userId, charName, charConcept, experience, whyJoin, gameId } } );
+    const [editWaitlistApp, {data: editWaitlistData, error: editWaitlistError}] = useMutation(EDIT_WAITLIST_APP, { variables: { applicationId, userId, charName, charConcept, experience, whyJoin, gameId }, errorPolicy: 'all' } );
 
     useEffect(() => {
         getApplication({ variables: {gameId, applicationId}})
@@ -98,6 +98,11 @@ function ViewApplication() {
         {application.ignored.toString() === 'true' && application.accepted.toString() !== 'true' && (<i>This application has been ignored.</i>)}
         {/* Display text or form depending on if the applicant wishes to edit the application. */}
         {editApplication.toString() === 'false' && (<div>
+          {editWaitlistError && editWaitlistError !== undefined && (editWaitlistError.graphQLErrors[0].extensions.errors.whyJoin)}
+         {editWaitlistError && editWaitlistError !== undefined && (editWaitlistError.graphQLErrors[0].extensions.errors.charConcept)}
+         {editWaitlistError && editWaitlistError !== undefined && (editWaitlistError.graphQLErrors[0].extensions.errors.charName)}
+         {editWaitlistError && editWaitlistError !== undefined && (editWaitlistError.graphQLErrors[0].extensions.errors.experience)}
+
         <p><b>Why Join:</b> {application.whyJoin}</p>
         <p><b>Experience:</b> {application.experience}</p>
         <p><b>Character Name:</b> {application.charName}</p>
