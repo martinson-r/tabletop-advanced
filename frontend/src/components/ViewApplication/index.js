@@ -33,7 +33,7 @@ function ViewApplication() {
     const [getApplication, { error, loading, data }] = useLazyQuery(GET_APPLICATION);
     const [approveApplication, {data:approveData}] = useMutation(APPROVE_APPLICATION);
     const [ignoreApplication, {data:ignoreData}] = useMutation(IGNORE_APPLICATION);
-    const [editWaitlistApp, {data: editWaitlistData}] = useMutation(EDIT_WAITLIST_APP, { variables: { applicationId, userId, charName, charConcept, experience, whyJoin, gameId } } );
+    const [editWaitlistApp, {data: editWaitlistData, error: editWaitlistError}] = useMutation(EDIT_WAITLIST_APP, { variables: { applicationId, userId, charName, charConcept, experience, whyJoin, gameId }, errorPolicy: 'all' } );
 
     useEffect(() => {
         getApplication({ variables: {gameId, applicationId}})
@@ -46,7 +46,7 @@ function ViewApplication() {
     },[sessionUser]);
 
     useEffect(() => {
-        if (data !== undefined) {
+        if (!loading && data) {
             setApplication(data.getApplication[0]);
             // Check if application object is not null, then check if user is host or applicant
             // If not, push them to main page.
@@ -59,7 +59,7 @@ function ViewApplication() {
     },[data]);
 
     useEffect(() => {
-        if (Object.keys(application).length !== 0) {
+        if (!loading && Object.keys(application).length !== 0) {
             setCharName(application.charName);
             setCharConcept(application.charConcept);
             setWhyJoin(application.whyJoin);
@@ -82,7 +82,6 @@ function ViewApplication() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setErrors([]);
         editWaitlistApp(applicationId, userId, charName, charConcept, experience, whyJoin);
         setEditApplication(false);
       };
@@ -98,6 +97,11 @@ function ViewApplication() {
         {application.ignored.toString() === 'true' && application.accepted.toString() !== 'true' && (<i>This application has been ignored.</i>)}
         {/* Display text or form depending on if the applicant wishes to edit the application. */}
         {editApplication.toString() === 'false' && (<div>
+          {editWaitlistError && editWaitlistError !== undefined && (editWaitlistError.graphQLErrors[0].extensions.errors.whyJoin)}
+         {editWaitlistError && editWaitlistError !== undefined && (editWaitlistError.graphQLErrors[0].extensions.errors.charConcept)}
+         {editWaitlistError && editWaitlistError !== undefined && (editWaitlistError.graphQLErrors[0].extensions.errors.charName)}
+         {editWaitlistError && editWaitlistError !== undefined && (editWaitlistError.graphQLErrors[0].extensions.errors.experience)}
+
         <p><b>Why Join:</b> {application.whyJoin}</p>
         <p><b>Experience:</b> {application.experience}</p>
         <p><b>Character Name:</b> {application.charName}</p>

@@ -43,6 +43,16 @@ const resolvers = {
             });
 
         },
+        gamesWithRuleset: (obj, args, context, info) => {
+            console.log(args);
+            const {rulesetid} = args
+
+            console.log('rule set id', rulesetid);
+            return Game.findAll({
+                where: { ruleSetId: rulesetid },
+                include: [{model: User, as: "host"}]
+            });
+        },
         rulesets: (obj, args, context, info) => {
 
             return Ruleset.findAll();
@@ -219,13 +229,15 @@ const resolvers = {
 
             //Check to see if this is a dice roll.
             //Fun with regex
-            const numbers = messageText.match(/(\d+)[Dd](\d+)/);
+            //const numbers = messageText.match(/(\d+)[Dd](\d+)/);
+            const numbers = messageText.match(/^(\/\/roll *)(\d+)[Dd](\d+)/);
 
             if (numbers !== null) {
-                const result = rolldice(numbers[1], numbers[2]);
+                console.log(numbers);
+                const result = rolldice(numbers[2], numbers[3]);
 
                 //push roll results into messageText
-                const messageText = `Dice roll result of ${numbers[1]}D${numbers[2]}: ${result}`;
+                const messageText = `Dice roll result of ${numbers[2]}D${numbers[3]}: ${result}`;
 
                 await Message.create({gameId, messageText, senderId: userId,spectatorChat});
 
@@ -234,7 +246,8 @@ const resolvers = {
                 pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
             } else if (numbers === null) {
 
-                if (messageText === '' || !messageText) {
+                //check if string is empty or all whitespace
+                if (messageText === '' || !messageText || /^\s*$/.test(messageText)) {
                     throw new UserInputError('Message cannot be blank.');
                 } else {
             const senderId = userId;
@@ -254,7 +267,7 @@ const resolvers = {
 
         const { conversationId, messageText, userId, offset } = args;
 
-        if (messageText === '' || !messageText) {
+        if (messageText === '' || !messageText || /^\s*$/.test(messageText)) {
             throw new UserInputError('Message cannot be blank.');
         } else {
         const senderId = userId;
@@ -476,24 +489,53 @@ const resolvers = {
         },
 
         submitGame: async(root, args) => {
-                        const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId } = args;
-                        const newGame = await Game.create({ hostId: userId, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
-                        return newGame;
+                        const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId, blurb } = args;
+
+                        let errors = {};
+
+                        try {
+                        //generate errors if information is missing.
+                        if (!title || title === '' || /^\s*$/.test(title)) {
+                            errors.title = 'Please add a title.';
+                        }
+                        if (!description || description === '' || /^\s*$/.test(description)) {
+                            errors.description = 'Please add a longer description.';
+                        }
+                        if (!blurb || blurb === '' || /^\s*$/.test(blurb)) {
+                            errors.blurb = 'Please add a short blurb.';
+                        }
+
+                        if (Object.keys(errors).length > 0) {
+                            // now `errors` will throw to the `catch` block
+                            throw errors;
+                          }
+
+                            const newGame = await Game.create({ hostId: userId, blurb, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
+                            return newGame;
+                    } catch (err) {
+                        throw new UserInputError('Bad User Input', { errors: err });
+                    }
+
                     },
         changeEmail: async(root, args) => {
             const {userId, newEmail, changeEmailPassword} = args;
             const foundUser = await User.findByPk(userId);
+
+            //TODO: Make sure it is actually an email address.
+            //Throw error if not.
+
             const passwordMatch = await bcrypt.compare(
                 changeEmailPassword,
                 foundUser.hashedPassword.toString()
               );
-              if (passwordMatch) {
+            const checkIfEmail = newEmail.match(/([A-Z])*([a-z])*\w.+@+([A-Z])*([a-z])*\w\.([A-Z])*([a-z])*\w/);
+              if (passwordMatch && checkIfEmail) {
             foundUser.email = newEmail;
             await foundUser.save();
             return foundUser;
               } else {
                 //Provide an Apollo error that the user cannot do this.
-                throw new UserInputError('Please enter correct account password.');
+                throw new UserInputError('Please enter a valid email address.');
               }
         },
         changePassword: async(root, args) => {
@@ -522,17 +564,50 @@ const resolvers = {
               return user;
         },
         joinWaitlist: async(root, args) => {
-            //TODO: If userId is hostId, do not allow & throw error.
+            //If userId is hostId, do not allow & throw error.
+        let errors = {}
+        try {
 
-            //create app
-            const { userId, gameId, whyJoin, charConcept, charName, experience, hostId } = args;
-            const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
+                const { userId, gameId, whyJoin, charConcept, charName, experience, hostId } = args;
+                //create app
+                if (userId === hostId) {
+                    errors.user = 'You cannot join the waitlist for your own game.';
+                }
 
-            //Add app to waitlist
-            await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
-            return newApp;
+                if (!whyJoin || whyJoin === '' || /^\s*$/.test(whyJoin)) {
+                    errors.whyJoin = 'Please explain why you would like to join this game.';
+                }
+
+                if (!charConcept || charConcept === '' || /^\s*$/.test(charConcept)) {
+                    errors.charConcept = 'Please explain your character concept or background.';
+                }
+
+                if (!charName || charName === '' || /^\s*$/.test(charName)) {
+                    errors.charName = 'Please provide a character name.';
+                }
+
+                if (!experience || experience === '' || /^\s*$/.test(experience)) {
+                    errors.experience = 'Please describe your level of experience playing tabletop RPGs and play by post games.';
+                }
+                if (Object.keys(errors).length > 0) {
+                    // now `errors` will throw to the `catch` block
+                    throw errors;
+                }
+                const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
+
+                //Add app to waitlist
+                await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
+                return newApp;
+
+            } catch(err) {
+                throw new UserInputError('Bad User Input', { errors: err });
+            }
+
         },
 
+
+        //Note that character creation fields can be incomplete since
+        //creating a character can take time.
         submitCharacterCreation: async(root, args) => {
             const { userId, gameId, bio, name, imageUrl } = args;
             const character = await Character.create({userId, gameId, bio, name, imageUrl});
@@ -585,10 +660,36 @@ const resolvers = {
          },
 
         editWaitlistApp: async(root, args) => {
-            const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
-            await Application.update({gameId, whyJoin, charConcept, charName, experience}, {where: { id: applicationId }});
-            const returnApp = await Application.findByPk(applicationId);
-            return returnApp;
+            let errors = {};
+            try {
+                const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
+                if (!whyJoin || whyJoin === '' || /^\s*$/.test(whyJoin)) {
+                    errors.whyJoin = 'Please explain why you would like to join this game.';
+                }
+
+                if (!charConcept || charConcept === '' || /^\s*$/.test(charConcept)) {
+                    errors.charConcept = 'Please explain your character concept or background.';
+                }
+
+                if (!charName || charName === '' || /^\s*$/.test(charName)) {
+                    errors.charName = 'Please provide a character name.';
+                }
+
+                if (!experience || experience === '' || /^\s*$/.test(experience)) {
+                    errors.experience = 'Please describe your level of experience playing tabletop RPGs and play by post games.';
+                }
+                if (Object.keys(errors).length > 0) {
+                    // now `errors` will throw to the `catch` block
+                    throw errors;
+                }
+
+                await Application.update({gameId, whyJoin, charConcept, charName, experience}, {where: { id: applicationId }});
+                const returnApp = await Application.findByPk(applicationId);
+                return returnApp;
+            } catch(err) {
+                throw new UserInputError("Bad User Input", {errors: err})
+            }
+
         },
 
         approveApplication: async(root, args) => {

@@ -27,9 +27,8 @@ function JoinWaitList({...props}) {
     const { loading: loadGame, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { userId, gameId }})
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
 
-    const [submitWaitlistApp] = useMutation(SUBMIT_WAITLIST_APP, { variables: { userId, charName, charConcept, experience, whyJoin, gameId, hostId }, onCompleted: submitWaitlistApp => { history.push(`/game/${gameId}/application/${submitWaitlistApp.joinWaitlist.id}`)} } );
+    const [submitWaitlistApp, {error}] = useMutation(SUBMIT_WAITLIST_APP, { variables: { userId, charName, charConcept, experience, whyJoin, gameId, hostId }, errorPolicy: 'all', onCompleted: submitWaitlistApp => { if (submitWaitlistApp.joinWaitlist !== null) {history.push(`/game/${gameId}/application/${submitWaitlistApp.joinWaitlist.id}`)}} } );
 
-    const [errors, setErrors] = useState([]);
 
     useEffect(() => {
       if (gameData !== undefined) {
@@ -40,7 +39,6 @@ function JoinWaitList({...props}) {
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      setErrors([]);
       submitWaitlistApp(userId, charName, charConcept, experience, whyJoin, hostId)
     };
 
@@ -82,12 +80,12 @@ function JoinWaitList({...props}) {
 
         <form onSubmit={handleSubmit}>
 
-
-         <ul>
-           {errors.map((error, idx) => (
-             <li key={idx}>{error}</li>
-           ))}
-         </ul>
+         {error !== undefined && (console.log(error.graphQLErrors))}
+         {error && error !== undefined && (error.graphQLErrors[0].extensions.errors.user)}
+         {error && error !== undefined && (error.graphQLErrors[0].extensions.errors.whyJoin)}
+         {error && error !== undefined && (error.graphQLErrors[0].extensions.errors.charConcept)}
+         {error && error !== undefined && (error.graphQLErrors[0].extensions.errors.charName)}
+         {error && error !== undefined && (error.graphQLErrors[0].extensions.errors.experience)}
          <label>
            Character Name:
            <input

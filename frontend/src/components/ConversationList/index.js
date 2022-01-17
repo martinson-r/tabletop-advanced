@@ -30,7 +30,6 @@ function ConversationList() {
     }, [sessionUser]);
 
     useEffect(() => {
-        console.log("Ran!");
         if (userId !== undefined && userId !== null) {
             getCurrentNonGameConvos({ variables: { userId }});
         }

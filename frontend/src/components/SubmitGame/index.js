@@ -3,6 +3,7 @@ import * as sessionActions from "../../store/session";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
+import { onError } from "@apollo/client/link/error";
 
 
 import {
@@ -20,6 +21,7 @@ function SubmitGame() {
 
     //Actual user selections
     const [title, setTitle] = useState("");
+    const [blurb, setBlurb] = useState("");
     const [description, setDescription] = useState("");
     const [gameTypeId, setGameTypeId] = useState(1);
     const [gameLanguageId, setGameLanguageId] = useState(1);
@@ -34,20 +36,21 @@ function SubmitGame() {
     const updateGameRulesetId = (e) => setGameRulesetId(e.target.value);
 
      //grab available gameType, language, etc info from database
-     const { loading, error, data } = useQuery(GET_GAME_CREATION_INFO);
+     const { loading, error: gameCreationError, data } = useQuery(GET_GAME_CREATION_INFO);
 
      //We also need to grab the data GraphQL returns.
      //We have to use a callback to get that sweet, sweet data out.
      //Then, we redirect the user to their new game.
      //We could also do a useEffect with a dependency, I guess.
-    const [submitGame] = useMutation(SUBMIT_GAME, { variables: { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId }, onCompleted: submitGame => { history.push(`/game/${submitGame.submitGame.id}`) }});
+    const [submitGame, {error}] = useMutation(SUBMIT_GAME, { variables: { userId, title, blurb, description, gameLanguageId, gameRulesetId, gameTypeId }, errorPolicy: 'all', onCompleted: submitGame => { if (submitGame.submitGame !== null) { history.push(`/game/${submitGame.submitGame.id}`) } }});
 
-    const [errors, setErrors] = useState([]);
+    // const [errors, setErrors] = useState([]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      setErrors([]);
-      submitGame(userId, title, description, gameLanguageId, gameRulesetId, gameTypeId);
+      submitGame(userId, title, description, gameLanguageId, gameRulesetId, gameTypeId)
+      // .catch((error) => {
+      //   console.log("Error: " + error)})
     };
 
     useEffect(() => {
@@ -66,11 +69,16 @@ function SubmitGame() {
         <div className="container">
           <h2>Start a Game:</h2>
       {data && <form onSubmit={handleSubmit}>
-         <ul>
-           {errors.map((error, idx) => (
-             <li key={idx}>{error}</li>
-           ))}
-         </ul>
+
+
+           {error !== undefined && (
+              <ul>
+              <li>{error.graphQLErrors[0].extensions.errors.title}</li>
+              <li>{error.graphQLErrors[0].extensions.errors.blurb}</li>
+              <li>{error.graphQLErrors[0].extensions.errors.description}</li>
+             </ul>
+             )}
+
          <label>
            Title:
            </label>
@@ -78,6 +86,16 @@ function SubmitGame() {
              type="text"
              value={title}
              onChange={(e) => setTitle(e.target.value)}
+             required
+           />
+
+          <label>
+           Short Blurb:
+           </label>
+           <input
+             type="text"
+             value={blurb}
+             onChange={(e) => setBlurb(e.target.value)}
              required
            />
 

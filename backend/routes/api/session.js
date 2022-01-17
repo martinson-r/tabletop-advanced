@@ -88,7 +88,16 @@ const handleValidationErrors = (req, res, next) => {
   const loginValidators = [
     check("userName")
       .exists({ checkFalsy: true })
-      .withMessage("Please enter your user name."),
+      .withMessage("Please enter your user name.")
+      .custom((value) => {
+        return db.User.findOne({ where: { userName: value } }).then((user) => {
+          if (!user) {
+            return Promise.reject(
+              "User not found."
+            );
+          }
+        })
+      }),
     check("password")
       .exists({ checkFalsy: true })
       .withMessage("Please enter your password."),
