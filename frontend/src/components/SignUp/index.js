@@ -31,8 +31,8 @@ function SignUp() {
 
     return (
       <>
-      <div className="login-form--body">
-        <h1>Log In</h1>
+      <div className="login-form--body gray-backdrop">
+        <h1>Sign Up</h1>
         <form onSubmit={handleSubmit}>
           <ul>
             {errors.map((error, idx) => (
