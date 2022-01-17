@@ -74,14 +74,21 @@ function Home() {
 
         //Just turning data.games into something easier to work with
         const gameData = data.games;
-        console.log('data.rulesets', data);
-        let ruleSetsData = [...rulesetsData.rulesets];
-        console.log('rulesets', ruleSetsData)
-        ruleSetsData.sort(function(a, b){
-            console.log('RULESET', a)
-if(a.ruleset < b.ruleset) { return -1; }
-if(a.ruleset > b.ruleset) { return 1; }
-return 0});
+
+        //make copy of ruleSetsData so that we are able to sort it
+
+            let ruleSetsData;
+
+            if (rulesetsData !== undefined ) {
+                //Sort rulesets alphabetically
+                ruleSetsData = [...rulesetsData.rulesets];
+                ruleSetsData.sort(function(a, b){
+                if(a.ruleset < b.ruleset) { return -1; }
+                if(a.ruleset > b.ruleset) { return 1; }
+                return 0});
+
+            }
+
         const gameId = 1;
 
      return (
