@@ -29,7 +29,7 @@ function Login() {
 
     return (
       <>
-      <div className="login-form--body">
+      <div className="login-form--body gray-backdrop">
         <h1>Log In</h1>
         <form onSubmit={handleSubmit}>
           <ul>
