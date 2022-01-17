@@ -19,6 +19,7 @@ import Character from "./components/Character";
 import CreateCharacter from "./components/CreateCharacter";
 import ViewApplication from "./components/ViewApplication";
 import StartNewMessage from "./components/StartNewMessage"
+import RuleSetPage from "./components/RuleSetPage";
 import * as sessionActions from "./store/session";
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
         <Route path="/game/:gameId/create-character" component={CreateCharacter} exact={true}></Route>
         <Route path="/search/:text" component={SearchResults} exact={true}></Route>
         <Route path="/conversations" component={ConversationList}></Route>
+        <Route path="/rulesets/:rulesetid" component={RuleSetPage}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

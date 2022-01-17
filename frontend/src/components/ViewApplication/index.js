@@ -46,7 +46,7 @@ function ViewApplication() {
     },[sessionUser]);
 
     useEffect(() => {
-        if (data !== undefined) {
+        if (!loading && data) {
             setApplication(data.getApplication[0]);
             // Check if application object is not null, then check if user is host or applicant
             // If not, push them to main page.
@@ -59,7 +59,7 @@ function ViewApplication() {
     },[data]);
 
     useEffect(() => {
-        if (Object.keys(application).length !== 0) {
+        if (!loading && Object.keys(application).length !== 0) {
             setCharName(application.charName);
             setCharConcept(application.charConcept);
             setWhyJoin(application.whyJoin);
@@ -82,7 +82,6 @@ function ViewApplication() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setErrors([]);
         editWaitlistApp(applicationId, userId, charName, charConcept, experience, whyJoin);
         setEditApplication(false);
       };

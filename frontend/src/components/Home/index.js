@@ -63,13 +63,13 @@ function Home() {
     }
 
 
-    if (!data) {
+    if (!data && loading) {
         return (
         <p>No games found. :(</p>
         )
     }
 
-    if (data) {
+    if (data && !loading) {
 
         //Just turning data.games into something easier to work with
         const gameData = data.games;
@@ -124,7 +124,7 @@ function Home() {
                     {/* TODO: fetch all rulesets from database and map containers */}
                     <div className="game-cards-container">
                        {rulesetsData !==undefined && (rulesetsData.rulesets.map((ruleset) =>  <div key={uuidv4()} className="game-card">
-                            <p>{ruleset.ruleset}</p>
+                       <Link to={`/rulesets/${ruleset.id}`}><p>{ruleset.ruleset}</p></Link>
                         </div>))}
                     </div>
 

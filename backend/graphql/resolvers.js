@@ -43,6 +43,16 @@ const resolvers = {
             });
 
         },
+        gamesWithRuleset: (obj, args, context, info) => {
+            console.log(args);
+            const {rulesetid} = args
+
+            console.log('rule set id', rulesetid);
+            return Game.findAll({
+                where: { ruleSetId: rulesetid },
+                include: [{model: User, as: "host"}]
+            });
+        },
         rulesets: (obj, args, context, info) => {
 
             return Ruleset.findAll();
