@@ -19,7 +19,7 @@ function RuleSetPage() {
     //TODO: Query to get all games with ruleset matching ID from params
     return (
         //TODO: map of all games from returned data
-        <div>{data && !loading && (data.gamesWithRuleset.map((game) => <p>{game.title}</p>))}</div>
+        <div>{data && !loading && (data.gamesWithRuleset.map((game) => <Link to={`/game/${game.id}`}><p>{game.title}</p></Link>))}</div>
     )
 }
 
