@@ -24,6 +24,7 @@ function Home() {
     const { loading: rulesetsLoading, error: rulesetsError, data: rulesetsData } = useQuery(GET_RULESETS);
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
+    const [sortedData, setSortedData] = useState([]);
 
     //TODO: Grab most recent/popular game and feed it into GameMessages
 
@@ -73,7 +74,14 @@ function Home() {
 
         //Just turning data.games into something easier to work with
         const gameData = data.games;
-        const ruleSetsData = data.rulesets;
+        console.log('data.rulesets', data);
+        let ruleSetsData = [...rulesetsData.rulesets];
+        console.log('rulesets', ruleSetsData)
+        ruleSetsData.sort(function(a, b){
+            console.log('RULESET', a)
+if(a.ruleset < b.ruleset) { return -1; }
+if(a.ruleset > b.ruleset) { return 1; }
+return 0});
         const gameId = 1;
 
      return (
@@ -123,11 +131,10 @@ function Home() {
                         <h2 className="game-filters-heading">Games by Ruleset:</h2>
                     {/* TODO: fetch all rulesets from database and map containers */}
                     <div className="game-cards-container">
-                       {rulesetsData !==undefined && (rulesetsData.rulesets.map((ruleset) =>  <Link to={`/rulesets/${ruleset.id}`}><div key={uuidv4()} className="game-card">
+                       {ruleSetsData !==undefined && (ruleSetsData.map((ruleset) =>  <Link to={`/rulesets/${ruleset.id}`}><div key={uuidv4()} className="game-card">
                        <p>{ruleset.ruleset}</p>
                         </div></Link>))}
                     </div>
-
                 </div>
                 <div>
                     {/* TODO: add Genres to database */}
