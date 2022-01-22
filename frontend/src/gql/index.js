@@ -202,9 +202,11 @@ query GetCharacter($userId: ID, $gameId: ID) {
 const GET_CHARACTER_BY_ID = gql`
 query GetCharacterById($characterId: ID) {
     characterById(characterId: $characterId) {
+        characterSheetId
         name
         bio
         imageUrl
+        characterSheetId
         User {
             userName
             id
@@ -229,6 +231,7 @@ query GetCharacterSheetById($charactersheetid: ID) {
 const GET_CHARACTERSHEET_LIST_BY_PLAYER = gql`
 query GetCharacterSheetListByPlayer($playerId: ID) {
     playercharactersheets(playerId: $playerId) {
+        id
         name
         class
     }
@@ -575,12 +578,13 @@ const SUBMIT_CHARACTER_CREATION = gql`
 `;
 
 const UPDATE_CHARACTER = gql`
-  mutation UpdateCharacter($characterId: ID, $bio: String, $imageUrl: String, $name: String) {
-    updateCharacter(characterId: $characterId, bio: $bio, imageUrl: $imageUrl, name: $name) {
+  mutation UpdateCharacter($characterId: ID, $bio: String, $imageUrl: String, $name: String, $characterSheetId: ID) {
+    updateCharacter(characterId: $characterId, bio: $bio, imageUrl: $imageUrl, name: $name, characterSheetId: $characterSheetId) {
                 id
                 bio
                 imageUrl
                 name
+                characterSheetId
     }
 }
 `;

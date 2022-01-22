@@ -309,7 +309,8 @@ const typeDefs = gql`
     bio: String,
     User: User,
     Game: Game,
-    gameId: ID
+    gameId: ID,
+    characterSheetId: ID
   }
   type Waitlist {
       id: ID,
@@ -328,7 +329,7 @@ const typeDefs = gql`
     submitGame(userId: ID!, title: String!, blurb: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     submitCharacterCreation(userId: ID, gameId: ID, bio: String, name: String, imageUrl: String): Character
-    updateCharacter(characterId: ID, bio: String, imageUrl: String, name: String): Character
+    updateCharacter(characterId: ID, bio: String, imageUrl: String, name: String, characterSheetId: ID): Character
     updateBio(currentUserId: ID, userId: ID, bio: String, avatarUrl: String, pronouns: String, firstName: String): AboutMe
     updateGame(gameId: ID, userId: ID, title: String, blurb: String, details: String): Game
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User

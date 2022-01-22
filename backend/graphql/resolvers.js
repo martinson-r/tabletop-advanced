@@ -620,9 +620,9 @@ const resolvers = {
             return character;
         },
         updateCharacter: async(root, args) => {
-            const {characterId, bio, name, imageUrl} = args;
+            const {characterId, bio, name, imageUrl, characterSheetId} = args;
             const characterToUpdate = await Character.findByPk(characterId);
-            await characterToUpdate.update({bio, name, imageUrl});
+            await characterToUpdate.update({bio, name, imageUrl, characterSheetId});
             const updatedCharacter = await Character.findByPk(characterId);
             return updatedCharacter;
         },

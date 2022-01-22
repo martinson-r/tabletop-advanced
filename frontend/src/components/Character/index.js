@@ -2,53 +2,67 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
-    useQuery, useMutation
+    useQuery, useMutation, useLazyQuery
   } from "@apollo/client";
-import { GET_CHARACTER_BY_ID, UPDATE_CHARACTER } from "../../gql"
+import { GET_CHARACTER_BY_ID, UPDATE_CHARACTER, GET_CHARACTERSHEET_LIST_BY_PLAYER } from "../../gql"
 import './character.css';
+import { v4 as uuidv4 } from 'uuid';
 
 function Character() {
 // Grab our character
 const { characterId } = useParams();
 const sessionUser = useSelector((state) => state.session.user);
 const [userId, setUserId] = useState(null);
+const [playerId, setPlayerId] = useState(null);
 const [name, setName] = useState("");
 const [bio, setBio] = useState("");
 const [imageUrl, setImageUrl] = useState("");
+const [characterSheetId,setCharacterSheetId] = useState(0);
+const [characterSheets, setCharacterSheets] = useState([]);
 
-
+const updateCharacterSheetId = (e) => setCharacterSheetId(e.target.value);
 
 // Note: include user and game so if someone has gone directly to char, they can
 // see what user plays them and game they are in
 const { data } = useQuery(GET_CHARACTER_BY_ID, { variables: { characterId } });
 const [updateCharacter, { data: updatedData }] = useMutation(UPDATE_CHARACTER);
+const { data: characterSheetData } = useQuery(GET_CHARACTERSHEET_LIST_BY_PLAYER, { variables: { playerId }});
 
 useEffect(() => {
     setUserId(sessionUser.id);
+    setPlayerId(sessionUser.id);
     if (data !== undefined) {
         if (data.characterById) {
             setName(data.characterById.name);
             setBio(data.characterById.bio);
             setImageUrl(data.characterById.imageUrl);
+            if (data.characterSheetId !== null) {
+                setCharacterSheetId(data.characterSheetId);
+            }
         }
     }
-
 },[sessionUser, data]);
+
+useEffect(() => {
+    if (characterSheetData) {
+            setCharacterSheets(characterSheetData.playercharactersheets);
+    }
+}, [characterSheetData])
 
 useEffect(() => {
     if (updatedData) {
         setName(updatedData.updateCharacter.name);
         setBio(updatedData.updateCharacter.bio);
         setImageUrl(updatedData.updateCharacter.imageUrl);
-        console.log('name', name)
+        setCharacterSheetId(updatedData.updateCharacter.characterSheetId);
     }
 
 },[updatedData])
 
 const handleSubmit = (e) => {
     e.preventDefault();
-    // setErrors([]);
-    updateCharacter({ variables: { characterId, name, bio, imageUrl } });
+    updateCharacter({ variables: { characterId, name, bio, imageUrl, characterSheetId } });
+
 
     const description = document.getElementById("character-description");
     const form = document.getElementById("edit-form");
@@ -117,6 +131,12 @@ if (form.classList.contains("edit-form-hidden")) {
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 required/>
+                {/* Check to see if there are any character sheets available to choose from */}
+                {characterSheets.length > 0 && (<div><label>Available character sheets:</label>
+                <select value={characterSheetId} onChange={updateCharacterSheetId}>
+                {characterSheets.map(sheet => <option key={uuidv4()} value={sheet.id}>{sheet.name}</option>)}
+             </select></div>)}
+                <div><p>Create New Character Sheet</p></div>
                 <button type="submit">Save</button>
             </form>
             </div>
