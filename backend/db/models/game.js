@@ -69,7 +69,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     languageId: DataTypes.INTEGER,
-    ruleSetId: DataTypes.INTEGER
+    ruleSetId: DataTypes.INTEGER,
+    genreId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Game',

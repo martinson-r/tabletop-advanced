@@ -227,8 +227,8 @@ query GetCharacterSheetById($charactersheetid: ID) {
 `
 
 const GET_CHARACTERSHEET_LIST_BY_PLAYER = gql`
-query GetCharacterSheetListByPlayer($playerid: ID) {
-    playercharactersheets(playerid: $playerid) {
+query GetCharacterSheetListByPlayer($playerId: ID) {
+    playercharactersheets(playerId: $playerId) {
         name
         class
     }
@@ -536,7 +536,7 @@ mutation DeclineOffer($applicationId: ID) {
 
 const CREATE_CHARACTERSHEET = gql`
 mutation CreateCharacterSheet($userId: ID, $characterClass: String, $name: String) {
-    createCharacterSheet(playerid: $userId, characterClass: $characterClass, name: $name) {
+    createCharacterSheet(playerId: $userId, characterClass: $characterClass, name: $name) {
         name
         class
     }
@@ -731,6 +731,7 @@ export { GET_ACCOUNTS,
         GET_CHARACTER,
         GET_CHARACTER_BY_ID,
         GET_CHARACTERSHEET_BY_ID,
+        GET_CHARACTERSHEET_LIST_BY_PLAYER,
         CREATE_CHARACTERSHEET,
         UPDATE_CHARACTER,
         UPDATE_BIO,

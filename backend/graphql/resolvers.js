@@ -75,7 +75,8 @@ const resolvers = {
 
         playercharactersheets:(obj, args, context, info) => {
             const { playerId } = args;
-            return CharacterSheet.findAll({where: {playerId}});
+            console.log(args);
+            return CharacterSheet.findAll({where: { playerId} });
         },
 
         messages: (obj, args, context, info) => {
@@ -727,11 +728,10 @@ const resolvers = {
         },
 
         createCharacterSheet: async(root, args) => {
-            const {playerid, name, characterClass} = args;
-
-            console.log(args);
-
-            const characterSheet = await CharacterSheet.create({playerid, name, class: characterClass});
+            const {playerId, name, characterClass} = args;
+            let age = playerId;
+            console.log(args)
+            const characterSheet = await CharacterSheet.create({age, playerId: 4, name, class: characterClass});
             return characterSheet;
         }
     },

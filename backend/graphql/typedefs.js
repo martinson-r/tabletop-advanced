@@ -27,7 +27,7 @@ const typeDefs = gql`
     simpleSearch(text: String): resultsArray
     characterById(characterId: ID): Character
     charactersheet(charactersheetid: ID): CharacterSheet
-    playercharactersheets(playerid: ID): [CharacterSheet]
+    playercharactersheets(playerId: ID): [CharacterSheet]
   }
   type GameCreationInfo {
     languages: [Language],
@@ -340,7 +340,7 @@ const typeDefs = gql`
     ignoreApplication(applicationId: ID): [Application]
     declineOffer(applicationId: ID): Application
     acceptOffer(applicationId: ID, gameId: ID, userId: ID): Application
-    createCharacterSheet(playerid: ID, name: String, characterClass: String): CharacterSheet
+    createCharacterSheet(playerId: ID, name: String, characterClass: String): CharacterSheet
     editWaitlistApp(applicationId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
   }
   type Subscription {

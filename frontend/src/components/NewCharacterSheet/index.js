@@ -22,6 +22,7 @@ function NewCharacterSheet() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log('userId', userId)
         createCharacterSheet({ variables: { name, userId, characterClass } });
         // setErrors([]);
     }

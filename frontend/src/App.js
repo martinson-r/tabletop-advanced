@@ -58,7 +58,7 @@ function App() {
         <Route path="/conversations" component={ConversationList}></Route>
         <Route path="/rulesets/:rulesetid" component={RuleSetPage}></Route>
         <Route path="/charactersheets/new" component={NewCharacterSheet}></Route>
-        <Route path="/charactersheets/list/:playerid" component={CharacterSheetList}></Route>
+        <Route path="/charactersheets/list/:playerId" component={CharacterSheetList}></Route>
         <Route path="/charactersheets/:charactersheetid" component={CharacterSheet}></Route>
 
         <Route path="/" component={Home}></Route>

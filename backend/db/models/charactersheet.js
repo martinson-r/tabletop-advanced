@@ -82,7 +82,8 @@ module.exports = (sequelize, DataTypes) => {
     augmentations: DataTypes.STRING,
     cyberdeck: DataTypes.STRING,
     vehicle: DataTypes.STRING,
-    other: DataTypes.STRING
+    other: DataTypes.STRING,
+    playerId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'CharacterSheet',
