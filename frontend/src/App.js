@@ -21,6 +21,9 @@ import ViewApplication from "./components/ViewApplication";
 import StartNewMessage from "./components/StartNewMessage"
 import RuleSetPage from "./components/RuleSetPage";
 import * as sessionActions from "./store/session";
+import CharacterSheetList from "./components/CharacterSheetList";
+import CharacterSheet from "./components/CharacterSheet";
+import NewCharacterSheet from "./components/NewCharacterSheet";
 
 function App() {
   const dispatch = useDispatch();
@@ -54,6 +57,10 @@ function App() {
         <Route path="/search/:text" component={SearchResults} exact={true}></Route>
         <Route path="/conversations" component={ConversationList}></Route>
         <Route path="/rulesets/:rulesetid" component={RuleSetPage}></Route>
+        <Route path="/charactersheets/new" component={NewCharacterSheet}></Route>
+        <Route path="/charactersheets/list/:playerid" component={CharacterSheetList}></Route>
+        <Route path="/charactersheets/:charactersheetid" component={CharacterSheet}></Route>
+
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

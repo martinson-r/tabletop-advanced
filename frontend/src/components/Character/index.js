@@ -96,7 +96,10 @@ if (form.classList.contains("edit-form-hidden")) {
             {(data !== undefined && (parseInt(data.characterById.User.id) === userId) && (<div>
 
             <button id="edit-button" onClick={edit}>Edit</button>
-            {/* TODO: create character form */}
+            {/* TODO: button to create a new character sheet
+            if this character does not have one */}
+            {/* TODO: dropdown of existing character sheets to select from
+            if this character does not have one */}
             <div id="edit-form" className="edit-form-hidden">
             <form onSubmit={handleSubmit}>
                 <label>Name</label>

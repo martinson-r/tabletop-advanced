@@ -217,6 +217,24 @@ query GetCharacterById($characterId: ID) {
 }
 `
 
+const GET_CHARACTERSHEET_BY_ID = gql`
+query GetCharacterSheetById($charactersheetid: ID) {
+    charactersheet(charactersheetid: $charactersheetid) {
+        name
+        class
+    }
+}
+`
+
+const GET_CHARACTERSHEET_LIST_BY_PLAYER = gql`
+query GetCharacterSheetListByPlayer($playerid: ID) {
+    playercharactersheets(playerid: $playerid) {
+        name
+        class
+    }
+}
+`
+
 //Get games a player is hosting
 //Grab waitlist info as well so they can see new apps
 const GET_HOSTED_GAMES = gql`
@@ -516,6 +534,15 @@ mutation DeclineOffer($applicationId: ID) {
 }
 `
 
+const CREATE_CHARACTERSHEET = gql`
+mutation CreateCharacterSheet($userId: ID, $characterClass: String, $name: String) {
+    createCharacterSheet(playerid: $userId, characterClass: $characterClass, name: $name) {
+        name
+        class
+    }
+}
+`
+
 //IDs are required on backend but if I don't mark them required on frontend,
 //we get a 404...
 //Took me forever to troubleshoot this.
@@ -703,6 +730,8 @@ export { GET_ACCOUNTS,
         GET_GAME,
         GET_CHARACTER,
         GET_CHARACTER_BY_ID,
+        GET_CHARACTERSHEET_BY_ID,
+        CREATE_CHARACTERSHEET,
         UPDATE_CHARACTER,
         UPDATE_BIO,
         UPDATE_GAME,

@@ -1,4 +1,4 @@
-const { Message, Recipient, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist } = require('../db/models');
+const { Message, Recipient, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist, CharacterSheet } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -71,6 +71,11 @@ const resolvers = {
         characterById: (obj, args, context, info) => {
             const { characterId } = args;
             return Character.findOne({where: { id: characterId }, include: [{ model: User }, { model: Game }]})
+        },
+
+        playercharactersheets:(obj, args, context, info) => {
+            const { playerId } = args;
+            return CharacterSheet.findAll({where: {playerId}});
         },
 
         messages: (obj, args, context, info) => {
@@ -719,6 +724,15 @@ const resolvers = {
             await Application.update({offerAccepted: 'false'}, {where: { id: applicationId}});
             const returnApplication = Application.findAll({where: { id: applicationId }})
             return returnApplication;
+        },
+
+        createCharacterSheet: async(root, args) => {
+            const {playerid, name, characterClass} = args;
+
+            console.log(args);
+
+            const characterSheet = await CharacterSheet.create({playerid, name, class: characterClass});
+            return characterSheet;
         }
     },
     Subscription: {

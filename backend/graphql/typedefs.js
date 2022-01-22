@@ -26,6 +26,8 @@ const typeDefs = gql`
     getGamesPlayingIn(userId: ID): [Game]
     simpleSearch(text: String): resultsArray
     characterById(characterId: ID): Character
+    charactersheet(charactersheetid: ID): CharacterSheet
+    playercharactersheets(playerid: ID): [CharacterSheet]
   }
   type GameCreationInfo {
     languages: [Language],
@@ -34,6 +36,79 @@ const typeDefs = gql`
   }
   type resultsArray {
     wordsArray: [[Game]]
+  }
+  type CharacterSheet {
+    id: ID,
+    playerId: ID,
+    name: String,
+    age: Int,
+    intelligence: Int,
+    strength: Int,
+    wisdom: Int,
+    agility: Int,
+    dexterity: Int,
+    constitution: Int,
+    charisma: Int,
+    class: String,
+    level: Int,
+    alignment: String,
+    background: String,
+    gender: String,
+    armor: String,
+    armorclass: Int,
+    initiative: String,
+    speed: Int,
+    maxhp: Int,
+    currenthp: Int,
+    temphp: Int,
+    proficiencybonus: Int,
+    passiveperception: Int,
+    spellsweapons: String,
+    spellatkbonus: Int,
+    spellsknown: String,
+    preparedspells: String,
+    spellsavedc: Int,
+    cantripsknown: String,
+    slotlevel: Int,
+    traits: String,
+    languages: String,
+    proficiencies: String,
+    weaponsspells: String,
+    items: String,
+    currency: String,
+    notes: String,
+    race: String,
+    height: String,
+    weight: String,
+    streetcred: String,
+    notoriety: String,
+    publicawareness: String,
+    karma: Int,
+    totalkarma: Int,
+    misc: String,
+    body: Int,
+    reaction: Int,
+    logic: Int,
+    edge: Int,
+    edgepoints: Int,
+    essence: Int,
+    magicresonance: Int,
+    matrixinitiative: Int,
+    astralinitiative: Int,
+    composure: Int,
+    judgeintentions: Int,
+    memory: Int,
+    liftcarry: Int,
+    skills: String,
+    primarylifestyle: String,
+    licenses: String,
+    fakeidsetc: String,
+    contacts: String,
+    qualities: String,
+    augmentations: String,
+    cyberdeck: String,
+    vehicle: String,
+    other: String
   }
   type User {
     id: ID,
@@ -265,6 +340,7 @@ const typeDefs = gql`
     ignoreApplication(applicationId: ID): [Application]
     declineOffer(applicationId: ID): Application
     acceptOffer(applicationId: ID, gameId: ID, userId: ID): Application
+    createCharacterSheet(playerid: ID, name: String, characterClass: String): CharacterSheet
     editWaitlistApp(applicationId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
   }
   type Subscription {
