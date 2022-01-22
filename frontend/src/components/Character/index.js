@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -136,7 +136,8 @@ if (form.classList.contains("edit-form-hidden")) {
                 <select value={characterSheetId} onChange={updateCharacterSheetId}>
                 {characterSheets.map(sheet => <option key={uuidv4()} value={sheet.id}>{sheet.name}</option>)}
              </select></div>)}
-                <div><p>Create New Character Sheet</p></div>
+                {/* TODO: cache user edits so they are not lost when creating new character sheet */}
+                <div><Link to="/charactersheets/new">Create New Character Sheet</Link></div>
                 <button type="submit">Save</button>
             </form>
             </div>

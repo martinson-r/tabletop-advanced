@@ -223,7 +223,47 @@ const GET_CHARACTERSHEET_BY_ID = gql`
 query GetCharacterSheetById($charactersheetid: ID) {
     charactersheet(charactersheetid: $charactersheetid) {
         name
+        age
+        intelligence
+        strength
+        wisdom
+        agility
+        dexterity
+        constitution
+        charisma
         class
+        level
+        alignment
+        background
+        gender
+        armor
+        armorclass
+        initiative
+        speed
+        maxhp
+        currenthp
+        temphp
+        proficiencybonus
+        passiveperception
+        spellsweapons
+        spellatkbonus
+        preparedspells
+        spellsavedc
+        cantripsknown
+        slotlevel
+        traits
+        languages
+        proficiencies
+        weaponsspells
+        items
+        currency
+        notes
+        race
+        weight
+        height
+        skills
+        other
+        playerId
     }
 }
 `
@@ -538,10 +578,131 @@ mutation DeclineOffer($applicationId: ID) {
 `
 
 const CREATE_CHARACTERSHEET = gql`
-mutation CreateCharacterSheet($userId: ID, $characterClass: String, $name: String) {
-    createCharacterSheet(playerId: $userId, characterClass: $characterClass, name: $name) {
+mutation CreateCharacterSheet(
+    $userId: ID,
+    $name: String,
+    $age: Int,
+    $intelligence: Int,
+    $strength: Int,
+    $wisdom: Int,
+    $agility: Int,
+    $dexterity: Int,
+    $constitution: Int,
+    $charisma: Int,
+    $characterClass: String,
+    $level: Int,
+    $alignment: String,
+    $background: String,
+    $gender: String,
+    $armor: String,
+    $armorClass: Int,
+    $initiative: String,
+    $speed: Int,
+    $maxhp: Int,
+    $currenthp: Int,
+    $temphp: Int,
+    $proficiencybonus: Int,
+    $passiveperception: Int,
+    $spellsweapons: String,
+    $preparedspells: String,
+    $spellsavedc: Int,
+    $cantripsknown: String,
+    $slotlevel: Int,
+    $traits: String,
+    $languages: String,
+    $proficiencies: String,
+    $weaponsspells: String,
+    $items: String,
+    $currency: String,
+    $notes: String,
+    $race: String,
+    $height: String,
+    $weight: String,
+    $skills: String,
+    $other: String) { createCharacterSheet(
+        playerId: $userId,
+        characterClass: $characterClass,
+        name: $name,
+        age: $age,
+        intelligence: $intelligence,
+        strength: $strength,
+        wisdom: $wisdom,
+        agility: $agility,
+        dexterity: $dexterity,
+        constitution: $constitution,
+        charisma: $charisma,
+        level: $level,
+        alignment: $alignment,
+        background: $background,
+        gender: $gender,
+        armor: $armor,
+        armorclass: $armorclass,
+        initiative: $initiative,
+        speed: $speed,
+        maxhp: $maxhp,
+        currenthp: $currenthp,
+        temphp: $temphp,
+        proficiencybonus: $proficiencybonus,
+        passiveperception: $passiveperception,
+        spellsweapons: $spellsweapons,
+        spellatkbonus: $spellatkbonus,
+        preparedspells: $preparedspells,
+        spellsavedc: $spellsavedc,
+        cantripsknown: $cantripsknown,
+        slotlevel: $slotlevel,
+        traits: $traits,
+        languages: $languages,
+        proficiencies: $proficiencies,
+        weaponsspells: $weaponsspells,
+        items: $items,
+        currency: $currency,
+        notes: $notes,
+        race: $race,
+        weight: $weight,
+        height: $height,
+        skills: $skills,
+        other: $other) {
         name
+        age
+        intelligence
+        strength
+        wisdom
+        agility
+        dexterity
+        constitution
+        charisma
         class
+        level
+        alignment
+        background
+        gender
+        armor
+        armorclass
+        initiative
+        speed
+        maxhp
+        currenthp
+        temphp
+        proficiencybonus
+        passiveperception
+        spellsweapons
+        spellatkbonus
+        preparedspells
+        spellsavedc
+        cantripsknown
+        slotlevel
+        traits
+        languages
+        proficiencies
+        weaponsspells
+        items
+        currency
+        notes
+        race
+        weight
+        height
+        skills
+        other
     }
 }
 `
