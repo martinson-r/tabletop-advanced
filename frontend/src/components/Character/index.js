@@ -1,12 +1,11 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
     useQuery, useMutation
   } from "@apollo/client";
 import { GET_CHARACTER_BY_ID, UPDATE_CHARACTER } from "../../gql"
 import './character.css';
-import { useEffect } from "react";
 
 function Character() {
 // Grab our character
@@ -75,6 +74,8 @@ if (form.classList.contains("edit-form-hidden")) {
     return (
         <div className="gray-backdrop">
             <div className="container">
+
+                {/* TODO: way to hook Character Sheet up to Character */}
 
 
             {(data !== undefined &&
