@@ -75,7 +75,8 @@ if (form.classList.contains("edit-form-hidden")) {
         <div className="gray-backdrop">
             <div className="container">
 
-                {/* TODO: way to hook Character Sheet up to Character */}
+            {/* TODO: way to hook Character Sheet up to Character.
+            Maybe a dropdown of player's existing sheets w/ associated character names */}
 
 
             {(data !== undefined &&
