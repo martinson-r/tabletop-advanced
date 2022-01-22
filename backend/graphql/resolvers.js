@@ -642,7 +642,7 @@ const resolvers = {
         },
 
         updateGame: async(root, args) => {
-            const {userId, gameId, title, details, blurb, waitListOpen} = args;
+            const {userId, gameId, title, details, blurb, waitListOpen, active, deleted} = args;
 
             console.log('WAITLIST ', args);
 
@@ -656,7 +656,7 @@ const resolvers = {
 
             if (userId.toString() === hostId.toString()) {
                 // const aboutMeToUpdate = await AboutMe.findByPk(userId);
-                await gameToUpdate.update({title, description: details, blurb, waitListOpen});
+                await gameToUpdate.update({title, description: details, blurb, waitListOpen, active, deleted});
                 const updatedGame = await Game.findByPk(gameId);
                 return updatedGame;
             } else {

@@ -763,12 +763,15 @@ const UPDATE_BIO = gql`
 `;
 
 const UPDATE_GAME = gql`
-  mutation UpdateGame($userId: ID, $gameId: ID, $title: String, $blurb: String, $details: String, $waitListOpen: Boolean) {
-    updateGame(userId: $userId, gameId: $gameId, title: $title, blurb: $blurb, details: $details, waitListOpen: $waitListOpen) {
+  mutation UpdateGame($userId: ID, $gameId: ID, $title: String, $blurb: String, $details: String, $waitListOpen: Boolean, $deleted: Boolean, $active: Boolean) {
+    updateGame(userId: $userId, gameId: $gameId, title: $title, blurb: $blurb, details: $details, waitListOpen: $waitListOpen, deleted: $deleted, active: $active) {
                 gameId
                 blurb
                 title
                 details
+                active
+                deleted
+                waitListOpen
     }
 }
 `;

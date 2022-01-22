@@ -33,3 +33,7 @@ label:first-of-type {
 .edit-hidden {
     display: none;
 }
+
+.delete {
+    background-color: red;
+}

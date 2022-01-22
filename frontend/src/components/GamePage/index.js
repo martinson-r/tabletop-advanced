@@ -26,6 +26,8 @@ function GamePage() {
     const [waitListOpen, setWaitListOpen] = useState(true);
     const [hostId, setHostId] = useState(null);
     const [filteredApps, setFilteredApps] = useState([]);
+    const [active, setActive] = useState(true);
+    const [deleted, setDeleted] = useState(false);
 
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
@@ -52,12 +54,11 @@ const toggleApplications = () => {
 
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId }});
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
-    const [updateGame] = useMutation(UPDATE_GAME, { variables: { userId, gameId, title, blurb, details, waitListOpen }, refetchQueries: ["GetSingleGame"] } );
+    const [updateGame] = useMutation(UPDATE_GAME, { variables: { userId, gameId, title, blurb, details, waitListOpen, active, deleted }, refetchQueries: ["GetSingleGame"] } );
 
 
     useEffect(() => {
       if (data) {
-        console.log(data);
         setHostId(data.game.host.id);
         setBlurb(data.game.blurb);
         setDetails(data.game.description);
@@ -67,19 +68,44 @@ const toggleApplications = () => {
     },[data]);
 
     const toggleWaitlist = async () => {
-      console.log(waitListOpen, !waitListOpen)
-      const togglePromise = new Promise((resolve, reject) => resolve(doToggle()));
+      const togglePromise = new Promise((resolve, reject) => resolve(doToggleWaitlist()));
       await togglePromise;
-      updateGame(gameId, userId, blurb, title, details, waitListOpen);
+      updateGame(gameId, userId, blurb, title, details, waitListOpen, active, deleted);
     }
 
-    let doToggle = () => {
+    let doToggleWaitlist = () => {
       setWaitListOpen(!waitListOpen);
       return waitListOpen;
     }
+
+    const toggleActive = async () => {
+      const togglePromise = new Promise((resolve, reject) => resolve(doToggleActive()));
+      await togglePromise;
+      updateGame(gameId, userId, blurb, title, details, waitListOpen, active, deleted);
+    }
+
+    let doToggleActive = () => {
+      setActive(!active);
+      return active;
+    }
+
+    const toggleDeleted = async () => {
+      const togglePromise = new Promise((resolve, reject) => resolve(doToggleDeleted()));
+      await togglePromise;
+      updateGame(gameId, userId, blurb, title, details, waitListOpen, active, deleted);
+    }
+
+    let doToggleDeleted = () => {
+      setDeleted(!deleted);
+      return deleted;
+    }
+
+
+
     useEffect(() => {
       if (data !== undefined && userId !== undefined) {
         setWaitListOpen(data.game.waitListOpen);
+        setActive(data.game.active);
         setFilteredApps(data.game.Applications.filter(app => app.applicationOwner[0].id == userId));
       }
     },[data, userId]);
@@ -192,6 +218,10 @@ return (
             {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
             {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && waitListOpen &&(<button onClick={toggleWaitlist}>Close Waitlist</button>)}{!waitListOpen && (<button onClick={toggleWaitlist}>Open Waitlist</button>)}
           </div>
+          {/* End Campaign (ends game series) */}
+          {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && active &&(<button onClick={toggleActive}>End Campaign</button>)}{hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && !active &&(<button onClick={toggleActive}>Restart Campaign</button>)}
+        {/* Delete Game (hides from search and everyone, including players) */}
+        {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && !deleted &&(<button class="delete" onClick={toggleDeleted}>DELETE Campaign</button>)}{hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && deleted &&(<button class="delete" onClick={toggleDeleted}>Undelete Campaign</button>)}
         </div>
         )}
       </div>
