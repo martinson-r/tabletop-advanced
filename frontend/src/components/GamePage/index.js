@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import GameMessages from "../GameMessages";
 import './game-page.css';
 
-import { GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
+import { GAME_MESSAGES_SUBSCRIPTION, GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
@@ -25,6 +25,7 @@ function GamePage() {
     const [blurb, setBlurb] = useState("");
     const [waitListOpen, setWaitListOpen] = useState(true);
     const [hostId, setHostId] = useState(null);
+    const [filteredApps, setFilteredApps] = useState([]);
 
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
@@ -56,6 +57,7 @@ const toggleApplications = () => {
 
     useEffect(() => {
       if (data) {
+        console.log(data);
         setHostId(data.game.host.id);
         setBlurb(data.game.blurb);
         setDetails(data.game.description);
@@ -76,10 +78,11 @@ const toggleApplications = () => {
       return waitListOpen;
     }
     useEffect(() => {
-      if (data !== undefined) {
+      if (data !== undefined && userId !== undefined) {
         setWaitListOpen(data.game.waitListOpen);
+        setFilteredApps(data.game.Applications.filter(app => app.applicationOwner[0].id == userId));
       }
-    },[data]);
+    },[data, userId]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -136,9 +139,10 @@ return (
             {/* Player is able to join waitlist */}
             {hostId !== null && userId !== null && userId !== undefined && hostId.toString() !== userId.toString() && waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Submit a Character to the Waitlist</Link><br /></>)}
 
-            {/* TODO: GM is not allowing multiple apps and player has applied */}
             {waitlistStatus && waitlistStatus.checkApplied.length > 0 && (<p>You have already applied to this game, and multiple applications are not allowed by the GM.</p>)}
-
+            {console.log('APPS: ', filteredApps, userId, )}
+            {filteredApps.length > 0 && (<p>Your Waitlist Applications:</p>)}
+            {filteredApps.map(app => <Link to={`/game/${gameId}/application/${app.id}`}>{app.charName}</Link>)}
             {waitListOpen !== null && hostId !== null && userId !== null && userId !== undefined && hostId !== userId.toString() && waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
         </div>
 
