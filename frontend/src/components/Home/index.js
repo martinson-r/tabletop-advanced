@@ -117,7 +117,7 @@ function Home() {
                     {/* Show inactive games conditionally */}
                     {displayInactive === true && (<span><p>Inactive Games:</p>
                     {gameData.map((game) =>
-                    (game.active === false && (<div key={uuidv4()} className="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}<br />Premise: {game.blurb}</p></div>))
+                    (game.active === false && game.deleted === false && (<div key={uuidv4()} className="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}<br />Premise: {game.blurb}</p></div>))
                     )}</span>)}
 
                     {/* Show closed waitlist games conditionally */}
