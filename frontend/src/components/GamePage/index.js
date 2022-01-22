@@ -23,6 +23,8 @@ function GamePage() {
     const [details, setDetails] = useState("");
     const [title, setTitle] = useState("");
     const [blurb, setBlurb] = useState("");
+    const [waitListOpen, setWaitListOpen] = useState(true);
+    const [hostId, setHostId] = useState(null);
 
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
@@ -40,14 +42,49 @@ function GamePage() {
     setDisplayAccepted(!displayAccepted)
 }
 
+const toggleApplications = () => {
+  //mutation
+  setWaitListOpen(!waitListOpen);
+}
+
+
+
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId }});
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
-    const [updateGame] = useMutation(UPDATE_GAME, { variables: { userId, gameId, title, blurb, details }, refetchQueries: ["GetSingleGame"] } );
+    const [updateGame] = useMutation(UPDATE_GAME, { variables: { userId, gameId, title, blurb, details, waitListOpen }, refetchQueries: ["GetSingleGame"] } );
+
+
+    useEffect(() => {
+      if (data) {
+        setHostId(data.game.host.id);
+        setBlurb(data.game.blurb);
+        setDetails(data.game.description);
+        setTitle(data.game.title);
+
+      }
+    },[data]);
+
+    const toggleWaitlist = async () => {
+      console.log(waitListOpen, !waitListOpen)
+      const togglePromise = new Promise((resolve, reject) => resolve(doToggle()));
+      await togglePromise;
+      updateGame(gameId, userId, blurb, title, details, waitListOpen);
+    }
+
+    let doToggle = () => {
+      setWaitListOpen(!waitListOpen);
+      return waitListOpen;
+    }
+    useEffect(() => {
+      if (data !== undefined) {
+        setWaitListOpen(data.game.waitListOpen);
+      }
+    },[data]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
       // setErrors([]);
-      updateGame({ variables: { gameId, userId, blurb, title, details } });
+      updateGame({ variables: { gameId, userId, blurb, title, details, waitListOpen } });
 
       const description = document.getElementById("edit-details");
       const form = document.getElementById("edit-form");
@@ -84,6 +121,8 @@ return (
 <GameMessages gameId={gameId} />
 <div className="gray-backdrop">
 <div className="details">
+  {console.log('HOSTID: ', hostId)}
+  {console.log('WAITLIST: ', waitListOpen)}
         <div id="edit-details" className="game-content-block">
             <h2>More About This Game</h2>
             {data !== undefined && (<span>{data.game.description}</span>)}
@@ -95,16 +134,16 @@ return (
             {data !== undefined && data.game.Characters.map((character) => <span key={uuidv4()}><Link to={`/${character.User.id}/bio`}>{character.User.userName}</Link> as <Link to={`/characters/${character.id}`}>{character.name}</Link></span>)}
 
             {/* Player is able to join waitlist */}
-            {data !== undefined && userId !== null && userId !== undefined && data.game.host.id.toString() !== userId.toString() && data.game.waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Submit a Character to the Waitlist</Link><br /></>)}
+            {hostId !== null && userId !== null && userId !== undefined && hostId.toString() !== userId.toString() && waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Submit a Character to the Waitlist</Link><br /></>)}
 
             {/* TODO: GM is not allowing multiple apps and player has applied */}
             {waitlistStatus && waitlistStatus.checkApplied.length > 0 && (<p>You have already applied to this game, and multiple applications are not allowed by the GM.</p>)}
 
-            {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
+            {waitListOpen !== null && hostId !== null && userId !== null && userId !== undefined && hostId !== userId.toString() && waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
         </div>
 
 </div>
-        {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (
+        {hostId !== null && userId !== undefined && userId !== null && hostId && userId.toString() === hostId && (
           <div>
 
           <div className="game-content-block">
@@ -147,10 +186,9 @@ return (
             {displayAccepted.toString() === 'true' &&(<div><p>Accepted Applications:</p>{data.game.Applications.map(application => application.accepted.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link> on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
             {displayIgnored.toString() === 'true' &&(<div><p>Ignored Applications:</p>
             {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
+            {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && waitListOpen &&(<button onClick={toggleWaitlist}>Close Waitlist</button>)}{!waitListOpen && (<button onClick={toggleWaitlist}>Open Waitlist</button>)}
           </div>
         </div>
-
-
         )}
       </div>
       </div>

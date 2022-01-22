@@ -43,7 +43,7 @@ function App() {
         <Route path="/login" component={Login}></Route>
         <Route path="/signup" component={SignUp}></Route>
         <Route path="/game/:gameId/gameroom/" name="GamePage" component={GamePage} exact={true}></Route>
-        <Route path="/game/:gameId" component={Game} exact={true}></Route>
+        {/* <Route path="/game/:gameId" component={Game} exact={true}></Route> */}
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
         <Route path="/dashboard" component={Dashboard} exact={true}></Route>
         <Route path="/account" component={Account} exact={true}></Route>

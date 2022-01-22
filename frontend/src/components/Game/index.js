@@ -24,12 +24,12 @@ function Game() {
     const { gameId } = useParams();
     const [displayIgnored, setDisplayIgnored] = useState(false);
     const [displayAccepted, setDisplayAccepted] = useState(false);
+    const [waitListOpen, setWaitListOpen] = useState(true);
 
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
         setUserId(sessionUser.id);
       }
-
     },[sessionUser])
 
 
@@ -41,9 +41,20 @@ function Game() {
     setDisplayAccepted(!displayAccepted)
 }
 
+const toggleApplications = () => {
+  //mutation
+}
+
     const { data } = useQuery(GET_GAME, { variables: { gameId } });
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
 
+    useEffect(() => {
+      console.log('useEffect');
+      if (data) {
+        setWaitListOpen(data.game.waitListOpen);
+        console.log('WAITLIST', waitListOpen);
+      }
+    },[data])
 
       return (
         <div className="container">
@@ -87,6 +98,9 @@ function Game() {
             {displayAccepted.toString() === 'true' &&(<div>{data.game.Applications.map(application => application.accepted.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link> on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
             {displayIgnored.toString() === 'true' &&(<div><p>Ignored Applications:</p>
             {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
+            {/* TODO: toggle applications (recruiting) open/closed
+            waitListOpen boolean on Games table */}
+            {waitListOpen &&(<button onClick={toggleApplications}>Close Waitlist</button>)}{!waitListOpen && (<button>Open Waitlist</button>)}
           </>
         )}
       </div>
