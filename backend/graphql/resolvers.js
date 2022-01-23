@@ -79,13 +79,12 @@ const resolvers = {
             return CharacterSheet.findAll({where: { playerId} });
         },
 
-        // getFollowedGames:(obj, args, context, info) => {
-        //     const {playerId} = args;
-        //     console.log('player id followed players')
-        //     return FollowedGame.findAll();
-        // },
+        getFollowedGames: (obj, args, context, info) => {
+            const {playerId} = args;
+            return User.findByPk(playerId, {include: [{model: Game, through: "FollowedGames", as: "followedgame"}]});
+        },
 
-        getFollowedPlayers: async(obj, args, context, info) => {
+        getFollowedPlayers:(obj, args, context, info) => {
             const {playerId} = args;
             let userId = playerId;
             console.log('player id ', userId)

@@ -24,7 +24,7 @@ const typeDefs = gql`
     getPlayingWaitingGames(userId: ID): [User]
     getWaitlistGames(userId: ID): [Game]
     getGamesPlayingIn(userId: ID): [Game]
-    getFollowedGames(playerId: ID): [FollowedGame]
+    getFollowedGames(playerId: ID): User
     getFollowedPlayers(playerId: ID): User
     simpleSearch(text: String): resultsArray
     characterById(characterId: ID): Character
@@ -171,6 +171,8 @@ const typeDefs = gql`
     applicationOwner: [Application]
     Characters: [Character]
     followedplayer: [User]
+    followedgame: [Game]
+    followinguser: [User]
   }
   type Ruleset {
     id: ID,
@@ -277,7 +279,8 @@ const typeDefs = gql`
     Characters: [Character],
     Applications: [Application],
     blurb: String,
-    spectatorChat: Boolean
+    spectatorChat: Boolean,
+    followedGame: [Game]
   }
   type Application {
     id: ID

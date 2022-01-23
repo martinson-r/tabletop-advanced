@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsToMany(models.Game, { through: "PlayerJoins", as: "gamePlayed", foreignKey: 'userId', otherKey: 'gameId' });
       User.belongsToMany(models.Conversation, {through: "Recipients", as: "recipient", foreignKey: "userId", otherKey: "conversationId" });
 
-      // Game.belongsToMany(models.User, { through: "Waitlists", as: "applicant", foreignKey: "gameId", otherKey: "userId"})
+      User.belongsToMany(models.Game, { through: "FollowedGames", as: "followedgame", foreignKey: "userId", otherKey: "gameId"});
       User.belongsToMany(models.User, { through: "FollowedPlayers", as: "followedplayer", foreignKey: "userId", otherKey: "playerId" });
     }
   };

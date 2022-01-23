@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
       Game.belongsTo(models.Language, {foreignKey: "languageId"});
       Game.belongsToMany(models.User, { through: "PlayerJoins", as: "player", foreignKey: "gameId", otherKey: "userId"});
       Game.hasMany(models.Character, { foreignKey: "gameId"});
-      Game.belongsToMany(models.User, { through: "Waitlists", as: "applicant", foreignKey: "gameId", otherKey: "userId"})
+      Game.belongsToMany(models.User, { through: "Waitlists", as: "applicant", foreignKey: "gameId", otherKey: "userId"});
+      Game.belongsToMany(models.User, { through: "FollowedGames", as: "followinguser", foreignKey: "gameId", otherKey: "userId"});
     }
   };
   Game.init({
