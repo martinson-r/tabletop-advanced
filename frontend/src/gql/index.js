@@ -154,6 +154,7 @@ const GET_GAME = gql`
         Characters {
             id
             name
+            retired
             User {
                 id
                 userName

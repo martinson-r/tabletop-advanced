@@ -197,8 +197,16 @@ return (
             {/* This feels a little backwards, but we're grabbing the player associated with the character */}
             {/* TODO: GMs can remove characters from game */}
             {data !== undefined && data.game.Characters.map((character) =>
-            <RemovePlayer character={character} userId={userId} hostId={hostId} gameId={gameId}></RemovePlayer>
+
+            {
+              return character.retired !== undefined && character.retired === false && (<RemovePlayer character={character} userId={userId} hostId={hostId} gameId={gameId}></RemovePlayer>)}
             )}
+<h3>Retired:</h3>
+{data !== undefined && data.game.Characters.map((character) =>
+
+{
+  return character.retired !== undefined && character.retired === true && (<RemovePlayer character={character} userId={userId} hostId={hostId} gameId={gameId}></RemovePlayer>)}
+)}
 
             {/* Player is able to join waitlist */}
             {hostId !== null && userId !== null && userId !== undefined && hostId.toString() !== userId.toString() && waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Submit a Character to the Waitlist</Link><br /></>)}

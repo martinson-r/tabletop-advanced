@@ -333,7 +333,8 @@ const typeDefs = gql`
     User: User,
     Game: Game,
     gameId: ID,
-    characterSheetId: ID
+    characterSheetId: ID,
+    retired: Boolean
   }
   type Waitlist {
       id: ID,

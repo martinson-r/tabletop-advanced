@@ -44,7 +44,7 @@ function RemovePlayer(props) {
             <span key={uuidv4()} className={`${character.User.userName}`}>
               <Link to={`/${character.User.id}/bio`}>{character.User.userName}</Link>
               as <Link to={`/characters/${character.id}`}>{character.name}</Link>
-              {hostId !== null && userId !== undefined && userId !== null && hostId && userId.toString() === hostId && (<div><p>Remove this player from the game (this will retire their character as well)</p><button onClick={openRemoveMenu}>Remove</button></div>)}
+              {hostId !== null && userId !== undefined && userId !== null && hostId && userId.toString() === hostId && character.retired === false && (<div><p>Remove this player from the game (this will retire their character as well)</p><button onClick={openRemoveMenu}>Remove</button></div>)}
                   {/* TODO: debug closing when typing */}
             </span>
             <div className={`removeForm noDisplay ${characterName}`}>
