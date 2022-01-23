@@ -40,6 +40,7 @@ function Home() {
       });
     //const [character, { data: charData, error: charError, loading: charLoading }] = useLazyQuery(GET_CHARACTER);
 
+
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
     const [openApps, setOpenApps] = useState([]);
@@ -123,6 +124,7 @@ function Home() {
                 {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}, as {game.player[0].Characters[0] === undefined && (<span><Link to={`/game/${game.id}/create-character`}>Create a character now</Link></span>)}{game.player[0].Characters[0] !== undefined && (<Link to={`/characters/${game.player[0].Characters[0].id}`}>{game.player[0].Characters[0].name}</Link>)}</p>))}
 
                 {/* TODO: create a character for a game if one doesn't exist */}
+                {/* TODO: link to page w/ all player characters & character sheets */}
 
                 </div>
                 <div className="appliedTo">

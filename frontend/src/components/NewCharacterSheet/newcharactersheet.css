@@ -1,0 +1,9 @@
+.formflex{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+form div {
+    padding: 10px;
+}

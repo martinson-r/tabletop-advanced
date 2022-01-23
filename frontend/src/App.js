@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
-import Game from "./components/Game";
+// import Game from "./components/Game";
 import GamePage from "./components/GamePage";
 import SubmitGame from "./components/SubmitGame";
 import JoinWaitList from "./components/JoinWaitList";
@@ -21,6 +21,10 @@ import ViewApplication from "./components/ViewApplication";
 import StartNewMessage from "./components/StartNewMessage"
 import RuleSetPage from "./components/RuleSetPage";
 import * as sessionActions from "./store/session";
+import CharacterSheetList from "./components/CharacterSheetList";
+import CharacterSheet from "./components/CharacterSheet";
+import NewCharacterSheet from "./components/NewCharacterSheet";
+import FollowedGamesPlayers from "./components/FollowedGamesPlayers";
 
 function App() {
   const dispatch = useDispatch();
@@ -39,8 +43,8 @@ function App() {
       {isLoaded && (<Switch>
         <Route path="/login" component={Login}></Route>
         <Route path="/signup" component={SignUp}></Route>
-        <Route path="/game/:gameId/gameroom/" name="GamePage" component={GamePage} exact={true}></Route>
-        <Route path="/game/:gameId" component={Game} exact={true}></Route>
+        <Route path="/game/:gameId/gameroom" name="GamePage" component={GamePage} exact={true}></Route>
+        {/* <Route path="/game/:gameId" component={Game} exact={true}></Route> */}
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
         <Route path="/dashboard" component={Dashboard} exact={true}></Route>
         <Route path="/account" component={Account} exact={true}></Route>
@@ -54,6 +58,10 @@ function App() {
         <Route path="/search/:text" component={SearchResults} exact={true}></Route>
         <Route path="/conversations" component={ConversationList}></Route>
         <Route path="/rulesets/:rulesetid" component={RuleSetPage}></Route>
+        <Route path="/charactersheets/new" component={NewCharacterSheet}></Route>
+        <Route path="/charactersheets/list/:playerId" component={CharacterSheetList}></Route>
+        <Route path="/charactersheets/:charactersheetid" component={CharacterSheet}></Route>
+        <Route path="/:playerId/followed" component={FollowedGamesPlayers}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

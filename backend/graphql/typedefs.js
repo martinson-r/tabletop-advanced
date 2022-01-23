@@ -24,8 +24,24 @@ const typeDefs = gql`
     getPlayingWaitingGames(userId: ID): [User]
     getWaitlistGames(userId: ID): [Game]
     getGamesPlayingIn(userId: ID): [Game]
+    getFollowedGames(playerId: ID): User
+    getFollowedPlayers(playerId: ID): User
     simpleSearch(text: String): resultsArray
     characterById(characterId: ID): Character
+    charactersheet(charactersheetid: ID): CharacterSheet
+    playercharactersheets(playerId: ID): [CharacterSheet]
+    checkFollowPlayer(currentUserId: ID, userId: ID): User
+  }
+  type FollowedGame {
+    id: ID,
+    userId: ID,
+    gameId: ID
+
+  }
+  type FollowedPlayer {
+    id: ID,
+    userId: ID,
+    playerId: ID
   }
   type GameCreationInfo {
     languages: [Language],
@@ -34,6 +50,84 @@ const typeDefs = gql`
   }
   type resultsArray {
     wordsArray: [[Game]]
+  }
+  type CharacterSheet {
+    id: ID,
+    playerId: ID,
+    name: String,
+    age: Int,
+    intelligence: Int,
+    strength: Int,
+    wisdom: Int,
+    agility: Int,
+    dexterity: Int,
+    constitution: Int,
+    charisma: Int,
+    class: String,
+    level: Int,
+    alignment: String,
+    background: String,
+    gender: String,
+    armor: String,
+    armorclass: Int,
+    initiative: String,
+    speed: Int,
+    maxhp: Int,
+    currenthp: Int,
+    temphp: Int,
+    proficiencybonus: Int,
+    passiveperception: Int,
+    spellsweapons: String,
+    spellatkbonus: Int,
+    spellsknown: String,
+    preparedspells: String,
+    spellsavedc: Int,
+    cantripsknown: String,
+    slotlevel: Int,
+    traits: String,
+    languages: String,
+    proficiencies: String,
+    weaponsspells: String,
+    items: String,
+    currency: String,
+    notes: String,
+    race: String,
+    height: String,
+    weight: String,
+    streetcred: String,
+    notoriety: String,
+    publicawareness: String,
+    karma: Int,
+    totalkarma: Int,
+    misc: String,
+    body: Int,
+    reaction: Int,
+    logic: Int,
+    edge: Int,
+    edgepoints: Int,
+    essence: Int,
+    magicresonance: Int,
+    matrixinitiative: Int,
+    astralinitiative: Int,
+    composure: Int,
+    judgeintentions: Int,
+    memory: Int,
+    liftcarry: Int,
+    skills: String,
+    primarylifestyle: String,
+    licenses: String,
+    fakeidsetc: String,
+    contacts: String,
+    qualities: String,
+    augmentations: String,
+    cyberdeck: String,
+    vehicle: String,
+    other: String
+  }
+  type PlayerJoin {
+    id: ID,
+    gameId: ID,
+    userId: ID
   }
   type User {
     id: ID,
@@ -80,6 +174,9 @@ const typeDefs = gql`
     gameApplication: [Application]
     applicationOwner: [Application]
     Characters: [Character]
+    followedplayer: [User]
+    followedgame: [Game]
+    followinguser: [User]
   }
   type Ruleset {
     id: ID,
@@ -163,6 +260,7 @@ const typeDefs = gql`
     title: String,
     description: String,
     details: String,
+    deleted: Boolean,
     premium: Boolean,
     remote: Boolean,
     host: User,
@@ -185,7 +283,7 @@ const typeDefs = gql`
     Characters: [Character],
     Applications: [Application],
     blurb: String,
-    spectatorChat: Boolean
+    spectatorChat: Boolean,
   }
   type Application {
     id: ID
@@ -234,7 +332,9 @@ const typeDefs = gql`
     bio: String,
     User: User,
     Game: Game,
-    gameId: ID
+    gameId: ID,
+    characterSheetId: ID,
+    retired: Boolean
   }
   type Waitlist {
       id: ID,
@@ -253,9 +353,9 @@ const typeDefs = gql`
     submitGame(userId: ID!, title: String!, blurb: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     submitCharacterCreation(userId: ID, gameId: ID, bio: String, name: String, imageUrl: String): Character
-    updateCharacter(characterId: ID, bio: String, imageUrl: String, name: String): Character
+    updateCharacter(characterId: ID, bio: String, imageUrl: String, name: String, characterSheetId: ID): Character
     updateBio(currentUserId: ID, userId: ID, bio: String, avatarUrl: String, pronouns: String, firstName: String): AboutMe
-    updateGame(gameId: ID, userId: ID, title: String, blurb: String, details: String): Game
+    updateGame(gameId: ID, userId: ID, title: String, blurb: String, details: String, waitListOpen: Boolean, deleted: Boolean, active: Boolean): Game
     changeEmail(userId: ID!, newEmail: String!, changeEmailPassword: String!): User
     changePassword(userId: ID!, newPassword: String!, oldPassword: String!): User
     joinWaitlist(hostId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
@@ -265,7 +365,13 @@ const typeDefs = gql`
     ignoreApplication(applicationId: ID): [Application]
     declineOffer(applicationId: ID): Application
     acceptOffer(applicationId: ID, gameId: ID, userId: ID): Application
+    createCharacterSheet(playerId: ID, name: String, characterClass: String): CharacterSheet
     editWaitlistApp(applicationId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
+    followGame(userId: ID, gameId: ID): Game
+    unFollowGame(userId: ID, gameId: ID): CountAll
+    followPlayer(currentUserId: ID, userId: ID): User
+    unFollowPlayer(currentUserId: ID, userId: ID): User
+    removePlayer(playerId: ID, gameId: ID, retireNote: String): [PlayerJoin]
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,

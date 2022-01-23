@@ -1,9 +1,10 @@
-const { Message, Recipient, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist } = require('../db/models');
+const { Message, Recipient, FollowedGame, FollowedPlayer, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist, CharacterSheet } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcryptjs');
 const user = require('../db/models/user');
+const game = require('../db/models/game');
 
 const pubsub = new PubSub();
 
@@ -71,6 +72,25 @@ const resolvers = {
         characterById: (obj, args, context, info) => {
             const { characterId } = args;
             return Character.findOne({where: { id: characterId }, include: [{ model: User }, { model: Game }]})
+        },
+
+        playercharactersheets:(obj, args, context, info) => {
+            const { playerId } = args;
+            console.log(args);
+            return CharacterSheet.findAll({where: { playerId} });
+        },
+
+        getFollowedGames: (obj, args, context, info) => {
+            const { playerId } = args;
+            return User.findByPk(playerId, {include: [{model: Game, through: "FollowedGames", as: "followedgame"}]});
+        },
+
+        getFollowedPlayers:(obj, args, context, info) => {
+            const { playerId } = args;
+            console.log(args);
+            let userId = playerId;
+            console.log('player id ', userId)
+            return User.findByPk(playerId, { include: [{model: User, through: "FollowedPlayers", as: "followedplayer"}]});
         },
 
         messages: (obj, args, context, info) => {
@@ -218,6 +238,12 @@ const resolvers = {
             return { wordsArray: wordsArray }
 
         },
+
+        checkFollowPlayer: (obj, args, context, info) => {
+            const {currentUserId, userId} = args;
+            return FollowedPlayer.findOne({where: {[Op.and]:
+                [{userId: currentUserId}, {playerId: userId}]}});
+        }
     },
     Mutation: {
         sendMessageToGame: async(root,args) => {
@@ -614,9 +640,9 @@ const resolvers = {
             return character;
         },
         updateCharacter: async(root, args) => {
-            const {characterId, bio, name, imageUrl} = args;
+            const {characterId, bio, name, imageUrl, characterSheetId} = args;
             const characterToUpdate = await Character.findByPk(characterId);
-            await characterToUpdate.update({bio, name, imageUrl});
+            await characterToUpdate.update({bio, name, imageUrl, characterSheetId});
             const updatedCharacter = await Character.findByPk(characterId);
             return updatedCharacter;
         },
@@ -636,9 +662,9 @@ const resolvers = {
         },
 
         updateGame: async(root, args) => {
-            const {userId, gameId, title, details, blurb} = args;
+            const {userId, gameId, title, details, blurb, waitListOpen, active, deleted} = args;
 
-            console.log(args);
+            console.log('WAITLIST ', args);
 
         //get the game's host id
         const gameToUpdate = await Game.findByPk(gameId);
@@ -650,7 +676,7 @@ const resolvers = {
 
             if (userId.toString() === hostId.toString()) {
                 // const aboutMeToUpdate = await AboutMe.findByPk(userId);
-                await gameToUpdate.update({title, description: details, blurb});
+                await gameToUpdate.update({title, description: details, blurb, waitListOpen, active, deleted});
                 const updatedGame = await Game.findByPk(gameId);
                 return updatedGame;
             } else {
@@ -719,7 +745,73 @@ const resolvers = {
             await Application.update({offerAccepted: 'false'}, {where: { id: applicationId}});
             const returnApplication = Application.findAll({where: { id: applicationId }})
             return returnApplication;
+        },
+
+        createCharacterSheet: async(root, args) => {
+            const {playerId, name, characterClass} = args;
+            const characterSheet = await CharacterSheet.create({age, playerId, name, class: characterClass});
+            return characterSheet;
+        },
+
+        followGame: async(root, args) => {
+            const {userId, gameId} = args;
+            let followCheck = await FollowedGame.findOne({where: {[Op.and]:
+                [{userId}, {gameId}]}});
+
+            //Just in case, make sure game cannot be followed more than once
+            if (followCheck) {
+                return followCheck;
+            } else {
+                const followedTheGame = await FollowedGame.create({userId, gameId});
+                return followedTheGame;
+            }
+        },
+
+        unFollowGame: async(root, args) => {
+            const {userId, gameId} = args;
+            let game = await FollowedGame.destroy({where: {[Op.and]:
+                [{userId}, {gameId}]}});
+                console.log(game);
+            return FollowedGame.findOne({where: {gameId}})
+        },
+
+        followPlayer: async(root, args) => {
+            const {currentUserId, userId} = args;
+            let otherUserId = userId;
+
+            //confusing and my own fault for naming variables this way
+            let followCheck = await FollowedPlayer.findOne({where: {[Op.and]:
+                [{userId: currentUserId}, {playerId: otherUserId}]}});
+
+            //Just in case, make sure game cannot be followed more than once
+            if (followCheck) {
+                return followCheck;
+            } else {
+                const followedThePlayer = await FollowedPlayer.create({userId: currentUserId, playerId: otherUserId});
+                return followedThePlayer;
+            }
+        },
+
+        unFollowPlayer: async(root, args) => {
+            const {currentUserId, userId} = args;
+            await FollowedPlayer.destroy({where: {[Op.and]:
+                [{userId: currentUserId}, {playerId: userId}]}});
+            return FollowedPlayer.findOne({where: {playerId: userId}})
+        },
+
+        removePlayer: async(root, args) => {
+            // TODO:
+            // remove the player from the game
+            // retire the character (note optional)
+            const {gameId, playerId, retireNote} = args;
+            await PlayerJoin.destroy({where: {[Op.and]:
+                [{userId: playerId}, {gameId}]}});
+            await Character.update({ retiredNote: retireNote, retired: true }, {where: {[Op.and]:
+                [{userId: playerId}, {gameId}]}});
+                //may need to change what it returns
+            return PlayerJoin.findAll({where: {gameId}})
         }
+
     },
     Subscription: {
         spectatorMessageSent: {

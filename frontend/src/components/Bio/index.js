@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams, Link, useHistory } from "react-router-dom";
 import {
-    useLazyQuery, useMutation
+    useQuery, useMutation, useLazyQuery
   } from "@apollo/client";
-import { GET_ABOUT,START_NEW_PRIVATE_CHAT, UPDATE_BIO } from "../../gql"
+import { GET_ABOUT, GET_GAMES_PLAYING_IN, START_NEW_PRIVATE_CHAT, UPDATE_BIO, CHECK_FOLLOW_PLAYER, FOLLOW_PLAYER, UNFOLLOW_PLAYER, CHECK_FOLLOW } from "../../gql"
 import './bio.css';
 
 function Bio() {
@@ -17,6 +17,7 @@ const [firstName, setFirstName] = useState("");
 const [bio, setBio] = useState("");
 const [pronouns, setPronouns] = useState("");
 const [avatarUrl, setAvatarUrl] = useState("");
+const [following, setFollowing] = useState(false);
 
 const history = useHistory();
 
@@ -27,9 +28,17 @@ useEffect(() => {
 },[sessionUser])
 
 const [getAbout, { data }] = useLazyQuery(GET_ABOUT);
+// const [checkFollowPlayer, { data: checkfollowData }] = useQuery(CHECK_FOLLOW_PLAYER);
+const { data: checkFollowData } = useQuery(CHECK_FOLLOW_PLAYER, { variables: { currentUserId, userId } });
 
 const [startNewNonGameConversation] = useMutation(START_NEW_PRIVATE_CHAT, { variables: { currentUserId, recipients }, onCompleted: startNewNonGameConversation => { history.push(`/conversation/${startNewNonGameConversation.startNewNonGameConversation.id}`)} } );
 const [updateBio, { data: updatedData }] = useMutation(UPDATE_BIO);
+const [followPlayer, { data: followData }] = useMutation(FOLLOW_PLAYER);
+const [unFollowPlayer, { data: unfollowData }] = useMutation(UNFOLLOW_PLAYER);
+// Force query to not use cache so that new characters show up right away
+const [getGamesPlayingIn, {loading: loadingPlayingIn, data: playingInData}] = useLazyQuery(GET_GAMES_PLAYING_IN, {
+    fetchPolicy: 'network-only'
+    });
 
 const sendNewMessage = () => {
     //TODO: Refactor for multiple recipients in an array. In this case, there won't be
@@ -38,9 +47,10 @@ startNewNonGameConversation({recipients, currentUserId});
 }
 
 useEffect(() => {
-
     if (userId !== null && userId !== undefined) {
         getAbout({ variables: { userId }})
+        getGamesPlayingIn({ variables: { userId }});
+
     }
 },[userId, getAbout]);
 
@@ -48,6 +58,7 @@ useEffect(() => {
  if (data !== undefined) {
     if (userId !== null && userId !== undefined) {
      setRecipients([data.about[0].User.userName]);
+     console.log('Playing In ', playingInData);
     }
     if (data !== undefined) {
         setFirstName(data.about[0].firstName);
@@ -57,6 +68,14 @@ useEffect(() => {
     }
  }
 },[data, userId]);
+
+useEffect(() => {
+    if (checkFollowData !== undefined) {
+        if (checkFollowData.checkFollowPlayer !== null) {
+            setFollowing(true);
+        }
+    }
+},[checkFollowData])
 
 const handleSubmit = (e) => {
     e.preventDefault();
@@ -71,6 +90,17 @@ const handleSubmit = (e) => {
     description.classList.remove("edit-hidden");
 
 }
+
+let followThePlayer = () => {
+    setFollowing(true);
+    followPlayer({ variables: { currentUserId, userId }});
+}
+
+let unFollowThePlayer = () => {
+    setFollowing(false);
+    unFollowPlayer({ variables: { currentUserId, userId }});
+}
+
 
 const edit = () => {
 const description = document.getElementById("user-description");
@@ -89,6 +119,16 @@ return (
     <div className="gray-backdrop">
     {data !== undefined &&
     (<div id="user-description"><p>About {data.about[0].User.userName}:</p>
+    {/* TODO: Follow player */}
+   {following === !true && (
+       <button onClick={followThePlayer}>Follow This Player</button>
+   )}
+   {following === true && (
+       <button onClick={unFollowThePlayer}>Unfollow This Player</button>
+   )}
+   <h3>Games this user is playing in:</h3>
+   {playingInData && playingInData.getGamesPlayingIn.map((game) => <div><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link></div>)}
+    <br />
     {avatarUrl && (<div><img className="avatarUrl" src={avatarUrl} /></div>)}
     {/* Conditional edit buttons based on whether user or not */}
     {/* Edit form fields directly */}

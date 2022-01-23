@@ -6,11 +6,12 @@ import { v4 as uuidv4 } from 'uuid';
 import GameMessages from "../GameMessages";
 import './game-page.css';
 
-import { GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
+import { GAME_MESSAGES_SUBSCRIPTION, REMOVE_PLAYER, GET_FOLLOWED_GAMES, FOLLOW_GAME, UNFOLLOW_GAME, GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
   import { DateTime } from "../../utils/luxon";
+import RemovePlayer from "../RemovePlayer";
 
 function GamePage() {
 
@@ -23,6 +24,15 @@ function GamePage() {
     const [details, setDetails] = useState("");
     const [title, setTitle] = useState("");
     const [blurb, setBlurb] = useState("");
+    const [waitListOpen, setWaitListOpen] = useState(true);
+    const [hostId, setHostId] = useState(null);
+    const [filteredApps, setFilteredApps] = useState([]);
+    const [active, setActive] = useState(true);
+    const [deleted, setDeleted] = useState(false);
+    const [isGameFollowed, setIsGameFollowed] = useState(false);
+    const [showRemove, setShowRemove] = useState({});
+    const [retireNote, setRetireNote] = useState('');
+    const [playerId, setPlayerId] = useState(null);
 
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
@@ -40,14 +50,87 @@ function GamePage() {
     setDisplayAccepted(!displayAccepted)
 }
 
+const removePlayerFromGame = () => {
+  removePlayer({ variables: { playerId, gameId, retireNote}})
+}
+
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId }});
+    const { data: followData, loading: followLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId: userId } });
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
-    const [updateGame] = useMutation(UPDATE_GAME, { variables: { userId, gameId, title, blurb, details }, refetchQueries: ["GetSingleGame"] } );
+    const [updateGame] = useMutation(UPDATE_GAME, { variables: { userId, gameId, title, blurb, details, waitListOpen, active, deleted }, refetchQueries: ["GetSingleGame"] } );
+    const [followGame] = useMutation(FOLLOW_GAME, { variables: { userId, gameId }, refetchQueries: ["GetSingleGame"] } );
+    const [unFollowGame] = useMutation(UNFOLLOW_GAME, { variables: { userId, gameId }, refetchQueries: ["GetSingleGame"] } );
+    const [removePlayer] = useMutation(REMOVE_PLAYER, { variables: { playerId, gameId, retireNote }} );
+
+    useEffect(() => {
+      if (data) {
+        setHostId(data.game.host.id);
+        setBlurb(data.game.blurb);
+        setDetails(data.game.description);
+        setTitle(data.game.title);
+
+      }
+    },[data]);
+
+    const toggleWaitlist = async () => {
+      const togglePromise = new Promise((resolve, reject) => resolve(doToggleWaitlist()));
+      await togglePromise;
+      updateGame(gameId, userId, blurb, title, details, waitListOpen, active, deleted);
+    }
+
+    let doToggleWaitlist = () => {
+      setWaitListOpen(!waitListOpen);
+      return waitListOpen;
+    }
+
+    const toggleActive = async () => {
+      const togglePromise = new Promise((resolve, reject) => resolve(doToggleActive()));
+      await togglePromise;
+      updateGame(gameId, userId, blurb, title, details, waitListOpen, active, deleted);
+    }
+
+    let doToggleActive = () => {
+      setActive(!active);
+      return active;
+    }
+
+    const toggleDeleted = async () => {
+      const togglePromise = new Promise((resolve, reject) => resolve(doToggleDeleted()));
+      await togglePromise;
+      updateGame(gameId, userId, blurb, title, details, waitListOpen, active, deleted);
+    }
+
+    let doToggleDeleted = () => {
+      setDeleted(!deleted);
+      return deleted;
+    }
+
+    useEffect(() => {
+      if (followData !== null && !followLoading) {
+        //check if the user is following the game
+        if (followData.getFollowedGames !== null) {
+          let followedArray = followData.getFollowedGames.followedgame.filter(game => game.id === gameId);
+          if (followedArray.length > 0) {
+            setIsGameFollowed(true);
+          }
+        }
+      }
+    },[followData]);
+
+
+
+    useEffect(() => {
+      if (data !== undefined && userId !== undefined) {
+        setWaitListOpen(data.game.waitListOpen);
+        setActive(data.game.active);
+        setFilteredApps(data.game.Applications.filter(app => app.applicationOwner[0].id == userId));
+      }
+    },[data, userId]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
       // setErrors([]);
-      updateGame({ variables: { gameId, userId, blurb, title, details } });
+      updateGame({ variables: { gameId, userId, blurb, title, details, waitListOpen } });
 
       const description = document.getElementById("edit-details");
       const form = document.getElementById("edit-form");
@@ -58,6 +141,23 @@ function GamePage() {
 
       //TODO:Actually update the stuff
 
+  }
+
+  const followThisGame = () => {
+    setIsGameFollowed(!isGameFollowed);
+    followGame({variables: { userId, gameId }});
+  }
+
+  const unFollowThisGame = () => {
+    setIsGameFollowed(!isGameFollowed);
+    unFollowGame({variables: { userId, gameId }});
+  }
+
+
+
+  const submitRemove = () => {
+    //setPlayerId(characterPlayerId)
+    //removePlayer({ variables: { playerId, gameId, retireNote }});
   }
 
   const edit = () => {
@@ -87,24 +187,38 @@ return (
         <div id="edit-details" className="game-content-block">
             <h2>More About This Game</h2>
             {data !== undefined && (<span>{data.game.description}</span>)}
+            {/* TODO: Follow Game */}
+            {isGameFollowed === false && (<button onClick={followThisGame}>Follow Game</button>)}
+            {isGameFollowed === true && (<button onClick={unFollowThisGame}>Unfollow Game</button>)}
         </div>
 
         <div className="game-content-block">
         <h2>Playing In This Game</h2>
             {/* This feels a little backwards, but we're grabbing the player associated with the character */}
-            {data !== undefined && data.game.Characters.map((character) => <span key={uuidv4()}><Link to={`/${character.User.id}/bio`}>{character.User.userName}</Link> as <Link to={`/characters/${character.id}`}>{character.name}</Link></span>)}
+            {/* TODO: GMs can remove characters from game */}
+            {data !== undefined && data.game.Characters.map((character) =>
+
+            {
+              return character.retired !== undefined && character.retired === false && (<RemovePlayer character={character} userId={userId} hostId={hostId} gameId={gameId}></RemovePlayer>)}
+            )}
+<h3>Retired:</h3>
+{data !== undefined && data.game.Characters.map((character) =>
+
+{
+  return character.retired !== undefined && character.retired === true && (<RemovePlayer character={character} userId={userId} hostId={hostId} gameId={gameId}></RemovePlayer>)}
+)}
 
             {/* Player is able to join waitlist */}
-            {data !== undefined && userId !== null && userId !== undefined && data.game.host.id.toString() !== userId.toString() && data.game.waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Submit a Character to the Waitlist</Link><br /></>)}
+            {hostId !== null && userId !== null && userId !== undefined && hostId.toString() !== userId.toString() && waitListOpen.toString() !== "false" && (<><Link to={`/waitlist/${gameId}`}>Submit a Character to the Waitlist</Link><br /></>)}
 
-            {/* TODO: GM is not allowing multiple apps and player has applied */}
             {waitlistStatus && waitlistStatus.checkApplied.length > 0 && (<p>You have already applied to this game, and multiple applications are not allowed by the GM.</p>)}
-
-            {data !== undefined && userId !== null && userId !== undefined && data.game.host.id !== userId.toString() && data.game.waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
+            {filteredApps.length > 0 && (<p>Your Waitlist Applications:</p>)}
+            {filteredApps.map(app => <Link to={`/game/${gameId}/application/${app.id}`}>{app.charName}</Link>)}
+            {waitListOpen !== null && hostId !== null && userId !== null && userId !== undefined && hostId !== userId.toString() && waitListOpen.toString() === "false" && (<><i>Waitlist closed.</i></>)}
         </div>
 
 </div>
-        {data !== undefined && userId !== undefined && userId !== null && data.game.host.id && userId.toString() === data.game.host.id && (
+        {hostId !== null && userId !== undefined && userId !== null && hostId && userId.toString() === hostId && (
           <div>
 
           <div className="game-content-block">
@@ -147,10 +261,13 @@ return (
             {displayAccepted.toString() === 'true' &&(<div><p>Accepted Applications:</p>{data.game.Applications.map(application => application.accepted.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link> on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
             {displayIgnored.toString() === 'true' &&(<div><p>Ignored Applications:</p>
             {data.game.Applications.map(application => application.accepted.toString() !== 'true' && application.ignored.toString() === 'true' && (<div key={uuidv4()}><p key={uuidv4()}><Link to={`/game/${gameId}/application/${application.id}`}>{application.charName}</Link>, submitted by <Link to={`/${application.applicationOwner[0].id}/bio/`}>{application.applicationOwner[0].userName}</Link>, submitted on {DateTime.local({millisecond: application.createdAt}).toFormat('MM/dd/yy')} at {DateTime.local({millisecond: application.createdAt}).toFormat('t')}</p></div>))}</div>)}
+            {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && waitListOpen &&(<button onClick={toggleWaitlist}>Close Waitlist</button>)}{!waitListOpen && (<button onClick={toggleWaitlist}>Open Waitlist</button>)}
           </div>
+          {/* End Campaign (ends game series) */}
+          {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && active &&(<button onClick={toggleActive}>End Campaign</button>)}{hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && !active &&(<button onClick={toggleActive}>Restart Campaign</button>)}
+        {/* Delete Game (hides from search and everyone, including players) */}
+        {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && !deleted &&(<button class="delete" onClick={toggleDeleted}>DELETE Campaign</button>)}{hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && deleted &&(<button class="delete" onClick={toggleDeleted}>Undelete Campaign</button>)}
         </div>
-
-
         )}
       </div>
       </div>

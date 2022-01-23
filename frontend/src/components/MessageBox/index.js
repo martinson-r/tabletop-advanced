@@ -26,6 +26,26 @@ function MessageBox(props) {
     const dropdownButton = useRef(null);
     const editDropdown = useRef(null);
 
+    //helper function for breaking up long words, reference
+    function breakLongWords(string) {
+      var maxWordLength = 8;
+      var arbitraryWordBreakPoint = 5;
+      string = string.split(' ').map(function(word){
+        if (word.length <= maxWordLength) return word;
+
+        var wordLength = word.length;
+
+        word = word.split('');
+        for (var i = arbitraryWordBreakPoint; i < wordLength; i = i+arbitraryWordBreakPoint) {
+          //you can't see it but the space is &shy;
+          word.splice(i, 0, '­');
+        }
+        return word.join('');
+      }).join(' ');
+
+      return string;
+    }
+
     const [editMessage] = useMutation(EDIT_MESSAGE, { variables: { messageId, userId, editMessageText } } );
     const [deleteMessage] = useMutation(DELETE_MESSAGE, { variables: { messageId: messageToDelete, userId } } );
     // const { loading, error, data } = useQuery(GET_CHARACTER, { variables: { userId: message.sender.id, gameId } });
@@ -127,16 +147,16 @@ function MessageBox(props) {
           <span className="character-box">
 
               {/* Display usernames in non game chats */}
-              {isGame === false && message.conversationId !== null && (<span>{message.sender.userName}</span>)}
+              {isGame === false && message.conversationId !== null && (<span>{breakLongWords(message.sender.userName)}</span>)}
 
               {/* Display character name only if sender has a character */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{message.sender.Characters[0].name}</span>)}
+              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<span>{breakLongWords(message.sender.Characters[0].name)}</span>)}
 
               {/* Display DM user name (they have no character) */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && (<span>{message.sender.userName}</span>)}
+              {message.sender.Characters !== undefined && message.sender.Characters.length === 0 && (<span>{breakLongWords(message.sender.userName)}</span>)}
 
               {/* Display sender name if they have a character */}
-              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<p className="sender-name">{message.sender.userName}</p>)}
+              {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<p className="sender-name">{breakLongWords(message.sender.userName)}</p>)}
 
               {/* Display tool tip if they are Game Master */}
               {gameData !== undefined && message.sender.Characters !== undefined && message.sender.Characters.length === 0 && message.sender.id === gameData.game.host.id && (<p className="sender-name">Game Master</p>)}
@@ -157,7 +177,7 @@ function MessageBox(props) {
 
             {/* Display message content */}
             {message.deleted !== true &&
-            (<span className="message-text">{message.messageText} </span>)}
+            (<span className="message-text">{breakLongWords(message.messageText)} </span>)}
             {message.deleted === true && (<i>message deleted</i>)}</span></div>)}
             {/* {userId === null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={false}>
 

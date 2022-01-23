@@ -154,6 +154,7 @@ const GET_GAME = gql`
         Characters {
             id
             name
+            retired
             User {
                 id
                 userName
@@ -173,6 +174,14 @@ const GET_GAME = gql`
         }
     }
 `;
+
+const CHECK_FOLLOW_PLAYER = gql`
+query CheckIfFollowingPlayer($currentUserId: ID, $userId: ID) {
+    checkFollowPlayer(currentUserId: $currentUserId, userId: $userId) {
+        id
+    }
+}
+`
 
 const GET_GAMES_WITH_RULESET = gql`
 query GetGamesWithRuleset($rulesetid: ID) {
@@ -202,9 +211,11 @@ query GetCharacter($userId: ID, $gameId: ID) {
 const GET_CHARACTER_BY_ID = gql`
 query GetCharacterById($characterId: ID) {
     characterById(characterId: $characterId) {
+        characterSheetId
         name
         bio
         imageUrl
+        characterSheetId
         User {
             userName
             id
@@ -213,6 +224,65 @@ query GetCharacterById($characterId: ID) {
             title
             id
         }
+    }
+}
+`
+
+const GET_CHARACTERSHEET_BY_ID = gql`
+query GetCharacterSheetById($charactersheetid: ID) {
+    charactersheet(charactersheetid: $charactersheetid) {
+        name
+        age
+        intelligence
+        strength
+        wisdom
+        agility
+        dexterity
+        constitution
+        charisma
+        class
+        level
+        alignment
+        background
+        gender
+        armor
+        armorclass
+        initiative
+        speed
+        maxhp
+        currenthp
+        temphp
+        proficiencybonus
+        passiveperception
+        spellsweapons
+        spellatkbonus
+        preparedspells
+        spellsavedc
+        cantripsknown
+        slotlevel
+        traits
+        languages
+        proficiencies
+        weaponsspells
+        items
+        currency
+        notes
+        race
+        weight
+        height
+        skills
+        other
+        playerId
+    }
+}
+`
+
+const GET_CHARACTERSHEET_LIST_BY_PLAYER = gql`
+query GetCharacterSheetListByPlayer($playerId: ID) {
+    playercharactersheets(playerId: $playerId) {
+        id
+        name
+        class
     }
 }
 `
@@ -390,6 +460,29 @@ query SimpleSearch($text: String) {
     }
 }
 `
+const GET_FOLLOWED_PLAYERS = gql`
+query GetFollowedPlayers($playerId: ID) {
+    getFollowedPlayers(playerId: $playerId) {
+        id
+        followedplayer {
+            id
+            userName
+        }
+    }
+}
+`
+
+const GET_FOLLOWED_GAMES = gql`
+query GetFollowedGames($playerId: ID) {
+    getFollowedGames(playerId: $playerId) {
+        id
+        followedgame {
+            id
+            title
+        }
+    }
+}
+`
 
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
@@ -516,6 +609,136 @@ mutation DeclineOffer($applicationId: ID) {
 }
 `
 
+const CREATE_CHARACTERSHEET = gql`
+mutation CreateCharacterSheet(
+    $userId: ID,
+    $name: String,
+    $age: Int,
+    $intelligence: Int,
+    $strength: Int,
+    $wisdom: Int,
+    $agility: Int,
+    $dexterity: Int,
+    $constitution: Int,
+    $charisma: Int,
+    $characterClass: String,
+    $level: Int,
+    $alignment: String,
+    $background: String,
+    $gender: String,
+    $armor: String,
+    $armorClass: Int,
+    $initiative: String,
+    $speed: Int,
+    $maxhp: Int,
+    $currenthp: Int,
+    $temphp: Int,
+    $proficiencybonus: Int,
+    $passiveperception: Int,
+    $spellsweapons: String,
+    $preparedspells: String,
+    $spellsavedc: Int,
+    $cantripsknown: String,
+    $slotlevel: Int,
+    $traits: String,
+    $languages: String,
+    $proficiencies: String,
+    $weaponsspells: String,
+    $items: String,
+    $currency: String,
+    $notes: String,
+    $race: String,
+    $height: String,
+    $weight: String,
+    $skills: String,
+    $other: String) { createCharacterSheet(
+        playerId: $userId,
+        characterClass: $characterClass,
+        name: $name,
+        age: $age,
+        intelligence: $intelligence,
+        strength: $strength,
+        wisdom: $wisdom,
+        agility: $agility,
+        dexterity: $dexterity,
+        constitution: $constitution,
+        charisma: $charisma,
+        level: $level,
+        alignment: $alignment,
+        background: $background,
+        gender: $gender,
+        armor: $armor,
+        armorclass: $armorclass,
+        initiative: $initiative,
+        speed: $speed,
+        maxhp: $maxhp,
+        currenthp: $currenthp,
+        temphp: $temphp,
+        proficiencybonus: $proficiencybonus,
+        passiveperception: $passiveperception,
+        spellsweapons: $spellsweapons,
+        spellatkbonus: $spellatkbonus,
+        preparedspells: $preparedspells,
+        spellsavedc: $spellsavedc,
+        cantripsknown: $cantripsknown,
+        slotlevel: $slotlevel,
+        traits: $traits,
+        languages: $languages,
+        proficiencies: $proficiencies,
+        weaponsspells: $weaponsspells,
+        items: $items,
+        currency: $currency,
+        notes: $notes,
+        race: $race,
+        weight: $weight,
+        height: $height,
+        skills: $skills,
+        other: $other) {
+        name
+        age
+        intelligence
+        strength
+        wisdom
+        agility
+        dexterity
+        constitution
+        charisma
+        class
+        level
+        alignment
+        background
+        gender
+        armor
+        armorclass
+        initiative
+        speed
+        maxhp
+        currenthp
+        temphp
+        proficiencybonus
+        passiveperception
+        spellsweapons
+        spellatkbonus
+        preparedspells
+        spellsavedc
+        cantripsknown
+        slotlevel
+        traits
+        languages
+        proficiencies
+        weaponsspells
+        items
+        currency
+        notes
+        race
+        weight
+        height
+        skills
+        other
+    }
+}
+`
+
 //IDs are required on backend but if I don't mark them required on frontend,
 //we get a 404...
 //Took me forever to troubleshoot this.
@@ -548,12 +771,13 @@ const SUBMIT_CHARACTER_CREATION = gql`
 `;
 
 const UPDATE_CHARACTER = gql`
-  mutation UpdateCharacter($characterId: ID, $bio: String, $imageUrl: String, $name: String) {
-    updateCharacter(characterId: $characterId, bio: $bio, imageUrl: $imageUrl, name: $name) {
+  mutation UpdateCharacter($characterId: ID, $bio: String, $imageUrl: String, $name: String, $characterSheetId: ID) {
+    updateCharacter(characterId: $characterId, bio: $bio, imageUrl: $imageUrl, name: $name, characterSheetId: $characterSheetId) {
                 id
                 bio
                 imageUrl
                 name
+                characterSheetId
     }
 }
 `;
@@ -571,15 +795,64 @@ const UPDATE_BIO = gql`
 `;
 
 const UPDATE_GAME = gql`
-  mutation UpdateGame($userId: ID, $gameId: ID, $title: String, $blurb: String, $details: String) {
-    updateGame(userId: $userId, gameId: $gameId, title: $title, blurb: $blurb, details: $details) {
+  mutation UpdateGame($userId: ID, $gameId: ID, $title: String, $blurb: String, $details: String, $waitListOpen: Boolean, $deleted: Boolean, $active: Boolean) {
+    updateGame(userId: $userId, gameId: $gameId, title: $title, blurb: $blurb, details: $details, waitListOpen: $waitListOpen, deleted: $deleted, active: $active) {
                 gameId
                 blurb
                 title
                 details
+                active
+                deleted
+                waitListOpen
     }
 }
 `;
+
+const FOLLOW_GAME = gql`
+mutation FollowGame($userId: ID, $gameId: ID) {
+    followGame(userId: $userId, gameId: $gameId) {
+        id
+        title
+        blurb
+        details
+        active
+        deleted
+        waitListOpen
+    }
+}
+`
+
+const UNFOLLOW_GAME = gql`
+mutation UnFollowGame($userId: ID, $gameId: ID) {
+    unFollowGame(userId: $userId, gameId: $gameId) {
+        id
+    }
+}
+`
+
+const FOLLOW_PLAYER = gql`
+mutation FollowPlayer($currentUserId: ID, $userId: ID) {
+    followPlayer(currentUserId: $currentUserId, userId: $userId) {
+        id
+    }
+}
+`
+
+const UNFOLLOW_PLAYER = gql`
+mutation UnFollowPlayer($currentUserId: ID, $userId: ID) {
+    unFollowPlayer(currentUserId: $currentUserId, userId: $userId) {
+        id
+    }
+}
+`
+
+const REMOVE_PLAYER = gql`
+mutation RemovePlayer($playerId: ID, $gameId: ID, $retireNote: String) {
+    removePlayer(playerId: $playerId, gameId: $gameId, retireNote: $retireNote) {
+        id
+    }
+}
+`
 
 const EDIT_WAITLIST_APP = gql`
   mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
@@ -703,9 +976,20 @@ export { GET_ACCOUNTS,
         GET_GAME,
         GET_CHARACTER,
         GET_CHARACTER_BY_ID,
+        GET_CHARACTERSHEET_BY_ID,
+        GET_CHARACTERSHEET_LIST_BY_PLAYER,
+        GET_FOLLOWED_PLAYERS,
+        GET_FOLLOWED_GAMES,
+        CREATE_CHARACTERSHEET,
         UPDATE_CHARACTER,
         UPDATE_BIO,
         UPDATE_GAME,
+        FOLLOW_GAME,
+        UNFOLLOW_GAME,
+        FOLLOW_PLAYER,
+        REMOVE_PLAYER,
+        UNFOLLOW_PLAYER,
+        CHECK_FOLLOW_PLAYER,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,
