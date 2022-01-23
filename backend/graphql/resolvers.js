@@ -80,17 +80,17 @@ const resolvers = {
         },
 
         getFollowedGames: (obj, args, context, info) => {
-            const {playerId} = args;
+            const { playerId } = args;
             return User.findByPk(playerId, {include: [{model: Game, through: "FollowedGames", as: "followedgame"}]});
         },
 
         getFollowedPlayers:(obj, args, context, info) => {
-            const {playerId} = args;
+            const { playerId } = args;
+            console.log(args);
             let userId = playerId;
             console.log('player id ', userId)
             return User.findByPk(playerId, { include: [{model: User, through: "FollowedPlayers", as: "followedplayer"}]});
         },
-
 
         messages: (obj, args, context, info) => {
             return Message.findAll();
@@ -742,11 +742,32 @@ const resolvers = {
 
         createCharacterSheet: async(root, args) => {
             const {playerId, name, characterClass} = args;
-            let age = playerId;
-            console.log(args)
-            const characterSheet = await CharacterSheet.create({age, playerId: 4, name, class: characterClass});
+            const characterSheet = await CharacterSheet.create({age, playerId, name, class: characterClass});
             return characterSheet;
+        },
+
+        followGame: async(root, args) => {
+            const {userId, gameId} = args;
+            let followCheck = await FollowedGame.findOne({where: {[Op.and]:
+                [{userId}, {gameId}]}});
+
+            //Just in case, make sure game cannot be followed more than once
+            if (followCheck) {
+                return followCheck;
+            } else {
+                const followedTheGame = await FollowedGame.create({userId, gameId});
+                return followedTheGame;
+            }
+        },
+
+        unFollowGame: async(root, args) => {
+            const {userId, gameId} = args;
+            let game = await FollowedGame.destroy({where: {[Op.and]:
+                [{userId}, {gameId}]}});
+                console.log(game);
+            return FollowedGame.findOne({where: {gameId}})
         }
+
     },
     Subscription: {
         spectatorMessageSent: {

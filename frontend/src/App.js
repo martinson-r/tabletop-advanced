@@ -43,7 +43,7 @@ function App() {
       {isLoaded && (<Switch>
         <Route path="/login" component={Login}></Route>
         <Route path="/signup" component={SignUp}></Route>
-        <Route path="/game/:gameId/gameroom/" name="GamePage" component={GamePage} exact={true}></Route>
+        <Route path="/game/:gameId/gameroom" name="GamePage" component={GamePage} exact={true}></Route>
         {/* <Route path="/game/:gameId" component={Game} exact={true}></Route> */}
         <Route path="/start-game" component={SubmitGame} exact={true}></Route>
         <Route path="/dashboard" component={Dashboard} exact={true}></Route>
@@ -61,7 +61,7 @@ function App() {
         <Route path="/charactersheets/new" component={NewCharacterSheet}></Route>
         <Route path="/charactersheets/list/:playerId" component={CharacterSheetList}></Route>
         <Route path="/charactersheets/:charactersheetid" component={CharacterSheet}></Route>
-        <Route path="/:playerid/followed" component={FollowedGamesPlayers}></Route>
+        <Route path="/:playerId/followed" component={FollowedGamesPlayers}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

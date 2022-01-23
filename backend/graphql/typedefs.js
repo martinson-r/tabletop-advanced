@@ -34,15 +34,13 @@ const typeDefs = gql`
   type FollowedGame {
     id: ID,
     userId: ID,
-    gameId: ID,
-    game: [Game]
+    gameId: ID
 
   }
   type FollowedPlayer {
     id: ID,
     userId: ID,
-    playerId: ID,
-    followedplayer: [User]
+    playerId: ID
   }
   type GameCreationInfo {
     languages: [Language],
@@ -280,7 +278,6 @@ const typeDefs = gql`
     Applications: [Application],
     blurb: String,
     spectatorChat: Boolean,
-    followedGame: [Game]
   }
   type Application {
     id: ID
@@ -363,6 +360,8 @@ const typeDefs = gql`
     acceptOffer(applicationId: ID, gameId: ID, userId: ID): Application
     createCharacterSheet(playerId: ID, name: String, characterClass: String): CharacterSheet
     editWaitlistApp(applicationId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
+    followGame(userId: ID, gameId: ID): Game
+    unFollowGame(userId: ID, gameId: ID): Game
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,

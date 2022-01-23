@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import GameMessages from "../GameMessages";
 import './game-page.css';
 
-import { GAME_MESSAGES_SUBSCRIPTION, GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
+import { GAME_MESSAGES_SUBSCRIPTION, GET_FOLLOWED_GAMES, FOLLOW_GAME, UNFOLLOW_GAME, GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
@@ -28,6 +28,7 @@ function GamePage() {
     const [filteredApps, setFilteredApps] = useState([]);
     const [active, setActive] = useState(true);
     const [deleted, setDeleted] = useState(false);
+    const [isGameFollowed, setIsGameFollowed] = useState(false);
 
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
@@ -45,17 +46,12 @@ function GamePage() {
     setDisplayAccepted(!displayAccepted)
 }
 
-const toggleApplications = () => {
-  //mutation
-  setWaitListOpen(!waitListOpen);
-}
-
-
-
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId }});
+    const { data: followData, loading: followLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId: userId } });
     const { loading: loadWaitlistStatus, error: waitlistError, data: waitlistStatus } = useQuery(GET_WAITLIST_APPLIED, { variables: { userId, gameId }})
     const [updateGame] = useMutation(UPDATE_GAME, { variables: { userId, gameId, title, blurb, details, waitListOpen, active, deleted }, refetchQueries: ["GetSingleGame"] } );
-
+    const [followGame] = useMutation(FOLLOW_GAME, { variables: { userId, gameId }, refetchQueries: ["GetSingleGame"] } );
+    const [unFollowGame] = useMutation(UNFOLLOW_GAME, { variables: { userId, gameId }, refetchQueries: ["GetSingleGame"] } );
 
     useEffect(() => {
       if (data) {
@@ -100,6 +96,18 @@ const toggleApplications = () => {
       return deleted;
     }
 
+    useEffect(() => {
+      if (followData !== null && !followLoading) {
+        //check if the user is following the game
+        if (followData.getFollowedGames !== null) {
+          let followedArray = followData.getFollowedGames.followedgame.filter(game => game.id === gameId);
+          if (followedArray.length > 0) {
+            setIsGameFollowed(true);
+          }
+        }
+      }
+    },[followData]);
+
 
 
     useEffect(() => {
@@ -126,6 +134,16 @@ const toggleApplications = () => {
 
   }
 
+  const followThisGame = () => {
+    setIsGameFollowed(!isGameFollowed);
+    followGame({variables: { userId, gameId }});
+  }
+
+  const unFollowThisGame = () => {
+    setIsGameFollowed(!isGameFollowed);
+    unFollowGame({variables: { userId, gameId }});
+  }
+
   const edit = () => {
   const description = document.getElementById("edit-details");
   const form = document.getElementById("edit-form");
@@ -150,11 +168,12 @@ return (
 <GameMessages gameId={gameId} />
 <div className="gray-backdrop">
 <div className="details">
-  {console.log('HOSTID: ', hostId)}
-  {console.log('WAITLIST: ', waitListOpen)}
         <div id="edit-details" className="game-content-block">
             <h2>More About This Game</h2>
             {data !== undefined && (<span>{data.game.description}</span>)}
+            {/* TODO: Follow Game */}
+            {isGameFollowed === false && (<button onClick={followThisGame}>Follow Game</button>)}
+            {isGameFollowed === true && (<button onClick={unFollowThisGame}>Unfollow Game</button>)}
         </div>
 
         <div className="game-content-block">

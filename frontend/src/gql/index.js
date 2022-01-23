@@ -452,17 +452,27 @@ query SimpleSearch($text: String) {
 }
 `
 const GET_FOLLOWED_PLAYERS = gql`
-query GetFollowedPlayers($playerId: String) {
+query GetFollowedPlayers($playerId: ID) {
     getFollowedPlayers(playerId: $playerId) {
         id
-        userName
-        player {
+        followedplayer {
             id
             userName
         }
     }
 }
+`
 
+const GET_FOLLOWED_GAMES = gql`
+query GetFollowedGames($playerId: ID) {
+    getFollowedGames(playerId: $playerId) {
+        id
+        followedgame {
+            id
+            title
+        }
+    }
+}
 `
 
 //MUTATIONS
@@ -789,6 +799,28 @@ const UPDATE_GAME = gql`
 }
 `;
 
+const FOLLOW_GAME = gql`
+mutation FollowGame($userId: ID, $gameId: ID) {
+    followGame(userId: $userId, gameId: $gameId) {
+        id
+        title
+        blurb
+        details
+        active
+        deleted
+        waitListOpen
+    }
+}
+`
+
+const UNFOLLOW_GAME = gql`
+mutation UnFollowGame($userId: ID, $gameId: ID) {
+    unFollowGame(userId: $userId, gameId: $gameId) {
+        id
+    }
+}
+`
+
 const EDIT_WAITLIST_APP = gql`
   mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
     editWaitlistApp(applicationId: $applicationId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
@@ -914,10 +946,13 @@ export { GET_ACCOUNTS,
         GET_CHARACTERSHEET_BY_ID,
         GET_CHARACTERSHEET_LIST_BY_PLAYER,
         GET_FOLLOWED_PLAYERS,
+        GET_FOLLOWED_GAMES,
         CREATE_CHARACTERSHEET,
         UPDATE_CHARACTER,
         UPDATE_BIO,
         UPDATE_GAME,
+        FOLLOW_GAME,
+        UNFOLLOW_GAME,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,
