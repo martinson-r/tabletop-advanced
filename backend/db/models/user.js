@@ -11,36 +11,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       //Aliased, to make life easier
-      User.belongsToMany(models.Game, { through: 'PlayerJoins', as: "gamePlayed", foreignKey: 'userId', otherKey: 'gameId' });
-      // User.belongsToMany(models.Game, {as: "GameModerator", through: 'Moderator', foreignKey: 'userId', otherKey: 'gameId' });
-      // User.belongsToMany(models.Game, {as: "GameSpectator", through: 'Spectator', foreignKey: 'userId', otherKey: 'gameId' });
       User.hasMany(models.Game, { as: "host", foreignKey: 'hostId' });
       User.hasMany(models.Character, { foreignKey: 'userId'});
       User.hasMany(models.Message, { as: "sender", foreignKey: "senderId" });
-      //User.hasMany(models.Application, {as: "applicant", foreignKey: "userId"});
+      User.hasMany(models.AboutMe, { foreignKey: "userId"});
 
       //Can't associate to applications again.
-      User.belongsToMany(models.Application, { through: "Waitlists", as: "applicationOwner", foreignKey: "userId", otherKey: "applicationId"});
-      User.belongsToMany(models.Application, {as: "gameHost", through: "Waitlists", foreignKey: "userId", otherKey: "applicationId"});
+      User.belongsToMany(models.Application, { through: "Waitlists", as: "applicationOwner", foreignKey: "userId", otherKey: "applicationId" });
+      User.belongsToMany(models.Application, {as: "gameHost", through: "Waitlists", foreignKey: "userId", otherKey: "applicationId" });
       User.belongsToMany(models.Game, { through: "Waitlists", as: "applicant", foreignKey: "userId", otherKey: "gameId"});
-      User.hasMany(models.AboutMe, { foreignKey: "userId"});
-      User.belongsToMany(models.Conversation, {through: "Recipients", as: "recipient", foreignKey: "userId", otherKey: "conversationId"});
+      User.belongsToMany(models.Game, { through: "PlayerJoins", as: "gamePlayed", foreignKey: 'userId', otherKey: 'gameId' });
+      User.belongsToMany(models.Conversation, {through: "Recipients", as: "recipient", foreignKey: "userId", otherKey: "conversationId" });
 
-      //TODO Refactor: Blocked Users in Games should go on a joins table
-
-      //Self joining association
-      //User.belongsToMany(models.User, {as: "BlockingUser", through: 'BlockedPlayer', foreignKey: 'userId', otherKey: 'otherUserId' });
-      //User.belongsToMany(models.User, {as: "BlockedUser", through: 'BlockedPlayer', foreignKey: 'otherUserId', otherKey: 'userId' });
-
-      // User.belongsToMany(models.GameDay, {through: 'GameDaysPreferences', foreignKey: 'userId', otherKey: 'gameDayId' });
-      // User.belongsToMany(models.GameFrequency, {through: 'GameFrequencyPreferences', foreignKey: 'userId', otherKey: 'gameFrequencyId' });
-      // User.belongsToMany(models.GameCleanliness, {through: 'GameCleanlinessPreferences', foreignKey: 'userId', otherKey: 'gameCleanlinessId' });
-      // User.belongsToMany(models.Badge, {through: 'BadgeJoin', foreignKey: 'usereId', otherKey: 'badgeId' });
-      // User.belongsToMany(models.GameType, { through: "GameTypePreference", foreignKey: "userId", otherKey: "gameTypeId"});
-      // User.belongsToMany(models.Book, { through: "PreferredBook", foreignKey: "userId", otherKey: "bookId"});
-      // User.belongsToMany(models.Ruleset, { through: "PreferredRuleset", foreignKey: "userId", otherKey: "rulesetId"});
-      // User.belongsToMany(models.Language, { through: "PreferredLanguage", foreignKey: "userId", otherKey: "languageId"});
-      //User.belongsToMany(models.Message, { through: "Recipient", foreignKey: "userId", otherKey: "messageId"});
+      // Game.belongsToMany(models.User, { through: "Waitlists", as: "applicant", foreignKey: "gameId", otherKey: "userId"})
+      User.belongsToMany(models.User, { through: "FollowedPlayers", as: "followedplayer", foreignKey: "userId", otherKey: "playerId" });
     }
   };
   User.init({

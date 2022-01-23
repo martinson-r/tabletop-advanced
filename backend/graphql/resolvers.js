@@ -1,4 +1,4 @@
-const { Message, Recipient, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist, CharacterSheet } = require('../db/models');
+const { Message, Recipient, FollowedGame, FollowedPlayer, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist, CharacterSheet } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -78,6 +78,20 @@ const resolvers = {
             console.log(args);
             return CharacterSheet.findAll({where: { playerId} });
         },
+
+        // getFollowedGames:(obj, args, context, info) => {
+        //     const {playerId} = args;
+        //     console.log('player id followed players')
+        //     return FollowedGame.findAll();
+        // },
+
+        getFollowedPlayers: async(obj, args, context, info) => {
+            const {playerId} = args;
+            let userId = playerId;
+            console.log('player id ', userId)
+            return User.findByPk(playerId, { include: [{model: User, through: "FollowedPlayers", as: "followedplayer"}]});
+        },
+
 
         messages: (obj, args, context, info) => {
             return Message.findAll();

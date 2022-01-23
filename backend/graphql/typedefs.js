@@ -24,10 +24,25 @@ const typeDefs = gql`
     getPlayingWaitingGames(userId: ID): [User]
     getWaitlistGames(userId: ID): [Game]
     getGamesPlayingIn(userId: ID): [Game]
+    getFollowedGames(playerId: ID): [FollowedGame]
+    getFollowedPlayers(playerId: ID): User
     simpleSearch(text: String): resultsArray
     characterById(characterId: ID): Character
     charactersheet(charactersheetid: ID): CharacterSheet
     playercharactersheets(playerId: ID): [CharacterSheet]
+  }
+  type FollowedGame {
+    id: ID,
+    userId: ID,
+    gameId: ID,
+    game: [Game]
+
+  }
+  type FollowedPlayer {
+    id: ID,
+    userId: ID,
+    playerId: ID,
+    followedplayer: [User]
   }
   type GameCreationInfo {
     languages: [Language],
@@ -155,6 +170,7 @@ const typeDefs = gql`
     gameApplication: [Application]
     applicationOwner: [Application]
     Characters: [Character]
+    followedplayer: [User]
   }
   type Ruleset {
     id: ID,

@@ -451,6 +451,19 @@ query SimpleSearch($text: String) {
     }
 }
 `
+const GET_FOLLOWED_PLAYERS = gql`
+query GetFollowedPlayers($playerId: String) {
+    getFollowedPlayers(playerId: $playerId) {
+        id
+        userName
+        player {
+            id
+            userName
+        }
+    }
+}
+
+`
 
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
@@ -900,6 +913,7 @@ export { GET_ACCOUNTS,
         GET_CHARACTER_BY_ID,
         GET_CHARACTERSHEET_BY_ID,
         GET_CHARACTERSHEET_LIST_BY_PLAYER,
+        GET_FOLLOWED_PLAYERS,
         CREATE_CHARACTERSHEET,
         UPDATE_CHARACTER,
         UPDATE_BIO,

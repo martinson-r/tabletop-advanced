@@ -10,24 +10,10 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      //Game.belongsToMany(models.User, {as: "UserModerator", through: 'Moderator', foreignKey: 'gameId', otherKey: 'userId' });
       Game.belongsToMany(models.Application, {through: "Waitlists", foreignKey: 'gameId', otherKey: 'applicationId'});
       Game.belongsTo(models.GameType, {foreignKey: "gameTypeId"});
-      // Game.belongsTo(models.GameSize, {foreignKey: "gameSizeId"});
-      // Game.belongsTo(models.GameFrequency, {foreignKey: "gameFrequencyId"});
-      // Game.belongsTo(models.GameCleanliness, {foreignKey: "gameCleanlinessId"});
-
-      //TODO Refactor: Blocked Users in Games should go on a joins table
-
-       Game.belongsTo(models.User, { as: "host", foreignKey: 'hostId'});
-      //Game.belongsTo(models.User, {as: "GuestHost", foreignKey: "guestHostId"});
-      // Game.belongsTo(models.Ruleset, {foreignKey: "ruleSetId"});
+      Game.belongsTo(models.User, { as: "host", foreignKey: 'hostId'});
       Game.belongsTo(models.Language, {foreignKey: "languageId"});
-      // Game.belongsTo(models.GameTime, {foreignKey: "gameTimeId"});
-      // Game.belongsTo(models.GameFrequency, {foreignKey: "gameFrequencyId"});
-      // Game.belongsTo(models.GameSize, {foreignKey: "gameSizeId"});
-      // Game.belongsToMany(models.Book, {through: 'BookList', foreignKey: 'gameId', otherKey: 'bookId' });
-      // Game.belongsToMany(models.GameDay, {through: 'GameDaysJoins', foreignKey: 'gameId', otherKey: 'gameDayId' });
       Game.belongsToMany(models.User, { through: "PlayerJoins", as: "player", foreignKey: "gameId", otherKey: "userId"});
       Game.hasMany(models.Character, { foreignKey: "gameId"});
       Game.belongsToMany(models.User, { through: "Waitlists", as: "applicant", foreignKey: "gameId", otherKey: "userId"})
