@@ -237,6 +237,12 @@ const resolvers = {
             return { wordsArray: wordsArray }
 
         },
+
+        checkFollowPlayer: (obj, args, context, info) => {
+            const {currentUserId, userId} = args;
+            return FollowedPlayer.findOne({where: {[Op.and]:
+                [{userId: currentUserId}, {playerId: userId}]}});
+        }
     },
     Mutation: {
         sendMessageToGame: async(root,args) => {
@@ -766,6 +772,30 @@ const resolvers = {
                 [{userId}, {gameId}]}});
                 console.log(game);
             return FollowedGame.findOne({where: {gameId}})
+        },
+
+        followPlayer: async(root, args) => {
+            const {currentUserId, userId} = args;
+            let otherUserId = userId;
+
+            //confusing and my own fault for naming variables this way
+            let followCheck = await FollowedPlayer.findOne({where: {[Op.and]:
+                [{userId: currentUserId}, {playerId: otherUserId}]}});
+
+            //Just in case, make sure game cannot be followed more than once
+            if (followCheck) {
+                return followCheck;
+            } else {
+                const followedThePlayer = await FollowedPlayer.create({userId: currentUserId, playerId: otherUserId});
+                return followedThePlayer;
+            }
+        },
+
+        unFollowPlayer: async(root, args) => {
+            const {currentUserId, userId} = args;
+            await FollowedPlayer.destroy({where: {[Op.and]:
+                [{userId: currentUserId}, {playerId: userId}]}});
+            return FollowedPlayer.findOne({where: {playerId: userId}})
         }
 
     },

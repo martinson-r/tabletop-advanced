@@ -30,6 +30,7 @@ const typeDefs = gql`
     characterById(characterId: ID): Character
     charactersheet(charactersheetid: ID): CharacterSheet
     playercharactersheets(playerId: ID): [CharacterSheet]
+    checkFollowPlayer(currentUserId: ID, userId: ID): User
   }
   type FollowedGame {
     id: ID,
@@ -214,7 +215,7 @@ const typeDefs = gql`
   }
   type CountAll {
     rows: [Message]
-    count: Int
+    count: Game
   }
   type GameTime {
       startHour: Int,
@@ -361,7 +362,9 @@ const typeDefs = gql`
     createCharacterSheet(playerId: ID, name: String, characterClass: String): CharacterSheet
     editWaitlistApp(applicationId: ID, userId: ID, gameId: ID, whyJoin: String, charConcept: String, charName: String, experience: String): Application
     followGame(userId: ID, gameId: ID): Game
-    unFollowGame(userId: ID, gameId: ID): Game
+    unFollowGame(userId: ID, gameId: ID): CountAll
+    followPlayer(currentUserId: ID, userId: ID): User
+    unFollowPlayer(currentUserId: ID, userId: ID): User
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,

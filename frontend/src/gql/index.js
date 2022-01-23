@@ -174,6 +174,14 @@ const GET_GAME = gql`
     }
 `;
 
+const CHECK_FOLLOW_PLAYER = gql`
+query CheckIfFollowingPlayer($currentUserId: ID, $userId: ID) {
+    checkFollowPlayer(currentUserId: $currentUserId, userId: $userId) {
+        id
+    }
+}
+`
+
 const GET_GAMES_WITH_RULESET = gql`
 query GetGamesWithRuleset($rulesetid: ID) {
     gamesWithRuleset(rulesetid: $rulesetid) {
@@ -821,6 +829,22 @@ mutation UnFollowGame($userId: ID, $gameId: ID) {
 }
 `
 
+const FOLLOW_PLAYER = gql`
+mutation FollowPlayer($currentUserId: ID, $userId: ID) {
+    followPlayer(currentUserId: $currentUserId, userId: $userId) {
+        id
+    }
+}
+`
+
+const UNFOLLOW_PLAYER = gql`
+mutation UnFollowPlayer($currentUserId: ID, $userId: ID) {
+    unFollowPlayer(currentUserId: $currentUserId, userId: $userId) {
+        id
+    }
+}
+`
+
 const EDIT_WAITLIST_APP = gql`
   mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
     editWaitlistApp(applicationId: $applicationId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
@@ -953,6 +977,9 @@ export { GET_ACCOUNTS,
         UPDATE_GAME,
         FOLLOW_GAME,
         UNFOLLOW_GAME,
+        FOLLOW_PLAYER,
+        UNFOLLOW_PLAYER,
+        CHECK_FOLLOW_PLAYER,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,
