@@ -22,7 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     characterSheetId: DataTypes.INTEGER,
     name: DataTypes.STRING,
     bio: DataTypes.TEXT,
-    imageUrl: DataTypes.STRING
+    imageUrl: DataTypes.STRING,
+    retired: DataTypes.BOOLEAN,
+    retiredNote: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Character',

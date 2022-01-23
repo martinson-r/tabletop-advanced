@@ -4,6 +4,7 @@ const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcryptjs');
 const user = require('../db/models/user');
+const game = require('../db/models/game');
 
 const pubsub = new PubSub();
 
@@ -796,6 +797,19 @@ const resolvers = {
             await FollowedPlayer.destroy({where: {[Op.and]:
                 [{userId: currentUserId}, {playerId: userId}]}});
             return FollowedPlayer.findOne({where: {playerId: userId}})
+        },
+
+        removePlayer: async(root, args) => {
+            // TODO:
+            // remove the player from the game
+            // retire the character (note optional)
+            const {gameId, playerId, retireNote} = args;
+            await PlayerJoin.destroy({where: {[Op.and]:
+                [{userId: playerId}, {gameId}]}});
+            await Character.update({ retiredNote: retireNote, retired: true }, {where: {[Op.and]:
+                [{userId: playerId}, {gameId}]}});
+                //may need to change what it returns
+            return PlayerJoin.findAll({where: {gameId}})
         }
 
     },

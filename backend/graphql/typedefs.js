@@ -124,6 +124,11 @@ const typeDefs = gql`
     vehicle: String,
     other: String
   }
+  type PlayerJoin {
+    id: ID,
+    gameId: ID,
+    userId: ID
+  }
   type User {
     id: ID,
     email: String,
@@ -215,7 +220,7 @@ const typeDefs = gql`
   }
   type CountAll {
     rows: [Message]
-    count: Game
+    count: Int
   }
   type GameTime {
       startHour: Int,
@@ -365,6 +370,7 @@ const typeDefs = gql`
     unFollowGame(userId: ID, gameId: ID): CountAll
     followPlayer(currentUserId: ID, userId: ID): User
     unFollowPlayer(currentUserId: ID, userId: ID): User
+    removePlayer(playerId: ID, gameId: ID, retireNote: String): [PlayerJoin]
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,

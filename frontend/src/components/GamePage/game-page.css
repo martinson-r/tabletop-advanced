@@ -37,3 +37,7 @@ label:first-of-type {
 .delete {
     background-color: red;
 }
+
+.noDisplay {
+    display: none;
+}

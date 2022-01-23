@@ -845,6 +845,14 @@ mutation UnFollowPlayer($currentUserId: ID, $userId: ID) {
 }
 `
 
+const REMOVE_PLAYER = gql`
+mutation RemovePlayer($playerId: ID, $gameId: ID, $retireNote: String) {
+    removePlayer(playerId: $playerId, gameId: $gameId, retireNote: $retireNote) {
+        id
+    }
+}
+`
+
 const EDIT_WAITLIST_APP = gql`
   mutation EditWaitlistApp($applicationId: ID, $userId: ID, $charName: String, $charConcept: String, $whyJoin: String, $experience: String, $gameId: ID) {
     editWaitlistApp(applicationId: $applicationId, userId: $userId, charName: $charName, charConcept: $charConcept, whyJoin: $whyJoin, experience: $experience, gameId: $gameId) {
@@ -978,6 +986,7 @@ export { GET_ACCOUNTS,
         FOLLOW_GAME,
         UNFOLLOW_GAME,
         FOLLOW_PLAYER,
+        REMOVE_PLAYER,
         UNFOLLOW_PLAYER,
         CHECK_FOLLOW_PLAYER,
         GET_PLAYING_WAITING_GAMES,
