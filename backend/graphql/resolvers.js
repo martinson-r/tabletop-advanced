@@ -5,6 +5,7 @@ const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcryptjs');
 const user = require('../db/models/user');
 const game = require('../db/models/game');
+const jsonwebtoken = require('jsonwebtoken')
 
 const pubsub = new PubSub();
 
@@ -29,15 +30,35 @@ const rolldice = (number, sides) => {
 // Provide resolver functions for your schema fields
 const resolvers = {
     Query: {
+        async me(_, args, { user }) {
+            if(!user) throw new Error('You are not authenticated')
+            return await User.findByPk(user.id)
+          },
+          async user(root, { id }, { user }) {
+            try {
+              if(!user) throw new Error('You are not authenticated!')
+              return User.findByPk(id)
+            } catch (error) {
+              throw new Error(error.message)
+            }
+          },
+          async allUsers(root, args, { user }) {
+            try {
+              if (!user) throw new Error('You are not authenticated!')
+              return User.findAll()
+            } catch (error) {
+              throw new Error(error.message)
+            }
+          },
         users: (obj, args, context, info) => {
             //This is where you actually query the database.
             return User.findAll({})
           },
-        user:(obj, args, context, info) => {
+        // user:(obj, args, context, info) => {
 
-            const {id} = args
-            return User.findByPk(id);
-        },
+        //     const {id} = args
+        //     return User.findByPk(id);
+        // },
         games: (obj, args, context, info) => {
             return Game.findAll({
                 include: [{model: User, as: "host"}]
@@ -835,10 +856,10 @@ const resolvers = {
 
         async registerUser(root, { userName, email, password }) {
             try {
-              const user = await models.User.create({
-                username,
+              const user = await User.create({
+                userName,
                 email,
-                password: await bcrypt.hash(password, 10)
+                hashedPassword: await bcrypt.hashSync(password)
               })
               const token = jsonwebtoken.sign(
                 { id: user.id, email: user.email},
@@ -852,13 +873,15 @@ const resolvers = {
               throw new Error(error.message)
             }
           },
-          async login(_, { email, password }) {
+          async login(_, { userName, password }) {
+
+            console.log('PASSWORD', password);
             try {
-              const user = await models.User.findOne({ where: { email }})
+              const user = await User.findOne({ where: { userName }})
               if (!user) {
-                throw new Error('No user with that email')
+                throw new Error('No user with that username')
               }
-              const isValid = await bcrypt.compare(password, user.password)
+              const isValid = await bcrypt.compare(password, user.hashedPassword.toString())
               if (!isValid) {
                 throw new Error('Incorrect password')
               }

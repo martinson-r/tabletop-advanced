@@ -1,5 +1,7 @@
 const express = require('express');
 const { db, environment, port } = require('./config');
+const { JWT_SECRET } = process.env
+const jwt =  require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const session = require("express-session");

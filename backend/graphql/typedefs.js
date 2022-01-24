@@ -4,7 +4,6 @@ const { gql } = require('apollo-server-express');
 const typeDefs = gql`
   type Query {
     users: [User]
-    user(id: ID!): User
     about(id: ID): [AboutMe]
     games: [Game]
     gamesWithRuleset(rulesetid: ID): [Game]
@@ -32,6 +31,9 @@ const typeDefs = gql`
     playercharactersheets(playerId: ID): [CharacterSheet]
     checkFollowPlayer(currentUserId: ID, userId: ID): User
     characterSheet(characterSheetId: ID): CharacterSheet
+    user(id: Int!): User
+    allUsers: [User!]!
+    me: User
   }
   type AuthPayload {
     token: String!
@@ -378,8 +380,8 @@ const typeDefs = gql`
     unFollowPlayer(currentUserId: ID, userId: ID): User
     removePlayer(playerId: ID, gameId: ID, retireNote: String, userId: ID): [PlayerJoin]
     retireCharacter(characterId: ID, userId: ID, retireNote: String): Character
-    registerUser(userName: String, email: String, password: String): AuthPayload
-    login(email: String, password: String): AuthPayload
+    registerUser(userName: String, email: String!, password: String!): AuthPayload!
+    login(userName: String!, password: String!): AuthPayload!
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,
