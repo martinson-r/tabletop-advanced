@@ -35,6 +35,10 @@ function ConversationList() {
         }
     },[userId]);
 
+    if (!sessionUser) {
+        return null;
+    }
+
     return (
         <div className="gray-backdrop">
     <p>Private Conversations:</p>

@@ -56,8 +56,6 @@ const resolvers = {
           },
         user:(obj, args, context, info) => {
             id = context.user.id;
-
-            console.log('id ', id)
             return User.findByPk(id);
         },
         games: (obj, args, context, info) => {
@@ -103,11 +101,13 @@ const resolvers = {
         },
 
         getFollowedGames: (obj, args, context, info) => {
+            //should followed games be private?
             const { playerId } = args;
             return User.findByPk(playerId, {include: [{model: Game, through: "FollowedGames", as: "followedgame"}]});
         },
 
         getFollowedPlayers:(obj, args, context, info) => {
+            //should followed players be private?
             const { playerId } = args;
             console.log(args);
             let userId = playerId;
@@ -137,7 +137,6 @@ const resolvers = {
             ], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
         },
         spectatorConvos: async (obj, args, context, info) => {
-            console.log('hit spectatorConvos')
             return Message.findAndCountAll({ where: {[Op.and]: [{ gameId: args.gameId, spectatorChat: true }]}, include: [
                 {model: User, as: "sender",
                 include: {model: Character, where: {
@@ -148,9 +147,7 @@ const resolvers = {
                      ]
                     },
                     required: false
-
                 }
-
                 }
 
             ], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
@@ -162,8 +159,8 @@ const resolvers = {
         },
         //Get all non game conversations for a specific user
         getNonGameConvos: (obj, args, context, info) => {
-            const { userId } = args;
-
+            //const { userId } = args;
+            const userId = context.user.id;
 
             //find all individual conversations involving this user somehow
 
@@ -182,6 +179,7 @@ const resolvers = {
         },
 
         getGamesHosting: (obj, args, context, info) => {
+            //not protected so that users can eventually see what games other players are hosting
             const { userId } = args;
             return Game.findAll({ where: { hostId: userId }, include: [{ model: Application }] })
         },
@@ -203,7 +201,13 @@ const resolvers = {
         },
 
         checkWaitList: async (obj, args, context, info) => {
+            const user = context.user.id;
             const { id, userId } = args;
+
+            //If there's no user logged in, don't let people query directly
+            if (!user) {
+                return null;
+            }
 
             const game = await Game.findAll({ where: {id}});
             return game;
@@ -221,10 +225,15 @@ const resolvers = {
         },
 
         getWaitlistGames: async (obj, args, context, info) => {
-            const { userId } = args;
+            //const { userId } = args;
+
+            //no querying directly.
+            const userId = context.user.id;
+            if (!userId) return null;
 
             //does Application need gameId after all?
-            //This is returning all games, not just games the user is in.
+            //This is returning all games, not just games the user is in,
+            //needs refactor for performance
             const game = await Game.findAll({include: [{model: User, as: "host"},
             {model: User, through: "Waitlists", as: "applicant", where: { id: userId },
             include: { model: Application, through: "Waitlists", as: "applicationOwner" }}]})
@@ -274,10 +283,9 @@ const resolvers = {
     Mutation: {
         sendMessageToGame: async(root,args,context) => {
 
-            //TODO: add a spectatorChat flag of true or false
-            //TODO: update migrations to flag if spectatorChat
-
         const { gameId, messageText, userId, offset, spectatorChat } = args;
+
+            const user = context.user.id;
 
             //Check to see if this is a dice roll.
             //Fun with regex
@@ -290,7 +298,7 @@ const resolvers = {
                 //push roll results into messageText
                 const messageText = `Dice roll result of ${numbers[2]}D${numbers[3]}: ${result}`;
 
-                await Message.create({gameId, messageText, senderId: userId,spectatorChat});
+                await Message.create({gameId, messageText, senderId: user,spectatorChat});
 
                 const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 
@@ -336,9 +344,12 @@ const resolvers = {
 
     },
 
-    startNewNonGameConversation: async(root,args) => {
+    startNewNonGameConversation: async(root,args, context) => {
 
         const { currentUserId, recipients, messageText } = args;
+
+        const user = context.user.id;
+
         const arrayOfConversations = [];
         const arrayOfUsers = [];
         let newUser = false;
@@ -356,7 +367,7 @@ const resolvers = {
 
             //Add current user
             try {
-                await Recipient.create({userId: currentUserId, conversationId})
+                await Recipient.create({userId: user, conversationId})
             } catch(e) {
                 console.log('Error', e)
             }
@@ -384,7 +395,7 @@ const resolvers = {
 
         //...maybe?
         //could make it buggy?
-        const findSenderConversations = await Recipient.findAll({ where: { userId: currentUserId }});
+        const findSenderConversations = await Recipient.findAll({ where: { userId: user }});
         arrayOfConversations.push(...findSenderConversations);
 
         for await (let recipient of recipients) {
@@ -419,7 +430,7 @@ const resolvers = {
             const arrayOfUserIds = arrayOfUsers.map(user => user.id.toString());
 
             //Find existing Conversations with each of these users
-            const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, currentUserId]}}});
+            const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, user]}}});
 
             //Now need to match up Recipients with conversationId somehow without making 50 database queries
 
@@ -439,7 +450,7 @@ const resolvers = {
             });
 
 
-            const includeSender = [...arrayOfUserIds, currentUserId];
+            const includeSender = [...arrayOfUserIds, user];
 
             const potentialDuplicates = [];
 
@@ -473,7 +484,7 @@ const resolvers = {
             const arrayOfUserIds = arrayOfUsers.map(user => user.id.toString());
 
             //Find existing Conversations with each of these users
-            const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, currentUserId]}}});
+            const lookForAllRecipients = await Recipient.findAll({where: { userId: {[Op.or]: [...arrayOfUserIds, user]}}});
 
             //Now need to match up Recipients with conversationId somehow without making 50 database queries
 
@@ -493,7 +504,7 @@ const resolvers = {
             });
 
             let conversationLookingForId;
-            const includeSender = [...arrayOfUserIds, currentUserId];
+            const includeSender = [...arrayOfUserIds, user];
 
             //Next, find the conversation id where all recipients match
             for (let conversation in conversationObjects) {
@@ -526,27 +537,32 @@ const resolvers = {
         return sendBackRecipient;
     },
 
-        editMessage: async(root, args) => {
+        editMessage: async(root, args, context) => {
             const { messageId, editMessageText, userId } = args;
-            await Message.update({ messageText: editMessageText }, { where: { id: messageId, senderId: userId }});
+
+            const user = context.user.id;
+
+            await Message.update({ messageText: editMessageText }, { where: { id: messageId, senderId: user }});
 
             //findAndCountAll seems weird, but our subscription expects something with rows and a count.
             const message = await Message.findAndCountAll({where: { id: messageId}, include: [{model: User, as: "sender"}], limit: 1 })
             pubsub.publish('NEW_MESSAGE', {messageSent: message});
         },
 
-        deleteMessage: async(root, args) => {
+        deleteMessage: async(root, args, context) => {
             const { messageId, userId } = args;
-            await Message.update({ deleted: true }, { where: { id: messageId, senderId: userId }});
+            const user = context.user.id;
+            await Message.update({ deleted: true }, { where: { id: messageId, senderId: user }});
             const message = await Message.findAndCountAll({where: { id: messageId}, include: [{model: User, as: "sender"}], limit: 1 });
             pubsub.publish('NEW_MESSAGE', {messageSent: message});
             return message;
         },
 
-        submitGame: async(root, args) => {
+        submitGame: async(root, args, context) => {
                         const { userId, title, description, gameLanguageId, gameRulesetId, gameTypeId, blurb } = args;
 
                         let errors = {};
+                        let user = context.user.id;
 
                         try {
                         //generate errors if information is missing.
@@ -565,16 +581,18 @@ const resolvers = {
                             throw errors;
                           }
 
-                            const newGame = await Game.create({ hostId: userId, blurb, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
+                            const newGame = await Game.create({ hostId: user, blurb, title, description, gameTypeId, ruleSetId: gameRulesetId, languageId: gameLanguageId}, {include: [{model:User, as: "host"}, {model:GameType}, {model:Language}]})
                             return newGame;
                     } catch (err) {
                         throw new UserInputError('Bad User Input', { errors: err });
                     }
 
                     },
-        changeEmail: async(root, args) => {
+        changeEmail: async(root, args, context) => {
             const {userId, newEmail, changeEmailPassword} = args;
-            const foundUser = await User.findByPk(userId);
+            const user = context.user.id;
+
+            const foundUser = await User.findByPk(user);
 
             //TODO: Make sure it is actually an email address.
             //Throw error if not.
@@ -593,9 +611,10 @@ const resolvers = {
                 throw new UserInputError('Please enter a valid email address.');
               }
         },
-        changePassword: async(root, args) => {
+        changePassword: async(root, args, context) => {
             const {userId, oldPassword, newPassword} = args;
-            const user = await User.findByPk(userId);
+            const contextUserId = context.user.id;
+            const user = await User.findByPk(contextUserID);
 
             //Make sure the user has re-entered their old password correctly
             //and is therefore authorized to do this.
@@ -618,14 +637,16 @@ const resolvers = {
               //I guess if an error isn't thrown, we know.
               return user;
         },
-        joinWaitlist: async(root, args) => {
+        joinWaitlist: async(root, args, context) => {
             //If userId is hostId, do not allow & throw error.
         let errors = {}
+        let user = context.user.id;
+        if (!user) return null;
         try {
 
                 const { userId, gameId, whyJoin, charConcept, charName, experience, hostId } = args;
                 //create app
-                if (userId === hostId) {
+                if (user === hostId) {
                     errors.user = 'You cannot join the waitlist for your own game.';
                 }
 
@@ -648,10 +669,10 @@ const resolvers = {
                     // now `errors` will throw to the `catch` block
                     throw errors;
                 }
-                const newApp = await Application.create({userId, gameId, whyJoin, charConcept, charName, experience});
+                const newApp = await Application.create({user, gameId, whyJoin, charConcept, charName, experience});
 
                 //Add app to waitlist
-                await Waitlist.create({userId, gameId, hostId, applicationId: newApp.id})
+                await Waitlist.create({user, gameId, hostId, applicationId: newApp.id})
                 return newApp;
 
             } catch(err) {
@@ -663,12 +684,19 @@ const resolvers = {
 
         //Note that character creation fields can be incomplete since
         //creating a character can take time.
-        submitCharacterCreation: async(root, args) => {
-            const { userId, gameId, bio, name, imageUrl } = args;
-            const character = await Character.create({userId, gameId, bio, name, imageUrl});
+        submitCharacterCreation: async(root, args, context) => {
+            const user = context.user.id;
+
+            const { gameId, bio, name, imageUrl } = args;
+            const character = await Character.create({user, gameId, bio, name, imageUrl});
             return character;
         },
-        updateCharacter: async(root, args) => {
+        updateCharacter: async(root, args, context) => {
+            const user = context.user.id;
+
+            //prevent non-user or lot logged in from altering character
+            if (!user || character.userId !== user) return null;
+
             const {characterId, bio, name, imageUrl, characterSheetId} = args;
             const characterToUpdate = await Character.findByPk(characterId);
             await characterToUpdate.update({bio, name, imageUrl, characterSheetId});
@@ -676,34 +704,32 @@ const resolvers = {
             return updatedCharacter;
         },
 
-        updateBio: async(root, args) => {
+        updateBio: async(root, args, context) => {
             const {currentUserId, userId, bio, firstName, avatarUrl, pronouns} = args;
 
-            if (currentUserId === userId) {
+            const user = context.user.id;
+
+            //prevent unauthorized users from updating bio.
+            if (!user || user !== userId) throw new UserInputError("Not authorized.");
+
                 const aboutMeToUpdate = await AboutMe.findByPk(userId);
                 await aboutMeToUpdate.update({bio, firstName, avatarUrl, pronouns});
                 const updatedAboutMe = await AboutMe.findByPk(userId);
                 return updatedAboutMe;
-            } else {
-                throw new UserInputError("Not authorized.")
-            }
 
         },
 
-        updateGame: async(root, args) => {
+        updateGame: async(root, args, context) => {
             const {userId, gameId, title, details, blurb, waitListOpen, active, deleted} = args;
 
-            console.log('WAITLIST ', args);
+            const user = context.user.id;
 
         //get the game's host id
         const gameToUpdate = await Game.findByPk(gameId);
         const hostId = gameToUpdate.hostId;
 
-        console.log("Host id ", hostId);
-        console.log("User id ", userId);
-        console.log(hostId.toString() === userId.toString());
-
-            if (userId.toString() === hostId.toString()) {
+        //prevent unauthorized users from altering game info
+            if (user.toString() === hostId.toString()) {
                 // const aboutMeToUpdate = await AboutMe.findByPk(userId);
                 await gameToUpdate.update({title, description: details, blurb, waitListOpen, active, deleted});
                 const updatedGame = await Game.findByPk(gameId);
@@ -714,8 +740,9 @@ const resolvers = {
 
          },
 
-        editWaitlistApp: async(root, args) => {
+        editWaitlistApp: async(root, args, context) => {
             let errors = {};
+            const user = context.user.id;
             try {
                 const { applicationId, userId, gameId, whyJoin, charConcept, charName, experience } = args;
                 if (!whyJoin || whyJoin === '' || /^\s*$/.test(whyJoin)) {
@@ -738,6 +765,11 @@ const resolvers = {
                     throw errors;
                 }
 
+                let appToUpdate = await Application.findByPk(applicationId);
+
+                //prevent unauthorized or not logged in users from altering application.
+                if (!user || appToUpdate.userId !== user) throw new Error("Not authorized.");
+
                 await Application.update({gameId, whyJoin, charConcept, charName, experience}, {where: { id: applicationId }});
                 const returnApp = await Application.findByPk(applicationId);
                 return returnApp;
@@ -747,8 +779,15 @@ const resolvers = {
 
         },
 
-        approveApplication: async(root, args) => {
+        approveApplication: async(root, args, context) => {
             const { applicationId } = args;
+            const user = context.user.id;
+            if (!user) throw Error('Unauthorized.');
+
+            //Prevent non-GMs from approving app
+            let appToApprove = await Application.findByPk(applicationId, { include: {model: Game, through: "Waitlists"}});
+            if (appToApprove.Games[0].hostId !== user) throw new Error("Not authorized.");
+
             const findAndUpdateAppToApprove = await Application.update({accepted: true}, {where: { id: applicationId}});
             const returnApp = await Application.findAll({where: {id: applicationId}})
             return returnApp;
@@ -821,23 +860,26 @@ const resolvers = {
             }
         },
 
-        unFollowPlayer: async(root, args) => {
+        unFollowPlayer: async(root, args, context) => {
+            const user = context.user.id;
+            if (!user) throw new Error("Not authorized.");
             const {currentUserId, userId} = args;
             await FollowedPlayer.destroy({where: {[Op.and]:
-                [{userId: currentUserId}, {playerId: userId}]}});
+                [{userId: user}, {playerId: userId}]}});
             return FollowedPlayer.findOne({where: {playerId: userId}})
         },
 
-        removePlayer: async(root, args) => {
+        removePlayer: async(root, args, context) => {
             // TODO:
             // remove the player from the game
             // retire the character (note optional)
 
             //TODO: check userId to make sure it is the DM of this game
             const {gameId, playerId, retireNote, userId} = args;
+            const user = context.user.id;
 
             let thisGame = await Game.findByPk(gameId);
-            if (thisGame.hostId === userId || playerId === userId) {
+            if (thisGame.hostId === user || playerId === user) {
                 await PlayerJoin.destroy({where: {[Op.and]:
                     [{userId: playerId}, {gameId}]}});
                 await Character.update({ retiredNote: retireNote, retired: true }, {where: {[Op.and]:
@@ -849,12 +891,14 @@ const resolvers = {
             }
         },
 
-        retireCharacter: async(root, args) => {
+        retireCharacter: async(root, args, context) => {
+            const user = context.user.id;
+            if (!user) throw Error("Not authorized");
             const {userId, retireNote, characterId} = args;
             console.log(args);
             //Op.and makes sure the user trying to retire this character is authorized.
             return Character.update({ retiredNote: retireNote, retired: true }, {where: {[Op.and]:
-                [{userId}, {id: characterId}]}});
+                [{userId: user}, {id: characterId}]}});
         },
 
         async registerUser(root, { userName, email, password, confirmPassword }) {

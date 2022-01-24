@@ -291,6 +291,7 @@ const typeDefs = gql`
     Applications: [Application],
     blurb: String,
     spectatorChat: Boolean,
+    hostId: ID
   }
   type Application {
     id: ID

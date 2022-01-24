@@ -195,6 +195,10 @@ const fetchAndOffset = () => {
 
 }
 
+if (!sessionUser) {
+  return null;
+}
+
 
     return (
       <div className="nonGameMessagesContainer">

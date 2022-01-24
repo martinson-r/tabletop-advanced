@@ -19,8 +19,6 @@ function Navigation({ isLoaded }){
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const { loading, error, data } = useQuery(GET_USER);
-
   const logout = (e) => {
     e.preventDefault();
     //TODO: redux to get log out button to toggle
@@ -29,8 +27,6 @@ function Navigation({ isLoaded }){
     dispatch(sessionActions.logout())
     history.push('/login');
   };
-
-  console.log('SESSION USER...', sessionUser)
 
   useEffect(() => {
     if (sessionUser !== null && sessionUser !== undefined ) {
