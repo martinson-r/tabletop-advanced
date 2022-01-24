@@ -26,13 +26,21 @@ import CharacterSheet from "./components/CharacterSheet";
 import NewCharacterSheet from "./components/NewCharacterSheet";
 import FollowedGamesPlayers from "./components/FollowedGamesPlayers";
 
+import { GET_USER } from "./gql";
+import {
+  useLazyQuery, useMutation, useQuery
+} from "@apollo/client";
+
 function App() {
   const dispatch = useDispatch();
+  const { data, loading, error } = useQuery(GET_USER);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  console.log('DATA APP', data);
+
   useEffect(() => {
-    dispatch(sessionActions.restoreUser()).then(() => setIsLoaded(true));
-  }, [dispatch]);
+      dispatch(sessionActions.restoreUser(data)).then(() => setIsLoaded(true));
+  }, [dispatch, data]);
 
   return (
     <div className="App">

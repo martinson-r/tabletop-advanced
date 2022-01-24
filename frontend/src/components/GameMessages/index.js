@@ -34,7 +34,7 @@ function GameMessages(props) {
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
 
     useEffect(() => {
-      if (sessionUser !== undefined) {
+      if (sessionUser !== undefined && sessionUser !== null) {
         setUserId(sessionUser.id);
       }
     },[sessionUser]);

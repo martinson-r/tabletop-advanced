@@ -4,6 +4,7 @@
 // import {
 //   useLazyQuery, useMutation, useQuery
 // } from "@apollo/client";
+import Cookies from 'js-cookie';
 
 const SET_USER = 'session/setUser';
 const REMOVE_USER = 'session/removeUser';
@@ -20,39 +21,42 @@ const removeUser = () => ({
 
 export const loginUser = (data) => async (dispatch) => {
 
-  console.log('DATA...', data);
   dispatch(setUser(data.user));
 
 };
 
 export const restoreUser = (data) => async (dispatch) => {
-    const res = await fetch('/api/session');
-    dispatch(setUser(data));
-    return res;
+    // const res = await fetch('/api/session');
+    // dispatch(setUser(data));
+    // return res;
+
+
+    //check for token and restore user data
+    if (data) {
+      console.log('RESTORE USER DATA ', data);
+      dispatch(setUser(data.user));
+    }
+
   };
 
-export const signup = (user) => async (dispatch) => {
-  const { userName, email, password, confirmPassword } = user;
-  const response = await fetch('/api/session/signup', {
-    method: 'POST',
-    body: JSON.stringify({
-      userName,
-      email,
-      password,
-      confirmPassword
-    })
-  });
+// export const signup = (user) => async (dispatch) => {
+//   const { userName, email, password, confirmPassword } = user;
+//   const response = await fetch('/api/session/signup', {
+//     method: 'POST',
+//     body: JSON.stringify({
+//       userName,
+//       email,
+//       password,
+//       confirmPassword
+//     })
+//   });
 
-  dispatch(setUser(response.data.user));
-  return response;
-};
+//   dispatch(setUser(response.data.user));
+//   return response;
+// };
 
 export const logout = () => async (dispatch) => {
-  const response = await fetch('/api/session/logout', {
-    method: 'DELETE'
-  });
   dispatch(removeUser());
-  return response;
 };
 
 const initialState = { user: null };

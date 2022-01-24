@@ -26,6 +26,7 @@ function Navigation({ isLoaded }){
     //TODO: redux to get log out button to toggle
     Cookies.remove('token');
     setUserId(null);
+    dispatch(sessionActions.logout())
     history.push('/login');
   };
 
@@ -38,7 +39,7 @@ function Navigation({ isLoaded }){
   },[sessionUser]);
 
   let sessionLinks;
-  if (userId !== null)
+  if (sessionUser)
  {
     sessionLinks = (
       <div className="navigation">

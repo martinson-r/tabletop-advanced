@@ -61,7 +61,7 @@ const resolvers = {
             return User.findByPk(id);
         },
         games: (obj, args, context, info) => {
-            if (!context.user) return null;
+            // if (!context.user) return null;
             //console.log('context', context.user);
             //userid is context.user.id
             return Game.findAll({
@@ -71,8 +71,6 @@ const resolvers = {
         gamesWithRuleset: (obj, args, context, info) => {
             console.log(args);
             const {rulesetid} = args
-
-            console.log('rule set id', rulesetid);
             return Game.findAll({
                 where: { ruleSetId: rulesetid },
                 include: [{model: User, as: "host"}]
@@ -134,7 +132,6 @@ const resolvers = {
                     required: false
 
                 }
-
                 }
 
             ], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
@@ -275,7 +272,7 @@ const resolvers = {
         }
     },
     Mutation: {
-        sendMessageToGame: async(root,args) => {
+        sendMessageToGame: async(root,args,context) => {
 
             //TODO: add a spectatorChat flag of true or false
             //TODO: update migrations to flag if spectatorChat
@@ -288,7 +285,6 @@ const resolvers = {
             const numbers = messageText.match(/^(\/\/roll *)(\d+)[Dd](\d+)/);
 
             if (numbers !== null) {
-                console.log(numbers);
                 const result = rolldice(numbers[2], numbers[3]);
 
                 //push roll results into messageText
@@ -305,7 +301,9 @@ const resolvers = {
                 if (messageText === '' || !messageText || /^\s*$/.test(messageText)) {
                     throw new UserInputError('Message cannot be blank.');
                 } else {
-            const senderId = userId;
+            //backup in case this breaks
+            //const senderId = userId;
+            const senderId = context.user.id
             await Message.create({gameId,messageText,senderId,spectatorChat});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
@@ -318,14 +316,16 @@ const resolvers = {
     }
     },
 
-    sendNonGameMessages: async(root,args) => {
+    sendNonGameMessages: async(root,args,context) => {
 
         const { conversationId, messageText, userId, offset } = args;
 
         if (messageText === '' || !messageText || /^\s*$/.test(messageText)) {
             throw new UserInputError('Message cannot be blank.');
         } else {
-        const senderId = userId;
+        //backup in case this breaks it
+        //const senderId = userId;
+        const senderId = context.user.id;
             await Message.create({conversationId,messageText,senderId});
 
             const conversation = await Message.findAndCountAll({ where: { conversationId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
