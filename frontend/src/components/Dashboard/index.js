@@ -5,7 +5,7 @@ import {
     useQuery, useLazyQuery, useMutation
   } from "@apollo/client";
 import { GET_GAMES, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITING_LIST_GAMES,
-    GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES, GET_FOLLOWED_GAMES } from "../../gql"
+    GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES, GET_FOLLOWED_GAMES, GET_FOLLOWED_PLAYERS } from "../../gql"
 
 import "./dashboard.css";
 import { v4 as uuidv4 } from 'uuid';
@@ -15,6 +15,7 @@ function Home() {
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState(null);
+    const [playerId, setPlayerId] = useState(null);
     const [applicationId, setApplicationId] = useState(null);
     const [gameId, setGameId] = useState(null);
     const history = useHistory();
@@ -67,6 +68,7 @@ function Home() {
         }
         if (sessionUser) {
             setUserId(sessionUser.id);
+            setPlayerId(sessionUser.id);
         }
     }, [sessionUser]);
 

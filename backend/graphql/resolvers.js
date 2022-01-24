@@ -1,4 +1,4 @@
-const { Message, Recipient, FollowedGame, FollowedPlayer, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist, CharacterSheet } = require('../db/models');
+const { Message, Recipient, FollowedGame, FollowedPlayer, MetaGameMessageType, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist, CharacterSheet } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -120,6 +120,7 @@ const resolvers = {
 
         convos: async (obj, args, context, info) => {
             return Message.findAndCountAll({ where: {[Op.and]: [{ gameId: args.gameId, spectatorChat: false }]}, include: [
+                {model: MetaGameMessageType},,
                 {model: User, as: "sender",
                 include: {model: Character, where: {
                     [Op.and]:
@@ -137,7 +138,7 @@ const resolvers = {
         },
         spectatorConvos: async (obj, args, context, info) => {
             return Message.findAndCountAll({ where: {[Op.and]: [{ gameId: args.gameId, spectatorChat: true }]}, include: [
-                {model: User, as: "sender",
+                {model: MetaGameMessageType}, {model: User, as: "sender",
                 include: {model: Character, where: {
                     [Op.and]:
                          [
@@ -150,6 +151,8 @@ const resolvers = {
                 }
 
             ], order: [['createdAt', 'DESC']], limit:20, offset: args.offset});
+
+            //console.log(msg.rows[0].MetaGameMessageType);
         },
         about: (obj, args, context, info) => {
             const { id } = args;

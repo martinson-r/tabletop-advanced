@@ -15,6 +15,8 @@ function MessageBox(props) {
 
   const { message, userId, gameId, gameData, conversationId } = props;
 
+  console.log('message coming in ', message)
+
     const [messageId, setMessageId] = useState(null);
     const [messageToDelete, setMessageToDelete] = useState(null);
     const [messageText, setMessage] = useState("");
@@ -23,6 +25,7 @@ function MessageBox(props) {
     const [editDisplay, setEditDisplay] = useState(false);
     const [editMessageText, setEditMessageText] = useState("");
     const [isGame, setIsGame] = useState(true);
+    const [metaGameType, setMetaGameType] = useState('');
     const dropdownButton = useRef(null);
     const editDropdown = useRef(null);
 
@@ -79,7 +82,15 @@ function MessageBox(props) {
         if (messageToDelete !== null) {
           deleteMessage(messageToDelete, userId);
         }
-      },[messageToDelete])
+      },[messageToDelete]);
+
+      useEffect(() => {
+        if (message.MetaGameMessageType !== null) {
+          setMetaGameType(message.MetaGameMessageType.metaGameMessageType)
+        } else {
+          setMetaGameType('');
+        }
+      },[message])
 
 
       //attempting to pass in more than one variable breaks this.
@@ -139,9 +150,9 @@ function MessageBox(props) {
             {message.sender.Characters !== undefined && message.sender.Characters.length > 0 && (<div className="avatar" style={{backgroundImage: "url(" + message.sender.Characters[0].imageUrl + ")"}}>
             </div>)}
         </div>
-
+            {/* {console.log('METAGAME TYPE: ', message.MetaGameMessageType.metaGameMessageType)} */}
         {message !== null && message !==undefined && message.sender.id !== null && message.sender.id !== undefined &&
-        (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={parseInt(message.sender.id)===userId}>
+        (<div className={`indivMessageBox status type-${metaGameType}`} game-status={isGame.toString()} data-status={parseInt(message.sender.id)===userId}>
 
           <span key={uuidv4()} className="indivMessage">
           <span className="character-box">
@@ -175,9 +186,11 @@ function MessageBox(props) {
               </div>
             </div>)}
 
-            {/* Display message content */}
+            {/* Display actual message content */}
             {message.deleted !== true &&
-            (<span className="message-text">{breakLongWords(message.messageText)} </span>)}
+            (<span className={`message-text`}>{message.MetaGameMessageType !== null &&
+            message.MetaGameMessageType !== undefined &&
+            (message.MetaGameMessageType.metaGameMessageType + ':')} {breakLongWords(message.messageText)} </span>)}
             {message.deleted === true && (<i>message deleted</i>)}</span></div>)}
             {/* {userId === null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={false}>
 

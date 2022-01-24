@@ -322,11 +322,12 @@ const typeDefs = gql`
     deleted: Boolean,
     reported: Boolean,
     spectatorChat: Boolean,
-    metaGameMessageTypeId: ID,
+    MetaGameMessageType: MetaGameMessageType,
     User: User,
     sender: User
   }
   type MetaGameMessageType {
+      id: ID
       metaGameMessageType: String
   }
   type Player {

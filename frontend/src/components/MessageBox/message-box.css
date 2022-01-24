@@ -4,6 +4,7 @@
     --darkerGray: #5A5850;
     --mediumGray: #C4C4C4;
     --lightestGray: #D3D3BA;
+    --pink: pink;
 
     /* Doing this so that I don't accidentally change the colors of
     things by accident */
@@ -40,6 +41,19 @@ margin-bottom: 0;
     left: 0;
     height: 10px;
     border-right: 30px solid var(--messageBubbleColor);
+    /* background: var(--messageBubbleColor); */
+    -webkit-border-bottom-right-radius: 80px 50px;
+    -moz-border-radius-bottomright: 80px 50px;
+    border-bottom-right-radius: 80px 50px;
+}
+
+.indivMessageBox.type-metagame::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 10px;
+    border-right: 30px solid var(--pink);
     /* background: var(--messageBubbleColor); */
     -webkit-border-bottom-right-radius: 80px 50px;
     -moz-border-radius-bottomright: 80px 50px;
@@ -217,4 +231,8 @@ margin-bottom: 0;
     position: absolute;
     top: -20px;
     padding: 5px;
+}
+
+.type-metagame {
+    background-color: pink;
 }

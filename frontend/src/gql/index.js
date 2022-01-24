@@ -375,6 +375,7 @@ const GET_GAME_CONVOS = gql`
             spectatorChat
             createdAt
             deleted
+            metaGameMessageTypeId
        }
     }
 }
@@ -400,6 +401,10 @@ const GET_SPECTATOR_CONVOS = gql`
             spectatorChat
             createdAt
             deleted
+            MetaGameMessageType {
+                id
+                metaGameMessageType
+            }
        }
     }
 }
@@ -517,6 +522,10 @@ const SEND_MESSAGE_TO_GAME = gql`
             spectatorChat
             createdAt
             deleted
+            MetaGameMessageType {
+                id
+                metaGameMessageType
+            }
        }
         }
       }
@@ -536,6 +545,10 @@ editMessage(messageId: $messageId, userId: $userId, editMessageText: $editMessag
             spectatorChat
             createdAt
             deleted
+            MetaGameMessageType {
+                id
+                metaGameMessageType
+            }
        }
     }
 }
@@ -555,6 +568,10 @@ deleteMessage(messageId: $messageId, userId: $userId) {
         spectatorChat
         createdAt
         deleted
+        MetaGameMessageType {
+            id
+            metaGameMessageType
+        }
    }
  }
 }
@@ -890,6 +907,10 @@ mutation SendNonGameNonSpecMessages($userId: ID!, $messageText: String!, $conver
             messageText
             createdAt
             deleted
+            MetaGameMessageType {
+                id
+                metaGameMessageType
+            }
        }
     }
 }
@@ -951,6 +972,11 @@ subscription OnMessageSent($gameId: ID, $conversationId: ID) {
             spectatorChat
             createdAt
             deleted
+            MetaGameMessageType {
+                id
+                metaGameMessageType
+            }
+
        }
     }
   }
@@ -971,6 +997,10 @@ subscription OnSpectatorMessageSent($gameId: ID, $conversationId: ID) {
             messageText
             createdAt
             deleted
+            MetaGameMessageType {
+                id
+                metaGameMessageType
+            }
        }
     }
   }
@@ -991,6 +1021,10 @@ subscription OnMessageSent($conversationId: ID!) {
             messageText
             createdAt
             deleted
+            MetaGameMessageType {
+                id
+                metaGameMessageType
+            }
        }
     }
   }
