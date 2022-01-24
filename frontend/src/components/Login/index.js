@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch } from "react-redux";
 import { useHistory } from 'react-router-dom';
+import {
+  useLazyQuery, useMutation, useQuery
+} from "@apollo/client";
+import Cookies from 'js-cookie';
 
+import { LOGIN } from "../../gql";
+import { useEffect } from "react";
 
 function Login() {
     const history = useHistory();
@@ -13,19 +19,39 @@ function Login() {
     const [errors, setErrors] = useState([]);
     const [inputErrors, setInputErrors] = useState([]);
 
+    const [login, { data, loading, error }] = useMutation(LOGIN, { variables: { userName, password }} );
+
+    const setCookie = () => {
+      Cookies.set('token', data.login.token);
+    }
+
+    //console.log(data);
+
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
-      return dispatch(sessionActions.login({ userName, password }))
-      .then((res) => {
-          if (res.data.errors) {
-            setErrors(res.data.errors);
-        } else {
-          history.push('/')
+
+      login({variables: { userName, password }});
+      // return dispatch(sessionActions.login({ userName, password }))
+      // .then((res) => {
+      //     if (res.data.errors) {
+      //       setErrors(res.data.errors);
+      //   } else {
+
+        //}
+      //}
+      //);
+    };
+
+    useEffect(() => {
+
+      if (data !== undefined && data !== null) {
+        if (!error) {
+          setCookie(data.login.token);
         }
       }
-      );
-    };
+
+    }, [data])
 
     return (
       <>

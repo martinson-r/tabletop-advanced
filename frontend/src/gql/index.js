@@ -12,8 +12,8 @@ const GET_ACCOUNTS = gql`query GetAccounts {
 }`;
 
 const GET_USER = gql`
-    query GetCurrentAccount($userId: ID!) {
-        user(id: $userId){
+    query GetCurrentAccount{
+        user {
             id
             email
             userName
@@ -912,6 +912,14 @@ mutation AddRecipient($recipientName: String, $conversationId: ID) {
 }
 `
 
+const LOGIN = gql`
+mutation Login($userName: String!, $password: String!) {
+    login(userName: $userName, password: $password) {
+        token
+    }
+}
+`
+
 //This is to fetch all of the messages in a conversation
 const GAME_MESSAGES_SUBSCRIPTION = gql`
 subscription OnMessageSent($gameId: ID, $conversationId: ID) {
@@ -1003,6 +1011,7 @@ export { GET_ACCOUNTS,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,
+        LOGIN,
         GET_APPLICATION,
         APPROVE_APPLICATION,
         IGNORE_APPLICATION,

@@ -1,6 +1,10 @@
 import { fetch } from './csrf.js';
 // import { connect } from 'react-redux';
 
+import {
+  useLazyQuery, useMutation, useQuery
+} from "@apollo/client";
+
 const SET_USER = 'session/setUser';
 const REMOVE_USER = 'session/removeUser';
 
@@ -13,13 +17,21 @@ const removeUser = () => ({
   type: REMOVE_USER
 });
 
+
 export const login = ({ userName, password }) => async (dispatch) => {
-  const res = await fetch('/api/session/login', {
-    method: 'POST',
-    body: JSON.stringify({ userName, password })
-  });
-  dispatch(setUser(res.data.user));
-  return res;
+
+
+
+  login({variables: { userName, password }});
+  // const res = await fetch('/api/session/login', {
+  //   method: 'POST',
+  //   body: JSON.stringify({ userName, password })
+  // });
+  // dispatch(setUser(res.data.user));
+  // return res;
+
+
+  //dispatch(setUser(data));
 };
 
 export const restoreUser = () => async (dispatch) => {

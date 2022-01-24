@@ -7,12 +7,21 @@ import SimpleSearch from "../SimpleSearch";
 import SearchModal from '../SearchModal';
 import './navigation.css';
 import * as sessionActions from "../../store/session";
+import {
+  useLazyQuery, useMutation, useQuery
+} from "@apollo/client";
+import Cookies from 'js-cookie';
+import { GET_USER } from "../../gql";
 
 function Navigation({ isLoaded }){
-  const sessionUser = useSelector(state => state.session.user);
+  //const sessionUser = useSelector(state => state.session.user);
   const [userId, setUserId] = useState(null);
   const dispatch = useDispatch();
   const history = useHistory();
+
+  const { loading, error, data } = useQuery(GET_USER);
+
+  console.log('user data ', data);
 
   const logout = (e) => {
     e.preventDefault();
@@ -21,21 +30,20 @@ function Navigation({ isLoaded }){
   };
 
   useEffect(() => {
-    if (sessionUser !== null && sessionUser !== undefined ) {
-      setUserId(sessionUser.id);
+    if (data !== null && data !== undefined ) {
+      setUserId(data.id);
     }
-
-  },[sessionUser])
-
+  },[data])
 
   let sessionLinks;
-  if (sessionUser && userId !== null) {
+  if (userId !== null)
+ {
     sessionLinks = (
       <div className="navigation">
       <div className="lefthand-nav">
         <div><i className="fas fa-dice-d20 logo"></i></div>
         <div><NavLink exact to="/">Tabletop Advanced</NavLink></div>
-        <div><p>Hello, {sessionUser.userName}!</p></div>
+        {/* <div><p>Hello, {sessionUser.userName}!</p></div> */}
       </div>
 
       <div className="righthand-nav">

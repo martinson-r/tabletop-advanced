@@ -34,14 +34,14 @@ const resolvers = {
             if(!user) throw new Error('You are not authenticated')
             return await User.findByPk(user.id)
           },
-          async user(root, { id }, { user }) {
-            try {
-              if(!user) throw new Error('You are not authenticated!')
-              return User.findByPk(id)
-            } catch (error) {
-              throw new Error(error.message)
-            }
-          },
+        //   async user(root, { id }, { user }) {
+        //     try {
+        //       if(!user) throw new Error('You are not authenticated!')
+        //       return User.findByPk(id)
+        //     } catch (error) {
+        //       throw new Error(error.message)
+        //     }
+        //   },
           async allUsers(root, args, { user }) {
             try {
               if (!user) throw new Error('You are not authenticated!')
@@ -54,16 +54,17 @@ const resolvers = {
             //This is where you actually query the database.
             return User.findAll({})
           },
-        // user:(obj, args, context, info) => {
-
-        //     const {id} = args
-        //     return User.findByPk(id);
-        // },
+        user:(obj, args, context, info) => {
+            id = context.user.id;
+            return User.findByPk(id);
+        },
         games: (obj, args, context, info) => {
+            if (!context.user) return null;
+            //console.log('context', context.user);
+            //userid is context.user.id
             return Game.findAll({
                 include: [{model: User, as: "host"}]
             });
-
         },
         gamesWithRuleset: (obj, args, context, info) => {
             console.log(args);

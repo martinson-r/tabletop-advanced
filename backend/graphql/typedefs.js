@@ -31,7 +31,7 @@ const typeDefs = gql`
     playercharactersheets(playerId: ID): [CharacterSheet]
     checkFollowPlayer(currentUserId: ID, userId: ID): User
     characterSheet(characterSheetId: ID): CharacterSheet
-    user(id: Int!): User
+    user: User
     allUsers: [User!]!
     me: User
   }

@@ -24,14 +24,18 @@ const asynchandler = require('express-async-handler');
 //init App
 const app = express();
 
+var corsOptions = {
+  origin: 'https://tabletop-advanced.herokuapp.com',
+  credentials: true // <-- REQUIRED backend setting
+};
+
 // Security Middleware
     //test if we are in Production
     const isProduction = environment === 'production';
     //if not production, CORS okay.
 if (!isProduction) {
     // enable cors only in development
-    app.use(cors(
-    ));
+    app.use(cors(corsOptions));
 }
 
 //Use cookie parser so we can parse cookies.
@@ -64,6 +68,7 @@ app.use(logger("dev"));
 const getUser = token => {
   try {
       if (token) {
+        console.log('TOKEN....', token);
           return jwt.verify(token, JWT_SECRET)
       }
       return null
@@ -77,9 +82,21 @@ const server = new ApolloServer({
     typeDefs,
     resolvers,
     context: ({ req }) => {
-      const token = req.get('Authorization') || ''
-      return { user: getUser(token.replace('Bearer', ''))}
-  },
+      // get the user token from the headers
+      const token = req.headers.authorization || '';
+
+      // // try to retrieve a user with the token
+      const user = getUser(token);
+
+      console.log('USER....', user);
+
+      // // optionally block the user
+      // // we could also check user roles/permissions here
+      //if (!user) throw new AuthenticationError('you must be logged in');
+
+      // // add the user to the context
+      return { user };
+    },
     schema: makeExecutableSchema({
         typeDefs,
         resolvers,

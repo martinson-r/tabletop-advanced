@@ -16,6 +16,9 @@ import {
 } from "@apollo/client";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from '@apollo/client/utilities';
+import { setContext } from '@apollo/client/link/context';
+import Cookies from 'js-cookie';
+
 
 
 import { Provider } from 'react-redux';
@@ -26,10 +29,27 @@ import { BrowserRouter } from 'react-router-dom';;
 // import * as sessionActions from './store/session';
 //split communication by operation so we don't use ws for everything
 const httpLink = new HttpLink({
-  uri: '/graphql'
+  uri: '/graphql',
+  credentials: 'same-origin'
 });
 
 let wsLink;
+
+const authLink = setContext((_, { headers }) => {
+  // get the authentication token from local storage if it exists
+  // const token = localStorage.getItem('token');
+  const token = Cookies.get('token');
+  // return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `${token}` : "",
+      // authorization: token ? `Bearer ${token}` : "",
+    }
+  }
+});
+
+
 
 //websocket endpoint changes depending on development vs production
 if (process.env.NODE_ENV !== "production") {
@@ -113,9 +133,17 @@ const cache = new InMemoryCache({});
 
 
 
+// const client = new ApolloClient({
+//   //uri of graphql backend
+//   link: splitLink,
+//   cache: cache
+
+// });
+
+
 const client = new ApolloClient({
   //uri of graphql backend
-  link: splitLink,
+  link: authLink.concat(splitLink),
   cache: cache
 
 });
