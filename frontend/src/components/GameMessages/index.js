@@ -292,6 +292,9 @@ const spectatorFetchAndOffset = () => {
   </InfiniteScroll>
 </div>
 
+{/* TODO: buttons to flag messages as Actions, Metagame, or Events */}
+{/* Regex for quick chat commands (//action, //event, //metagame) */}
+{/* Events are limited to GM */}
           {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
           <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
 
