@@ -857,23 +857,29 @@ const resolvers = {
                 [{userId}, {id: characterId}]}});
         },
 
-        async registerUser(root, { userName, email, password }) {
-            try {
-              const user = await User.create({
-                userName,
-                email,
-                hashedPassword: await bcrypt.hashSync(password)
-              })
-              const token = jsonwebtoken.sign(
-                { id: user.id, email: user.email},
-                process.env.JWT_SECRET,
-                { expiresIn: '1y' }
-              )
-              return {
-                token, id: user.id, username: user.username, email: user.email, message: "Authentication succesfull"
-              }
-            } catch (error) {
-              throw new Error(error.message)
+        async registerUser(root, { userName, email, password, confirmPassword }) {
+            if (password === confirmPassword) {
+                try {
+                    const user = await User.create({
+                      userName,
+                      email,
+                      hashedPassword: await bcrypt.hashSync(password)
+                    })
+
+                    const token = jsonwebtoken.sign(
+                      { id: user.id, email: user.email},
+                      process.env.JWT_SECRET,
+                      { expiresIn: '1y' }
+                    )
+                    return {
+                        token, user
+                    //   token, id: user.id, username: user.username, email: user.email, message: "Authentication successful"
+                    }
+                  } catch (error) {
+                    throw new Error(error.message)
+                  }
+            } else {
+                throw new Error('Confirm password and password must match.')
             }
           },
           async login(_, { userName, password }) {

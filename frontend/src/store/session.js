@@ -20,17 +20,9 @@ const removeUser = () => ({
 
 export const loginUser = (data) => async (dispatch) => {
 
-  //login({variables: { userName, password }});
-  // const res = await fetch('/api/session/login', {
-  //   method: 'POST',
-  //   body: JSON.stringify({ userName, password })
-  // });
-  // dispatch(setUser(res.data.user));
-  // return res;
+  console.log('DATA...', data);
+  dispatch(setUser(data.user));
 
-  console.log('LOGGED IN USER', data);
-
-  dispatch(setUser(data.login.user));
 };
 
 export const restoreUser = (data) => async (dispatch) => {

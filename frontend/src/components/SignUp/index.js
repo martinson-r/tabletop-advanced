@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import * as sessionActions from "../../store/session";
 import { useDispatch } from "react-redux";
 import { useHistory } from 'react-router-dom';
+import {
+  useLazyQuery, useMutation, useQuery
+} from "@apollo/client";
+import Cookies from 'js-cookie';
+
+import { SIGNUP } from "../../gql";
 import './signup.css';
 
 function SignUp() {
@@ -13,20 +19,35 @@ function SignUp() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errors, setErrors] = useState([]);
 
+    const [registerUser, { data, loading, error }] = useMutation(SIGNUP, { variables: { userName, password, confirmPassword, email }} );
+
+    console.log(data);
+
     const handleSubmit = (e) => {
       e.preventDefault();
       setErrors([]);
 
+      registerUser({ variables: { userName, email, password, confirmPassword }})
+      .then((res) => {
+        if (res.data.errors) {
+                setErrors(res.data.errors)
+              } else {
+                console.log(res.data.registerUser)
+                dispatch(sessionActions.loginUser(res.data.registerUser));
+                history.push('/')
+              }
+      })
+
       //get errors to display
       //TODO: Errors for feedback about userName having to be unique
-      return dispatch(sessionActions.signup({ email, userName, password, confirmPassword }))
-        .then(res => {
-          if (res.data.errors) {
-            setErrors(res.data.errors)
-          } else {
-            history.push('/')
-          }
-        });
+      // return dispatch(sessionActions.signup({ email, userName, password, confirmPassword }))
+      //   .then(res => {
+      //     if (res.data.errors) {
+      //       setErrors(res.data.errors)
+      //     } else {
+      //       history.push('/')
+      //     }
+      //   });
   }
 
     return (

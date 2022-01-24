@@ -380,7 +380,7 @@ const typeDefs = gql`
     unFollowPlayer(currentUserId: ID, userId: ID): User
     removePlayer(playerId: ID, gameId: ID, retireNote: String, userId: ID): [PlayerJoin]
     retireCharacter(characterId: ID, userId: ID, retireNote: String): Character
-    registerUser(userName: String, email: String!, password: String!): AuthPayload!
+    registerUser(userName: String, email: String!, password: String!, confirmPassword: String!): AuthPayload!
     login(userName: String!, password: String!): AuthPayload!
   }
   type Subscription {

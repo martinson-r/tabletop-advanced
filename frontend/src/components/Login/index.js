@@ -26,7 +26,6 @@ function Login() {
       Cookies.set('token', data.login.token);
     }
 
-    //console.log(data);
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -37,12 +36,10 @@ function Login() {
             console.log(res.data.errors);
           } else {
             console.log(res.data);
-            dispatch(sessionActions.loginUser(res.data));
+            dispatch(sessionActions.loginUser(res.data.login));
             history.push('/');
         }
-      })
-
-      ;
+      });
       // return dispatch(sessionActions.login({ userName, password }))
       // .then((res) => {
       //     if (res.data.errors) {

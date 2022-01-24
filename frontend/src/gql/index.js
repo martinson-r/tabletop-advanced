@@ -923,6 +923,18 @@ mutation Login($userName: String!, $password: String!) {
 }
 `
 
+const SIGNUP = gql`
+mutation Signup($userName: String!, $password: String!, $confirmPassword: String!, $email: String!) {
+    registerUser(userName: $userName, password: $password, confirmPassword: $confirmPassword, email: $email) {
+        token
+        user {
+            id
+            userName
+        }
+    }
+}
+`
+
 //This is to fetch all of the messages in a conversation
 const GAME_MESSAGES_SUBSCRIPTION = gql`
 subscription OnMessageSent($gameId: ID, $conversationId: ID) {
@@ -1015,6 +1027,7 @@ export { GET_ACCOUNTS,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,
         LOGIN,
+        SIGNUP,
         GET_APPLICATION,
         APPROVE_APPLICATION,
         IGNORE_APPLICATION,
