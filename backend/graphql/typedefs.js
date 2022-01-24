@@ -33,6 +33,10 @@ const typeDefs = gql`
     checkFollowPlayer(currentUserId: ID, userId: ID): User
     characterSheet(characterSheetId: ID): CharacterSheet
   }
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
   type FollowedGame {
     id: ID,
     userId: ID,
@@ -374,6 +378,8 @@ const typeDefs = gql`
     unFollowPlayer(currentUserId: ID, userId: ID): User
     removePlayer(playerId: ID, gameId: ID, retireNote: String, userId: ID): [PlayerJoin]
     retireCharacter(characterId: ID, userId: ID, retireNote: String): Character
+    registerUser(userName: String, email: String, password: String): AuthPayload
+    login(email: String, password: String): AuthPayload
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,

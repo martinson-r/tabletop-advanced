@@ -59,13 +59,28 @@ app.use(logger("dev"));
 
 // set up session middleware
 
+const getUser = token => {
+  try {
+      if (token) {
+          return jwt.verify(token, JWT_SECRET)
+      }
+      return null
+  } catch (error) {
+      return null
+  }
+}
+
 
 const server = new ApolloServer({
     typeDefs,
     resolvers,
+    context: ({ req }) => {
+      const token = req.get('Authorization') || ''
+      return { user: getUser(token.replace('Bearer', ''))}
+  },
     schema: makeExecutableSchema({
         typeDefs,
-        resolvers
+        resolvers,
      }),
     subscriptions: {
         path: '/subscriptions'
