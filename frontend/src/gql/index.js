@@ -972,10 +972,6 @@ subscription OnMessageSent($gameId: ID, $conversationId: ID) {
             spectatorChat
             createdAt
             deleted
-            MetaGameMessageType {
-                id
-                metaGameMessageType
-            }
 
        }
     }

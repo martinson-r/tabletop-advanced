@@ -27,6 +27,7 @@ function Home() {
     const [sortedData, setSortedData] = useState([]);
 
     //TODO: Grab most recent/popular game and feed it into GameMessages
+    //out of games updated in last 3 days, w/ most followers
 
     //TODO: Grab rulesets for display
 

@@ -301,7 +301,7 @@ const resolvers = {
                 //push roll results into messageText
                 const messageText = `Dice roll result of ${numbers[2]}D${numbers[3]}: ${result}`;
 
-                await Message.create({gameId, messageText, senderId: user,spectatorChat});
+                await Message.create({gameId, messageText, senderId: user, spectatorChat, metaGameMessageTypeId: 2});
 
                 const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 
@@ -1025,6 +1025,7 @@ const resolvers = {
                 //If it has a gameId at all, it's a game.
                 if (variables.gameId !== null && variables.gameId !== undefined) {
                     //Yes, you have to cast it to a string...
+                    console.log(payload);
                     return payload.spectatorMessageSent.rows[0].gameId.toString() === variables.gameId}
             }),
     },
@@ -1037,6 +1038,7 @@ const resolvers = {
                     //If it has a gameId at all, it's a game.
                     if (variables.gameId !== null && variables.gameId !== undefined) {
                         //Yes, you have to cast it to a string...
+                        console.log(payload);
                         return payload.messageSent.rows[0].gameId.toString() === variables.gameId;
                     }
                         return payload.messageSent.rows[0].conversationId.toString() === variables.conversationId;

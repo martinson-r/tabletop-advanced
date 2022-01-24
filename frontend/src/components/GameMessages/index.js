@@ -33,6 +33,8 @@ function GameMessages(props) {
 
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
 
+    console.log('SESSION ', sessionUser);
+
     useEffect(() => {
       if (sessionUser !== undefined && sessionUser !== null) {
         setUserId(sessionUser.id);
@@ -41,11 +43,19 @@ function GameMessages(props) {
 
     useEffect(() => {
         try {
-          gameData.game.player.forEach((player) => {
-            if (parseInt(player.id) === userId) {
-                setIsPlayer(true);
-            }
-          });
+          const isPlayer = gameData.game.player.filter((player) => player.id === userId)
+
+          if (isPlayer.length > 0) {
+            setIsPlayer(true);
+          }
+          // gameData.game.player.forEach((player) => {
+
+          //   console.log('player', player.id === userId);
+          //   console.log('userid', userId)
+          //   if (parseInt(player.id) === userId) {
+          //       setIsPlayer(true);
+          //   }
+          //});
         } catch {
           return ( <div>Loading...</div>)
         }
@@ -261,6 +271,7 @@ const spectatorFetchAndOffset = () => {
 
       <div className="messagesContainer">
       <div className="messageListing"  data-status={hideSpectatorChat}>
+      {console.log('GAME DATA ', gameData, 'IS PLAYER ', isPlayer, 'SESSION USER ', sessionUser)}
       {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
           <div className="notification spectator">You are a spectator</div>)}
       <div
