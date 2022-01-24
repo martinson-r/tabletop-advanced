@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 
 import { LOGIN } from "../../gql";
 import { useEffect } from "react";
+import ConversationList from "../ConversationList";
 
 function Login() {
     const history = useHistory();
@@ -31,7 +32,17 @@ function Login() {
       e.preventDefault();
       setErrors([]);
 
-      login({variables: { userName, password }});
+      login({variables: { userName, password }}).then((res) => {
+        if (res.data.errors) {
+            console.log(res.data.errors);
+          } else {
+            console.log(res.data);
+            dispatch(sessionActions.loginUser(res.data));
+            history.push('/');
+        }
+      })
+
+      ;
       // return dispatch(sessionActions.login({ userName, password }))
       // .then((res) => {
       //     if (res.data.errors) {
@@ -50,9 +61,8 @@ function Login() {
           setCookie(data.login.token);
         }
       }
-
     }, [data])
-
+    console.log(data);
     return (
       <>
       <div className="login-form--body gray-backdrop">

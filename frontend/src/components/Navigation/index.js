@@ -14,26 +14,28 @@ import Cookies from 'js-cookie';
 import { GET_USER } from "../../gql";
 
 function Navigation({ isLoaded }){
-  //const sessionUser = useSelector(state => state.session.user);
+  const sessionUser = useSelector(state => state.session.user);
   const [userId, setUserId] = useState(null);
   const dispatch = useDispatch();
   const history = useHistory();
 
   const { loading, error, data } = useQuery(GET_USER);
 
-  console.log('user data ', data);
-
   const logout = (e) => {
     e.preventDefault();
-    dispatch(sessionActions.logout());
+    //TODO: redux to get log out button to toggle
+    Cookies.remove('token');
+    setUserId(null);
     history.push('/login');
   };
 
+  console.log('SESSION USER...', sessionUser)
+
   useEffect(() => {
-    if (data !== null && data !== undefined ) {
-      setUserId(data.id);
+    if (sessionUser !== null && sessionUser !== undefined ) {
+      setUserId(sessionUser.id);
     }
-  },[data])
+  },[sessionUser]);
 
   let sessionLinks;
   if (userId !== null)

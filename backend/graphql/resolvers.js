@@ -56,6 +56,8 @@ const resolvers = {
           },
         user:(obj, args, context, info) => {
             id = context.user.id;
+
+            console.log('id ', id)
             return User.findByPk(id);
         },
         games: (obj, args, context, info) => {

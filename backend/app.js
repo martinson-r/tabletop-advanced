@@ -68,7 +68,6 @@ app.use(logger("dev"));
 const getUser = token => {
   try {
       if (token) {
-        console.log('TOKEN....', token);
           return jwt.verify(token, JWT_SECRET)
       }
       return null
@@ -87,9 +86,6 @@ const server = new ApolloServer({
 
       // // try to retrieve a user with the token
       const user = getUser(token);
-
-      console.log('USER....', user);
-
       // // optionally block the user
       // // we could also check user roles/permissions here
       //if (!user) throw new AuthenticationError('you must be logged in');
