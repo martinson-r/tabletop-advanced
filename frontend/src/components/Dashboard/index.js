@@ -5,7 +5,7 @@ import {
     useQuery, useLazyQuery, useMutation
   } from "@apollo/client";
 import { GET_GAMES, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITING_LIST_GAMES,
-    GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES } from "../../gql"
+    GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES, GET_FOLLOWED_GAMES } from "../../gql"
 
 import "./dashboard.css";
 import { v4 as uuidv4 } from 'uuid';
@@ -40,6 +40,8 @@ function Home() {
       });
     //const [character, { data: charData, error: charError, loading: charLoading }] = useLazyQuery(GET_CHARACTER);
 
+    const { data: followedPlayerData, loading: followedPlayerLoading } = useQuery(GET_FOLLOWED_PLAYERS, { variables: { playerId } });
+    const { data: followedGameData, loading: followedGameLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId } });
 
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
@@ -150,10 +152,12 @@ function Home() {
                 )}
                 </div>
                 <div className="following">
-                <p>Games I'm Following:</p>
-                {/* TODO: ability to follow games */}
+                    <p>Games I'm Following:</p>
+                        {followedGameData && followedGameData.getFollowedGames.followedgame.map(game => <div><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link></div>)}
+                    <div>Followed Players:</div>
+                        {followedPlayerData && followedPlayerData.getFollowedPlayers.followedplayer.map(player => <div><Link to={`/${player.id}/bio`}>{player.userName}</Link></div>)}
+                    </div>
                 </div>
-            </div>
             </div>
         )
     }
