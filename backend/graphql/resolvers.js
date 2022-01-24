@@ -813,7 +813,7 @@ const resolvers = {
             const {gameId, playerId, retireNote, userId} = args;
 
             let thisGame = await Game.findByPk(gameId);
-            if (thisGame.hostId === userId) {
+            if (thisGame.hostId === userId || playerId === userId) {
                 await PlayerJoin.destroy({where: {[Op.and]:
                     [{userId: playerId}, {gameId}]}});
                 await Character.update({ retiredNote: retireNote, retired: true }, {where: {[Op.and]:

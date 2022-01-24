@@ -11,6 +11,8 @@ import { REMOVE_PLAYER } from "../../gql"
 function RemovePlayer(props) {
 
     const { character, hostId, gameId, userId } = props;
+
+    console.log(character);
     const [retireNote, setRetireNote] = useState('');
     const [playerId, setPlayerId] = useState(character.User.id);
     const [characterName, setCharacterName] = useState(character.name);
@@ -18,10 +20,9 @@ function RemovePlayer(props) {
     const [removePlayer] = useMutation(REMOVE_PLAYER, { variables: { playerId, gameId, retireNote, userId }} );
 
       const submitRemove = (e) => {
-        console.log('playerId submitting ', playerId);
-        console.log('character name submitting ', characterName)
         e.preventDefault();
         removePlayer({ variables: { playerId, gameId, retireNote, userId }});
+        openRemoveMenu();
       }
 
     const openRemoveMenu = () => {
@@ -48,6 +49,7 @@ function RemovePlayer(props) {
               {/* TODO: Retired notes displayed for retired characters */}
               {/* <p>{character.retiredNote}</p> */}
               {hostId !== null && userId !== undefined && userId !== null && hostId && userId.toString() === hostId && character.retired === false && (<div><p>Remove this player from the game (this will retire their character as well)</p><button onClick={openRemoveMenu}>Remove</button></div>)}
+              {userId !== undefined && userId !== null && userId.toString() === character.User.id && character.retired === false && (<div><p>Leave this game (this will retire their character as well)</p><button onClick={openRemoveMenu}>Leave</button></div>)}
                   {/* TODO: debug closing when typing */}
             </span>
             <div className={`removeForm noDisplay ${characterName}`}>
