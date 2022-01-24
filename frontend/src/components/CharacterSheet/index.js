@@ -10,24 +10,25 @@ import "./charactersheet.css";
 
 function CharacterSheet() {
 
-    const { charactersheetid } = useParams();
-    const { data, loading } = useQuery(GET_CHARACTERSHEET_BY_ID, { variables: { charactersheetid } });
+    const { characterSheetId } = useParams();
+    const { data, loading } = useQuery(GET_CHARACTERSHEET_BY_ID, { variables: { characterSheetId } });
 
-    console.log(data);
+    console.log('data', data.characterSheet);
+    console.log('character sheet id' , characterSheetId);
 
-    if (loading) {
+    if (loading || data === undefined) {
         return (
             <div>Loading...</div>
         )
     }
 
-    if (data && !loading) {
+    if (data !== null && data !== undefined && !loading) {
         return (
             <div className="gray-backdrop">
                 <div className="container">
-                    <h3>Character Sheet for {data.charactersheet.name}</h3>
-                    <p>Name: {data.charactersheet.name}</p>
-                    <p>Class: {data.charactersheet.class}</p>
+                    <h3>Character Sheet for {data.characterSheet.name}</h3>
+                    <p>Name: {data.characterSheet.name}</p>
+                    <p>Class: {data.characterSheet.class}</p>
                     {/* TODO: form to edit and save Character Sheet */}
                     {/* TODO: way to hook Character Sheet up to Character */}
                 </div>

@@ -226,6 +226,11 @@ const resolvers = {
             return {languages, rulesets, gameTypes};
         },
 
+        characterSheet: async(obj, args, context, info) => {
+            const {characterSheetId} = args;
+            return CharacterSheet.findByPk(characterSheetId);
+        },
+
         simpleSearch: async(obj, args, context, info) => {
             const { text } = args;
             const words = text.split(' ');
@@ -803,13 +808,29 @@ const resolvers = {
             // TODO:
             // remove the player from the game
             // retire the character (note optional)
-            const {gameId, playerId, retireNote} = args;
-            await PlayerJoin.destroy({where: {[Op.and]:
-                [{userId: playerId}, {gameId}]}});
-            await Character.update({ retiredNote: retireNote, retired: true }, {where: {[Op.and]:
-                [{userId: playerId}, {gameId}]}});
-                //may need to change what it returns
-            return PlayerJoin.findAll({where: {gameId}})
+
+            //TODO: check userId to make sure it is the DM of this game
+            const {gameId, playerId, retireNote, userId} = args;
+
+            let thisGame = await Game.findByPk(gameId);
+            if (thisGame.hostId === userId) {
+                await PlayerJoin.destroy({where: {[Op.and]:
+                    [{userId: playerId}, {gameId}]}});
+                await Character.update({ retiredNote: retireNote, retired: true }, {where: {[Op.and]:
+                    [{userId: playerId}, {gameId}]}});
+                    //may need to change what it returns
+                return PlayerJoin.findAll({where: {gameId}});
+            } else {
+                throw new UserInputError('Not Authorized.');
+            }
+        },
+
+        retireCharacter: async(root, args) => {
+            const {userId, retireNote, characterId} = args;
+            console.log(args);
+            //Op.and makes sure the user trying to retire this character is authorized.
+            return Character.update({ retiredNote: retireNote, retired: true }, {where: {[Op.and]:
+                [{userId}, {id: characterId}]}});
         }
 
     },

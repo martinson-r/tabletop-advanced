@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import {
     useQuery, useMutation, useLazyQuery
   } from "@apollo/client";
-import { GET_CHARACTER_BY_ID, UPDATE_CHARACTER, GET_CHARACTERSHEET_LIST_BY_PLAYER } from "../../gql"
+import { RETIRE_CHARACTER, GET_CHARACTER_BY_ID, UPDATE_CHARACTER, GET_CHARACTERSHEET_LIST_BY_PLAYER } from "../../gql"
 import './character.css';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -19,8 +19,12 @@ const [bio, setBio] = useState("");
 const [imageUrl, setImageUrl] = useState("");
 const [characterSheetId,setCharacterSheetId] = useState(0);
 const [characterSheets, setCharacterSheets] = useState([]);
+const [retireNote, setRetireNote] = useState('');
+const [retireForm, setRetireForm] = useState(false);
 
 const updateCharacterSheetId = (e) => setCharacterSheetId(e.target.value);
+
+const [retireCharacter] = useMutation(RETIRE_CHARACTER, { variables: { userId, characterId, retireNote }} );
 
 // Note: include user and game so if someone has gone directly to char, they can
 // see what user plays them and game they are in
@@ -57,7 +61,19 @@ useEffect(() => {
         setCharacterSheetId(updatedData.updateCharacter.characterSheetId);
     }
 
-},[updatedData])
+},[updatedData]);
+
+const submitRetire = (e) => {
+    e.preventDefault();
+    console.log('retire submitted')
+    console.log(userId, characterId, retireNote);
+    retireCharacter({ variables: { userId, characterId, retireNote } });
+}
+
+const showRetireForm = () => {
+    setRetireForm(!retireForm);
+}
+
 
 const handleSubmit = (e) => {
     e.preventDefault();
@@ -106,6 +122,21 @@ if (form.classList.contains("edit-form-hidden")) {
 
                 <p>{name}, played by {data.characterById.User.userName} in {data.characterById.Game.title}</p>
             <p>{bio}</p>
+            <p><Link to={`/charactersheets/${data.characterById.characterSheetId}`}>Character Sheet</Link></p>
+           {/* TODO: Retire Character */}
+           {userId === parseInt(data.characterById.User.id) && (<div>
+           <button onClick={showRetireForm}>Retire This Character</button>
+           {retireForm === true && <form onSubmit={submitRetire}>
+               {console.log('character id', characterId)}
+                <label>Retire Note:</label>
+                <input type="text"
+                value={retireNote}
+                onChange={(e) => setRetireNote(e.target.value)}
+                required/>
+                <button type="submit">Submit</button>
+            </form>}
+            </div>)}
+
             </div></div>))}
             {(data !== undefined && (parseInt(data.characterById.User.id) === userId) && (<div>
 

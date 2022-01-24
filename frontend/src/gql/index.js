@@ -124,6 +124,7 @@ query GetGamesPlayingIn($userId: ID) {
                 id
                 gameId
                 name
+                retired
             }
         }
     }
@@ -227,10 +228,18 @@ query GetCharacterById($characterId: ID) {
     }
 }
 `
+const RETIRE_CHARACTER = gql`
+mutation RetireCharacter($characterId: ID, $userId: ID, $retireNote: String) {
+    retireCharacter(characterId: $characterId, userId: $userId, retireNote: $retireNote) {
+        id
+    }
+}
+`
+
 
 const GET_CHARACTERSHEET_BY_ID = gql`
-query GetCharacterSheetById($charactersheetid: ID) {
-    charactersheet(charactersheetid: $charactersheetid) {
+query GetCharacterSheetById($characterSheetId: ID) {
+    characterSheet(characterSheetId: $characterSheetId) {
         name
         age
         intelligence
@@ -847,8 +856,8 @@ mutation UnFollowPlayer($currentUserId: ID, $userId: ID) {
 `
 
 const REMOVE_PLAYER = gql`
-mutation RemovePlayer($playerId: ID, $gameId: ID, $retireNote: String) {
-    removePlayer(playerId: $playerId, gameId: $gameId, retireNote: $retireNote) {
+mutation RemovePlayer($playerId: ID, $gameId: ID, $retireNote: String, $userId: ID) {
+    removePlayer(playerId: $playerId, gameId: $gameId, retireNote: $retireNote, userId: $userId) {
         id
     }
 }
@@ -988,6 +997,7 @@ export { GET_ACCOUNTS,
         UNFOLLOW_GAME,
         FOLLOW_PLAYER,
         REMOVE_PLAYER,
+        RETIRE_CHARACTER,
         UNFOLLOW_PLAYER,
         CHECK_FOLLOW_PLAYER,
         GET_PLAYING_WAITING_GAMES,

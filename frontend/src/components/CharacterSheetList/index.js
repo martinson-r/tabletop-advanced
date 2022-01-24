@@ -34,12 +34,15 @@ function CharacterSheetList() {
         return (
             <div className="gray-backdrop">
                 <div className="container">
-                    {data.playercharactersheets.map(
+                    {console.log('data', data)}
+                    {data !== null && data !== undefined && data.playercharactersheets.map(
                         sheet => <div key={uuidv4()}>
-                            <div>{sheet.name}</div>
-                            <div>{sheet.class}</div>
+                            <Link to={`/charactersheets/${sheet.id}`}><div>{sheet.name}</div></Link>
+                            <div>Level {sheet.level} {sheet.class}</div>
+                            {/* TODO: sheet created on date & time displayed along with character level */}
                             </div>
                     )}
+                    <p><Link to="/charactersheets/new">Create a new character sheet</Link></p>
                 </div>
             </div>
         )

@@ -31,6 +31,7 @@ const typeDefs = gql`
     charactersheet(charactersheetid: ID): CharacterSheet
     playercharactersheets(playerId: ID): [CharacterSheet]
     checkFollowPlayer(currentUserId: ID, userId: ID): User
+    characterSheet(characterSheetId: ID): CharacterSheet
   }
   type FollowedGame {
     id: ID,
@@ -371,7 +372,8 @@ const typeDefs = gql`
     unFollowGame(userId: ID, gameId: ID): CountAll
     followPlayer(currentUserId: ID, userId: ID): User
     unFollowPlayer(currentUserId: ID, userId: ID): User
-    removePlayer(playerId: ID, gameId: ID, retireNote: String): [PlayerJoin]
+    removePlayer(playerId: ID, gameId: ID, retireNote: String, userId: ID): [PlayerJoin]
+    retireCharacter(characterId: ID, userId: ID, retireNote: String): Character
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll,

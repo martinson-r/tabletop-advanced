@@ -119,13 +119,20 @@ function Home() {
                     {/* REFACTOR. Rework how you pull this data. This is not maintainable. */}
                     {/* Just do 2 separate queries. One for Waiting List (excluding offerAccepted apps), one for games the user is a player in. */}
                 <p>Games I'm Playing In:</p>
-                {/* Link to character info from character name */}
-                {/* Use lazy query */}
-                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game => <p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}, as {game.player[0].Characters[0] === undefined && (<span><Link to={`/game/${game.id}/create-character`}>Create a character now</Link></span>)}{game.player[0].Characters[0] !== undefined && (<Link to={`/characters/${game.player[0].Characters[0].id}`}>{game.player[0].Characters[0].name}</Link>)}</p>))}
+                {console.log('retired ', playingInData)}
 
-                {/* TODO: create a character for a game if one doesn't exist */}
-                {/* TODO: link to page w/ all player characters & character sheets */}
+                {/* TODO: filter for unretired characters */}
 
+                {playingInData !== undefined && (playingInData.getGamesPlayingIn.map(game =>
+                <p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}, as {game.player[0].Characters.filter(character => character.retired === false).length === 0 &&
+                (<span><Link to={`/game/${game.id}/create-character`}>Create a character now</Link></span>)}
+
+
+                {game.player[0].Characters.filter(character => character.retired === false).length > 0 && game.player[0].Characters.filter(character => character.retired === false).map(character => <Link to={`/characters/${character.id}`}>{game.player[0].Characters[0].name}</Link>)}
+                </p>))}
+
+                <p><Link to={`/charactersheets/list/${userId}`}>My character sheets</Link></p>
+                <p><Link to="/charactersheets/new">Create a new character sheet</Link></p>
                 </div>
                 <div className="appliedTo">
                 <p>Games I've Applied To:</p>

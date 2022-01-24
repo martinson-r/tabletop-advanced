@@ -7,6 +7,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { REMOVE_PLAYER } from "../../gql"
 
+// TODO: Rename component something more appropriate
 function RemovePlayer(props) {
 
     const { character, hostId, gameId, userId } = props;
@@ -14,13 +15,13 @@ function RemovePlayer(props) {
     const [playerId, setPlayerId] = useState(character.User.id);
     const [characterName, setCharacterName] = useState(character.name);
 
-    const [removePlayer] = useMutation(REMOVE_PLAYER, { variables: { playerId, gameId, retireNote }} );
+    const [removePlayer] = useMutation(REMOVE_PLAYER, { variables: { playerId, gameId, retireNote, userId }} );
 
       const submitRemove = (e) => {
         console.log('playerId submitting ', playerId);
         console.log('character name submitting ', characterName)
         e.preventDefault();
-        removePlayer({ variables: { playerId, gameId, retireNote }});
+        removePlayer({ variables: { playerId, gameId, retireNote, userId }});
       }
 
     const openRemoveMenu = () => {

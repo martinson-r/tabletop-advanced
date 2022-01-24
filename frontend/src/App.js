@@ -60,7 +60,7 @@ function App() {
         <Route path="/rulesets/:rulesetid" component={RuleSetPage}></Route>
         <Route path="/charactersheets/new" component={NewCharacterSheet}></Route>
         <Route path="/charactersheets/list/:playerId" component={CharacterSheetList}></Route>
-        <Route path="/charactersheets/:charactersheetid" component={CharacterSheet}></Route>
+        <Route path="/charactersheets/:characterSheetId" component={CharacterSheet}></Route>
         <Route path="/:playerId/followed" component={FollowedGamesPlayers}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
