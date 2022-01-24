@@ -782,7 +782,7 @@ const resolvers = {
         approveApplication: async(root, args, context) => {
             const { applicationId } = args;
             const user = context.user.id;
-            if (!user) throw Error('Unauthorized.');
+            if (!user) throw Error('Please log in.');
 
             //Prevent non-GMs from approving app
             let appToApprove = await Application.findByPk(applicationId, { include: {model: Game, through: "Waitlists"}});
@@ -793,63 +793,96 @@ const resolvers = {
             return returnApp;
         },
 
-        ignoreApplication: async(root, args) => {
+        ignoreApplication: async(root, args, context) => {
             const { applicationId } = args;
+            const user = context.user.id;
+            if (!user) throw new Error("Please log in.");
+
+            //Prevent non-GMs from ignoring app
+            let appToIgnore = await Application.findByPk(applicationId, { include: {model: Game, through: "Waitlists"}});
+            if (appToIgnore.Games[0].hostId !== user) throw new Error("Not authorized.");
+
             const findAndUpdateAppToApprove = await Application.update({ignored: true}, {where: { id: applicationId}});
             const returnApp = await Application.findAll({where: {id: applicationId}})
             return returnApp;
         },
 
-        acceptOffer: async(root, args) => {
+        acceptOffer: async(root, args, context) => {
             const { applicationId, userId, gameId } = args;
+            const user = context.user.id;
+
+            if (!user) throw new Error("Please log in.");
+
+            //TODO: get app, compare app userId to user
+            let appToCheck = await Waitlist.findAll({ where: { applicationId }});
+            if (appToCheck.userId !== user) throw new Error("Not authorized");
+
             await Application.update({offerAccepted: 'true'}, {where: { id: applicationId}});
             const addPlayerToGame = await PlayerJoin.create({userId, gameId});
             return addPlayerToGame;
         },
 
-        declineOffer: async(root, args) => {
+        declineOffer: async(root, args, context) => {
             const { applicationId } = args;
+            const user = context.user.id;
+
+            if (!user) throw new Error("Please log in.");
+
+            //TODO: get app, compare app userId to user
+            let appToCheck = await Waitlist.findAll({ where: { applicationId }});
+            if (appToCheck.userId !== user) throw new Error("Not authorized");
+
             //For some reason, false must be a string in order for this to work.
             await Application.update({offerAccepted: 'false'}, {where: { id: applicationId}});
             const returnApplication = Application.findAll({where: { id: applicationId }})
             return returnApplication;
         },
 
-        createCharacterSheet: async(root, args) => {
+        createCharacterSheet: async(root, args, context) => {
             const {playerId, name, characterClass} = args;
-            const characterSheet = await CharacterSheet.create({age, playerId, name, class: characterClass});
+            const user = context.user.id
+            if (!user) throw new Error("Please log in.");
+            const characterSheet = await CharacterSheet.create({age, playerId: user, name, class: characterClass});
             return characterSheet;
         },
 
-        followGame: async(root, args) => {
+        followGame: async(root, args, context) => {
             const {userId, gameId} = args;
+            const user = context.user.id;
+            if (!user) throw new Error("Not Authorized.");
             let followCheck = await FollowedGame.findOne({where: {[Op.and]:
-                [{userId}, {gameId}]}});
+                [{userId: user}, {gameId}]}});
 
             //Just in case, make sure game cannot be followed more than once
             if (followCheck) {
                 return followCheck;
             } else {
-                const followedTheGame = await FollowedGame.create({userId, gameId});
+                const followedTheGame = await FollowedGame.create({userId: user, gameId});
                 return followedTheGame;
             }
         },
 
-        unFollowGame: async(root, args) => {
+        unFollowGame: async(root, args, context) => {
             const {userId, gameId} = args;
+            const user = context.user.id;
+            if (!user) throw new Error("Not Authorized.");
+            //TODO: mismatch between followgame and user error
             let game = await FollowedGame.destroy({where: {[Op.and]:
-                [{userId}, {gameId}]}});
+                [{userId: user}, {gameId}]}});
                 console.log(game);
             return FollowedGame.findOne({where: {gameId}})
         },
 
-        followPlayer: async(root, args) => {
+        followPlayer: async(root, args, context) => {
             const {currentUserId, userId} = args;
+            const user = context.user.id;
             let otherUserId = userId;
+
+            if (!user) throw new Error("Not Authorized.");
 
             //confusing and my own fault for naming variables this way
             let followCheck = await FollowedPlayer.findOne({where: {[Op.and]:
-                [{userId: currentUserId}, {playerId: otherUserId}]}});
+                [{userId: user}, {playerId: otherUserId}]}});
 
             //Just in case, make sure game cannot be followed more than once
             if (followCheck) {
