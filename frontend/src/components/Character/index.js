@@ -22,6 +22,8 @@ const [characterSheets, setCharacterSheets] = useState([]);
 const [retireNote, setRetireNote] = useState('');
 const [retireForm, setRetireForm] = useState(false);
 
+console.log('SESSION USER', sessionUser);
+
 const updateCharacterSheetId = (e) => setCharacterSheetId(e.target.value);
 
 const [retireCharacter] = useMutation(RETIRE_CHARACTER, { variables: { userId, characterId, retireNote }} );
@@ -31,11 +33,15 @@ const [retireCharacter] = useMutation(RETIRE_CHARACTER, { variables: { userId, c
 const { data } = useQuery(GET_CHARACTER_BY_ID, { variables: { characterId } });
 const [updateCharacter, { data: updatedData }] = useMutation(UPDATE_CHARACTER);
 const { data: characterSheetData } = useQuery(GET_CHARACTERSHEET_LIST_BY_PLAYER, { variables: { playerId }});
-
+console.log('DATa', data)
 useEffect(() => {
-    setUserId(sessionUser.id);
-    setPlayerId(sessionUser.id);
+    if (sessionUser !== undefined && sessionUser !== null) {
+        setUserId(sessionUser.id);
+        setPlayerId(sessionUser.id);
+    }
+
     if (data !== undefined) {
+
         if (data.characterById) {
             setName(data.characterById.name);
             setBio(data.characterById.bio);

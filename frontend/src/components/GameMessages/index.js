@@ -89,8 +89,6 @@ function GameMessages(props) {
 
     useEffect(() => {
 
-      console.log('DATA......', data);
-
       //Double check to make sure data is not undefined.
       if (data !== undefined) {
 

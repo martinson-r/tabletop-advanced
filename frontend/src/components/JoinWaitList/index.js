@@ -39,6 +39,9 @@ function JoinWaitList({...props}) {
 
     const handleSubmit = (e) => {
       e.preventDefault();
+
+      console.log('USER...', userId);
+
       submitWaitlistApp(userId, charName, charConcept, experience, whyJoin, hostId)
     };
 

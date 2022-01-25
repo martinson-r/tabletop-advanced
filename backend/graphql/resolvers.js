@@ -92,6 +92,7 @@ const resolvers = {
 
         characterById: (obj, args, context, info) => {
             const { characterId } = args;
+            console.log('CHAR ID', characterId);
             return Character.findOne({where: { id: characterId }, include: [{ model: User }, { model: Game }]})
         },
 
@@ -663,12 +664,15 @@ const resolvers = {
         let errors = {}
         if (!context.user) return null;
         let user = context.user.id;
+
+        console.log('USER....', user);
+
         if (!user) return null;
         try {
 
                 const { userId, gameId, whyJoin, charConcept, charName, experience, hostId } = args;
                 //create app
-                if (user === hostId) {
+                if (user.toString() === hostId.toString()) {
                     errors.user = 'You cannot join the waitlist for your own game.';
                 }
 
@@ -694,7 +698,7 @@ const resolvers = {
                 const newApp = await Application.create({user, gameId, whyJoin, charConcept, charName, experience});
 
                 //Add app to waitlist
-                await Waitlist.create({user, gameId, hostId, applicationId: newApp.id})
+                await Waitlist.create({userId: user, gameId, hostId, applicationId: newApp.id})
                 return newApp;
 
             } catch(err) {
@@ -711,7 +715,7 @@ const resolvers = {
             const user = context.user.id;
 
             const { gameId, bio, name, imageUrl } = args;
-            const character = await Character.create({user, gameId, bio, name, imageUrl});
+            const character = await Character.create({userId: user, gameId, bio, name, imageUrl});
             return character;
         },
         updateCharacter: async(root, args, context) => {
@@ -841,9 +845,13 @@ const resolvers = {
 
             if (!user) throw new Error("Please log in.");
 
+            console.log(applicationId)
+
             //TODO: get app, compare app userId to user
             let appToCheck = await Waitlist.findAll({ where: { applicationId }});
-            if (appToCheck.userId !== user) throw new Error("Not authorized");
+
+            console.log(appToCheck[0].userId)
+            if (appToCheck[0].userId.toString() !== user.toString()) throw new Error("Not authorized");
 
             await Application.update({offerAccepted: 'true'}, {where: { id: applicationId}});
             const addPlayerToGame = await PlayerJoin.create({userId, gameId});
@@ -859,7 +867,7 @@ const resolvers = {
 
             //TODO: get app, compare app userId to user
             let appToCheck = await Waitlist.findAll({ where: { applicationId }});
-            if (appToCheck.userId !== user) throw new Error("Not authorized");
+            if (appToCheck.userId.toString() !== user.toString()) throw new Error("Not authorized");
 
             //For some reason, false must be a string in order for this to work.
             await Application.update({offerAccepted: 'false'}, {where: { id: applicationId}});
@@ -871,6 +879,9 @@ const resolvers = {
             const {playerId, name, characterClass} = args;
             if (!context.user) return null;
             const user = context.user.id
+
+            console.log(user);
+
             if (!user) throw new Error("Please log in.");
             const characterSheet = await CharacterSheet.create({age, playerId: user, name, class: characterClass});
             return characterSheet;
@@ -947,7 +958,10 @@ const resolvers = {
             const user = context.user.id;
 
             let thisGame = await Game.findByPk(gameId);
-            if (thisGame.hostId === user || playerId === user) {
+            console.log(thisGame);
+
+
+            if (thisGame.hostId.toString() === user.toString() || playerId.toString() === user.toString()) {
                 await PlayerJoin.destroy({where: {[Op.and]:
                     [{userId: playerId}, {gameId}]}});
                 await Character.update({ retiredNote: retireNote, retired: true }, {where: {[Op.and]:
@@ -955,7 +969,7 @@ const resolvers = {
                     //may need to change what it returns
                 return PlayerJoin.findAll({where: {gameId}});
             } else {
-                throw new UserInputError('Not Authorized.');
+                throw new UserInputError('Not Authorized to do that.');
             }
         },
 

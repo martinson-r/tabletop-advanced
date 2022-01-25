@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
 import {
@@ -9,7 +9,7 @@ import {
   function CreateCharacter() {
     // Grab our session user
 const sessionUser = useSelector((state) => state.session.user);
-const userId = sessionUser.id;
+const [userId, setUserId] = useState(null);
 const [name, setName] = useState("");
 const [bio, setBio] = useState("");
 const [imageUrl, setImageUrl] = useState("");
@@ -18,6 +18,13 @@ const { gameId } = useParams();
 const history = useHistory();
 
 const [submitCharacterCreation] = useMutation(SUBMIT_CHARACTER_CREATION, { variables: { userId, name, bio, imageUrl, gameId }, onCompleted: submitCharacterCreation => {  history.push(`/characters/${submitCharacterCreation.submitCharacterCreation.id}`) } } );
+
+useEffect(() => {
+    if (sessionUser !== undefined && sessionUser !== null) {
+        setUserId(sessionUser.id);
+    }
+
+},[sessionUser])
 
 const handleSubmit = (e) => {
     e.preventDefault();
