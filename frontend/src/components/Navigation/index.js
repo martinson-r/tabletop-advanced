@@ -37,6 +37,11 @@ function Navigation({ isLoaded }){
   let sessionLinks;
   if (sessionUser)
  {
+
+  // TODO: red dot on letter when there are messages
+  // TODO: red dot on My Games when there are updates
+  // TODO: check Visited in games list against last updated for that game
+  // TODO: check seen status of messages
     sessionLinks = (
       <div className="navigation">
       <div className="lefthand-nav">

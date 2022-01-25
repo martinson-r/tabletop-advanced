@@ -101,10 +101,17 @@ const resolvers = {
             return CharacterSheet.findAll({where: { playerId} });
         },
 
-        getFollowedGames: (obj, args, context, info) => {
+        getFollowedGames:(obj, args, context, info) => {
             //should followed games be private?
             const { playerId } = args;
-            return User.findByPk(playerId, {include: [{model: Game, through: "FollowedGames", as: "followedgame"}]});
+            return User.findByPk(playerId, {include: [{model: Game, through: "FollowedGames", as: "followedgame",
+            include: [{model: Message}]
+        }]});
+        },
+
+        getFollowedTimeStamps: async (obj, args, context, info) => {
+            const { playerId } = args;
+            return FollowedGame.findAll({where: {userId: playerId} });
         },
 
         getFollowedPlayers:(obj, args, context, info) => {

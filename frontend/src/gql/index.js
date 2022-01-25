@@ -42,6 +42,7 @@ const GET_GAMES = gql`
         active
         blurb
         description
+        updatedAt
         host {
             userName
             id
@@ -494,9 +495,24 @@ query GetFollowedGames($playerId: ID) {
     getFollowedGames(playerId: $playerId) {
         id
         followedgame {
-            id
-            title
-        }
+            updatedAt
+         id
+         title
+         Messages {
+           id
+           updatedAt
+         }
+       }
+    }
+}
+`
+
+const GET_FOLLOWED_VISITED_TIME = gql`
+query GetFollowedVisitedTime($playerId: ID) {
+    getFollowedTimeStamps(playerId: $playerId) {
+        id
+        gameId
+        visited
     }
 }
 `
@@ -1058,6 +1074,7 @@ export { GET_ACCOUNTS,
         REMOVE_PLAYER,
         RETIRE_CHARACTER,
         UNFOLLOW_PLAYER,
+        GET_FOLLOWED_VISITED_TIME,
         CHECK_FOLLOW_PLAYER,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,

@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       Message.belongsTo(models.User, { as: "sender", foreignKey: "senderId" });
       Message.belongsTo(models.MetaGameMessageType, { foreignKey: "metaGameMessageTypeId" });
       //Message.belongsTo(models.User, { as: "sender", foreignKey: "senderId"});
+      Message.belongsTo(models.Game, {foreignKey: "gameId"})
     }
   };
   Message.init({

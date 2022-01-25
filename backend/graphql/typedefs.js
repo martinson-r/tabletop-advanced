@@ -31,6 +31,7 @@ const typeDefs = gql`
     playercharactersheets(playerId: ID): [CharacterSheet]
     checkFollowPlayer(currentUserId: ID, userId: ID): User
     characterSheet(characterSheetId: ID): CharacterSheet
+    getFollowedTimeStamps(playerId: ID): [FollowedGame]
     user: User
     allUsers: [User!]!
     me: User
@@ -42,7 +43,8 @@ const typeDefs = gql`
   type FollowedGame {
     id: ID,
     userId: ID,
-    gameId: ID
+    gameId: ID,
+    visited: String
 
   }
   type FollowedPlayer {
@@ -292,6 +294,8 @@ const typeDefs = gql`
     blurb: String,
     spectatorChat: Boolean,
     hostId: ID
+    updatedAt: String
+    Messages: [Message]
   }
   type Application {
     id: ID
@@ -319,6 +323,7 @@ const typeDefs = gql`
     gameId: ID,
     messageText: String,
     createdAt: String,
+    updatedAt: String,
     deleted: Boolean,
     reported: Boolean,
     spectatorChat: Boolean,

@@ -113,6 +113,7 @@ function Home() {
         const gameData = data.games;
 
         return (
+            // TODO: check Visited in games list against last updated for that game
             <div className="gray-backdrop">
                 <div className="container">
                 <div className="hosting">
