@@ -21,6 +21,17 @@
     align-items: flex-start;
   }
 
+  #circle {
+    width: 10px;
+    height: 10px;
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+    border-radius: 100%;
+    background: red;
+    margin-left: -40px;
+    padding: 0;
+  }
+
   .lefthand-nav {
     padding-left: 10px;
     display: flex;

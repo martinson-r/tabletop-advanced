@@ -78,16 +78,17 @@ margin-bottom: 0;
 }
 
 .indivMessageBox.type-event::before {
-    content: "";
+    /* Events shouldn't have a little bubble tail */
+    display: none;
+    /* content: "";
     position: absolute;
     bottom: -10px;
     left: 0;
     height: 10px;
     border-right: 36px solid var(--lightblue);
-    /* background: var(--messageBubbleColor); */
     -webkit-border-bottom-right-radius: 80px 50px;
     -moz-border-radius-bottomright: 80px 50px;
-    border-bottom-right-radius: 80px 50px;
+    border-bottom-right-radius: 80px 50px; */
 }
 
 .indivMessageBox.type-rpAction::before {

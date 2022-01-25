@@ -18,8 +18,6 @@ function FollowedGamesPlayers() {
     const { data: gameData, loading: gameLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId } });
     const { data: visitedDate } = useQuery(GET_FOLLOWED_VISITED_TIME, { variables: { playerId } });
 
-    console.log('VISITED DATE:', visitedDate);
-
     let matchUpDates = () => {
         if (gameData !== undefined && visitedDate !== undefined) {
             //these are both arrays...
@@ -72,12 +70,10 @@ function FollowedGamesPlayers() {
     //  TODO: List of followed games
      <div>
         <div>Followed Games:</div>
-        {/* {gameData && gameData.getFollowedGames.followedgame.map(game => <div><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link> */}
         {matchedDates && matchedDates.map(game =>
         <div>
             <Link to={`/game/${game.game.id}/gameroom`}>{game.game.title}</Link>
             {/* Actually, we need the updated message times for the game */}
-            {console.log(game.game.Messages[game.game.Messages.length-1])}
             {game.game.Messages[game.game.Messages.length-1] !== undefined
             && game.game.Messages[game.game.Messages.length-1].updatedAt > game.visitDate.visited
             && (<div>New Activity</div>)}
