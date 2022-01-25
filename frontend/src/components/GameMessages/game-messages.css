@@ -152,3 +152,7 @@ textarea
 .infinite-scroll-component.infinite-scroll-window {
     overflow: hidden;
 }
+
+.actionBox {
+    display: flex;
+}

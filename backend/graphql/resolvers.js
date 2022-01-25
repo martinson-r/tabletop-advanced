@@ -286,13 +286,12 @@ const resolvers = {
     Mutation: {
         sendMessageToGame: async(root,args,context) => {
 
-        const { gameId, messageText, userId, offset, spectatorChat } = args;
-            console.log('CONTEXT GAME', context);
+        const { gameId, messageText, userId, offset, spectatorChat, metaGameMessageTypeId } = args;
+
+        console.log('META TYPE ID: ', metaGameMessageTypeId)
 
         //if (!context.user) return null;
             const user = context.user.id;
-
-            console.log(context.user.id)
 
             //Check to see if this is a dice roll.
             //Fun with regex
@@ -305,7 +304,7 @@ const resolvers = {
                 //push roll results into messageText
                 const messageText = `Dice roll result of ${numbers[2]}D${numbers[3]}: ${result}`;
 
-                await Message.create({gameId, messageText, senderId: user, spectatorChat});
+                await Message.create({gameId, messageText, senderId: user, spectatorChat, metaGameMessageTypeId});
 
                 const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}, {model: MetaGameMessageType}], order: [['createdAt', 'DESC']], limit:20});
 
@@ -319,7 +318,7 @@ const resolvers = {
             //backup in case this breaks
             //const senderId = userId;
             const senderId = context.user.id
-            await Message.create({gameId,messageText,senderId,spectatorChat});
+            await Message.create({gameId,messageText,senderId,spectatorChat, metaGameMessageTypeId});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}, {model: MetaGameMessageType}], order: [['createdAt', 'DESC']], limit:20});
 
@@ -378,7 +377,7 @@ const resolvers = {
 
             //Add current user
             try {
-                await Recipient.create({userId: user, conversationId})
+                await Recipient.create({userId: user, conversationId, seen: true})
             } catch(e) {
                 console.log('Error', e)
             }
@@ -389,7 +388,7 @@ const resolvers = {
             try {
                 let user = await User.findAll({where: { userName: {[Op.iLike]: recipient}
                 }});
-                await Recipient.create({userId: user[0].id, conversationId});
+                await Recipient.create({userId: user[0].id, conversationId, seen: false});
             } catch(e) {
                 console.log('Error', e);
             }
@@ -1042,9 +1041,6 @@ const resolvers = {
                     //We'll see if this is a game or conversation, first.
                     //If it has a gameId at all, it's a game.
 
-                    console.log('VARS...',variables);
-                    console.log('PAYLOAD', payload)
-
                     if (variables.gameId !== null && variables.gameId !== undefined) {
                         //Yes, you have to cast it to a string...
 
@@ -1054,14 +1050,6 @@ const resolvers = {
                          return payload.messageSent.rows[0].conversationId.toString() === variables.conversationId;
                     }),
             },
-
-            // messageSent: {
-            //     subscribe: (_, __, { pubsub }) => pubsub.asyncIterator(NEW_MESSAGE),
-            //      resolve: (payload) => {
-            //          console.log('PAYLOAD', payload);
-            //            //return payload;
-            //      }
-        //}
 
 
     },

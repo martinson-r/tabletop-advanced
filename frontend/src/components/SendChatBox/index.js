@@ -16,11 +16,39 @@ import { GET_GAME, GET_GAME_CONVOS, SEND_MESSAGE_TO_GAME, SEND_NON_GAME_NON_SPEC
 function SendChatBox(props){
 
     const [messageText, setMessage] = useState("");
-const {gameId, conversationId, userId, spectatorChat} = props;
+    const {gameId, conversationId, userId, spectatorChat, isAction, isEvent, isGmChat} = props;
     const [submittedMessage, setSubmittedMessage] = useState(false);
+    const [metaGameMessageTypeId, setMetaGameMessageTypeId] = useState(null);
 
-    const [updateMessages, {error: gameMessageError}] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat }, errorPolicy: 'all' } );
-    const [sendNonGameMessage, {error}] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText }, errorPolicy: 'all' } );
+    const [updateMessages, {error: gameMessageError}] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat, metaGameMessageTypeId }, errorPolicy: 'all' } );
+    const [sendNonGameMessage, {error}] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText, metaGameMessageTypeId }, errorPolicy: 'all' } );
+
+    console.log('PROPS', props);
+
+    useEffect(() => {
+
+      if (isAction === true) {
+        setMetaGameMessageTypeId(6);
+      }
+
+    },[props]);
+
+    useEffect(() => {
+
+      if (isEvent === true) {
+        setMetaGameMessageTypeId(7);
+      }
+
+    },[props]);
+
+    useEffect(() => {
+      if (isGmChat !== undefined){
+        if (isGmChat === true && isAction === false && isEvent === false) {
+          setMetaGameMessageTypeId(1);
+        }
+      }
+    },[props])
+
 
     //Submit messages when user presses Enter
     const handleKeyDown = (e) => {
@@ -34,12 +62,13 @@ const {gameId, conversationId, userId, spectatorChat} = props;
 
           //Offset is fine at this point. No need to do anything with it.
           if (gameId !== undefined) {
-          updateMessages(gameId, userId, messageText, spectatorChat);
+          console.log('METAGAME ID: ', metaGameMessageTypeId);
+          updateMessages(gameId, userId, messageText, spectatorChat, metaGameMessageTypeId);
           setSubmittedMessage(true);
           setMessage('');
           }
           else if (conversationId !== undefined) {
-          sendNonGameMessage(conversationId, userId, messageText);
+          sendNonGameMessage(conversationId, userId, messageText, metaGameMessageTypeId);
           setSubmittedMessage(true);
           setMessage('');
 
@@ -51,6 +80,7 @@ const {gameId, conversationId, userId, spectatorChat} = props;
      <>
 
      {(<form onSubmit={handleSpectatorSubmit}>
+      {console.log('META TYPE', metaGameMessageTypeId)}
       {gameMessageError && gameMessageError !== undefined && (
       <span>{gameMessageError.toString()}</span>)}
       {error && error !== undefined && (

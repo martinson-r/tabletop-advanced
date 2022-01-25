@@ -512,8 +512,8 @@ const ADD_BLOCKED_USER = gql`
 `;
 
 const SEND_MESSAGE_TO_GAME = gql`
-  mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String, $spectatorChat: Boolean) {
-    sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText, spectatorChat: $spectatorChat) {
+  mutation SendMessageToGame($gameId: ID, $userId: ID, $messageText: String, $spectatorChat: Boolean, $metaGameMessageTypeId: ID) {
+    sendMessageToGame(gameId: $gameId, userId: $userId, messageText: $messageText, spectatorChat: $spectatorChat, metaGameMessageTypeId: $metaGameMessageTypeId) {
         count
         rows {
             sender {
@@ -529,7 +529,7 @@ const SEND_MESSAGE_TO_GAME = gql`
                 id
                 metaGameMessageType
             }
-       }
+         }
         }
       }
 `;
@@ -899,7 +899,7 @@ const EDIT_WAITLIST_APP = gql`
 //This is to send a non-game message to a conversation
 const SEND_NON_GAME_NON_SPEC_MESSAGES = gql`
 mutation SendNonGameNonSpecMessages($userId: ID!, $messageText: String!, $conversationId: ID) {
-    sendNonGameMessages(userId: $userId, messageText: $messageText, conversationId: $conversationId){
+    sendNonGameMessages(userId: $userId, messageText: $messageText, conversationId: $conversationId ){
         count
         rows {
             sender {
@@ -971,8 +971,8 @@ subscription OnMessageSent($gameId: ID, $conversationId: ID) {
                 userName
             }
             id
-            messageText
             spectatorChat
+            messageText
             createdAt
             deleted
             MetaGameMessageType {

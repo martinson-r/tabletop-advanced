@@ -355,10 +355,10 @@ const typeDefs = gql`
   }
   type Mutation {
     blockUser(emailToBlock: String!, blockerEmail: String!): User
-    sendMessageToGame(gameId: ID, userId: ID, messageText: String, spectatorChat: Boolean): CountAll
+    sendMessageToGame(gameId: ID, userId: ID, messageText: String, spectatorChat: Boolean, metaGameMessageTypeId: ID): CountAll
     editMessage(messageId: ID, userId: ID, editMessageText: String):CountAll
     deleteMessage(messageId: ID, userId: ID): CountAll
-    sendNonGameMessages(userId: ID!, messageText: String!, conversationId: ID): CountAll
+    sendNonGameMessages(userId: ID!, messageText: String!, conversationId: ID, metaGameMessageTypeId: ID): CountAll
     submitGame(userId: ID!, title: String!, blurb: String!, description: String!, gameTypeId: ID!, gameRulesetId: ID!, gameLanguageId: ID!): Game
     submitWaitlistApp(userId: ID!, charName: String!, charConcept: String!, whyJoin: String!, experience: String!, gameId: ID!): Game
     submitCharacterCreation(userId: ID, gameId: ID, bio: String, name: String, imageUrl: String): Character

@@ -187,7 +187,7 @@ function MessageBox(props) {
             {message.deleted !== true &&
             (<span className={`message-text`}>{message.MetaGameMessageType !== null &&
             message.MetaGameMessageType !== undefined &&
-            (message.MetaGameMessageType.metaGameMessageType + ':')} {breakLongWords(message.messageText)} </span>)}
+            (<b>{message.MetaGameMessageType.metaGameMessageType + ':'}</b>)} {breakLongWords(message.messageText)} </span>)}
             {message.deleted === true && (<i>message deleted</i>)}</span></div>)}
             {/* {userId === null && (<div className="indivMessageBox status" game-status={isGame.toString()} data-status={false}>
 

@@ -28,10 +28,23 @@ function GameMessages(props) {
     const [isScrolling, setIsScrolling] = useState(false);
     const [spectatorChat, setSpectatorChat] = useState(false);
     const [hideSpectatorChat, setHideSpectatorChat] = useState(false);
+    const [isAction, setAction] = useState(false);
+    const [isEvent, setEvent] = useState(false);
+    const [isGmChat, setGmChat] = useState(false);
 
     const { gameId } = props;
 
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
+
+    const toggleAction = () => {
+      setAction(!isAction);
+      setEvent(false);
+    }
+
+    const toggleEvent = () => {
+      setEvent(!isEvent);
+      setAction(false);
+    }
 
     useEffect(() => {
       if (sessionUser !== undefined && sessionUser !== null) {
@@ -40,7 +53,17 @@ function GameMessages(props) {
     },[sessionUser]);
 
     useEffect(() => {
+      if (userId !== null && userId !== undefined && gameData !== undefined) {
+        if (userId === gameData.game.host.id) {
+          setGmChat(true);
+        }
+      }
+    }, [userId, gameData])
+
+    useEffect(() => {
         try {
+
+          //See if the user is a player in this game
           const isPlayer = gameData.game.player.filter((player) => player.id === userId)
 
           if (isPlayer.length > 0) {
@@ -56,9 +79,6 @@ function GameMessages(props) {
       GET_GAME_CONVOS,
       { variables: { gameId, offset } }
     );
-
-    console.log(gameId, offset)
-    console.log('DATA', data)
 
 
     let { subscribeToMore: spectatorSubscribe, fetchMore: spectatorFetchMore, data: spectatorData, loading: spectatorLoading, error: spectatorError } = useQuery(
@@ -313,8 +333,33 @@ const spectatorFetchAndOffset = () => {
 {/* TODO: buttons to flag messages as Actions, Metagame, or Events */}
 {/* Regex for quick chat commands (//action, //event, //metagame) */}
 {/* Events are limited to GM */}
-          {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) && (<div className="sendChatBox">
-          <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} /></div>)}
+          {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) &&
+          (<div>
+            <div class="actionBox">
+
+              {console.log('GAME DATA...', gameData)}
+
+            { userId === gameData.game.host.id && (<div><input
+              name="event"
+              type="checkbox"
+              checked={isEvent}
+              onChange={toggleEvent} />
+              <label>This is an event</label></div>)}
+
+              <div><input
+              name="action"
+              type="checkbox"
+              checked={isAction}
+              onChange={toggleAction} />
+              <label>This is an action</label>
+              </div>
+            </div>
+            <div className="sendChatBox">
+              {console.log('GM Chat?', isGmChat)}
+          <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} isAction={isAction} isEvent={isEvent} isGmChat={isGmChat} />
+          </div>
+
+          </div>)}
 
 {!sessionUser && (
         <div className="notification">Please <Link to={`/login`}>log in</Link> to participate.
@@ -363,7 +408,7 @@ const spectatorFetchAndOffset = () => {
        )} */}
 
       {sessionUser !== undefined && sessionUser !== null && gameData !== undefined && (<div className="sendChatBox">
-      <SendChatBox gameId={gameId} userId={userId} spectatorChat={true} /></div>)}
+      <SendChatBox gameId={gameId} userId={userId} spectatorChat={true} isAction={isAction} isEvent={isEvent} isGmChat={isGmChat} /></div>)}
 
       {!sessionUser && (
         <div className="notification">

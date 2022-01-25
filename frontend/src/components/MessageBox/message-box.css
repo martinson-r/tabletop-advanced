@@ -5,6 +5,9 @@
     --mediumGray: #C4C4C4;
     --lightestGray: #D3D3BA;
     --pink: pink;
+    --yellow: rgb(238, 238, 168);
+    --lightblue: lightskyblue;
+    --brown: rgb(135, 98, 98);
 
     /* Doing this so that I don't accidentally change the colors of
     things by accident */
@@ -34,13 +37,14 @@ margin-bottom: 0;
     white-space: pre-wrap;
  }
 
+ /* This is the little hook on the chat bubble */
 .indivMessageBox::before {
     content: "";
     position: absolute;
     bottom: -10px;
     left: 0;
     height: 10px;
-    border-right: 30px solid var(--messageBubbleColor);
+    border-right: 36px solid var(--messageBubbleColor);
     /* background: var(--messageBubbleColor); */
     -webkit-border-bottom-right-radius: 80px 50px;
     -moz-border-radius-bottomright: 80px 50px;
@@ -53,7 +57,46 @@ margin-bottom: 0;
     bottom: -10px;
     left: 0;
     height: 10px;
-    border-right: 30px solid var(--pink);
+    border-right: 36px solid var(--pink);
+    /* background: var(--messageBubbleColor); */
+    -webkit-border-bottom-right-radius: 80px 50px;
+    -moz-border-radius-bottomright: 80px 50px;
+    border-bottom-right-radius: 80px 50px;
+}
+
+.indivMessageBox.type-gmChat::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 10px;
+    border-right: 36px solid var(--yellow);
+    /* background: var(--messageBubbleColor); */
+    -webkit-border-bottom-right-radius: 80px 50px;
+    -moz-border-radius-bottomright: 80px 50px;
+    border-bottom-right-radius: 80px 50px;
+}
+
+.indivMessageBox.type-event::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 10px;
+    border-right: 36px solid var(--lightblue);
+    /* background: var(--messageBubbleColor); */
+    -webkit-border-bottom-right-radius: 80px 50px;
+    -moz-border-radius-bottomright: 80px 50px;
+    border-bottom-right-radius: 80px 50px;
+}
+
+.indivMessageBox.type-rpAction::before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 10px;
+    border-right: 36px solid var(--brown);
     /* background: var(--messageBubbleColor); */
     -webkit-border-bottom-right-radius: 80px 50px;
     -moz-border-radius-bottomright: 80px 50px;
@@ -235,4 +278,16 @@ margin-bottom: 0;
 
 .type-metagame {
     background-color: pink;
+}
+
+.type-rpAction {
+    background-color: var(--brown);
+}
+
+.type-event{
+    background-color: var(--lightblue);
+}
+
+.type-gmChat{
+    background-color: var(--yellow);
 }
