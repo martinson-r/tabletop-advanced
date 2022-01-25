@@ -37,7 +37,6 @@ const {gameId, conversationId, userId, spectatorChat} = props;
           updateMessages(gameId, userId, messageText, spectatorChat);
           setSubmittedMessage(true);
           setMessage('');
-          console.log(gameMessageError);
           }
           else if (conversationId !== undefined) {
           sendNonGameMessage(conversationId, userId, messageText);

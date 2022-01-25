@@ -319,7 +319,7 @@ const resolvers = {
             //backup in case this breaks
             //const senderId = userId;
             const senderId = context.user.id
-            await Message.create({gameId,messageText,senderId,spectatorChat,metaGameMessageTypeId:4});
+            await Message.create({gameId,messageText,senderId,spectatorChat});
 
             const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}, {model: MetaGameMessageType}], order: [['createdAt', 'DESC']], limit:20});
 
