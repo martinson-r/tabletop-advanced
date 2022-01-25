@@ -33,8 +33,6 @@ function GameMessages(props) {
 
     const { loading: gameLoading, error: gameError, data: gameData } = useQuery(GET_GAME, { variables: { gameId } });
 
-    console.log('SESSION ', sessionUser);
-
     useEffect(() => {
       if (sessionUser !== undefined && sessionUser !== null) {
         setUserId(sessionUser.id);
@@ -48,14 +46,6 @@ function GameMessages(props) {
           if (isPlayer.length > 0) {
             setIsPlayer(true);
           }
-          // gameData.game.player.forEach((player) => {
-
-          //   console.log('player', player.id === userId);
-          //   console.log('userid', userId)
-          //   if (parseInt(player.id) === userId) {
-          //       setIsPlayer(true);
-          //   }
-          //});
         } catch {
           return ( <div>Loading...</div>)
         }
@@ -67,6 +57,10 @@ function GameMessages(props) {
       { variables: { gameId, offset } }
     );
 
+    console.log(gameId, offset)
+    console.log('DATA', data)
+
+
     let { subscribeToMore: spectatorSubscribe, fetchMore: spectatorFetchMore, data: spectatorData, loading: spectatorLoading, error: spectatorError } = useQuery(
       //add offset
       GET_SPECTATOR_CONVOS,
@@ -74,6 +68,8 @@ function GameMessages(props) {
     );
 
     useEffect(() => {
+
+      console.log('DATA......', data);
 
       //Double check to make sure data is not undefined.
       if (data !== undefined) {
@@ -184,23 +180,30 @@ function GameMessages(props) {
     //This hopefully covers all, edits and deletions included
     useEffect(() => {
 
+      if (data !== undefined) {
+        subscribeToMore({
+          document: GAME_MESSAGES_SUBSCRIPTION,
+          variables: { gameId },
+          updateQuery: (prev, { subscriptionData }) => {
 
-      subscribeToMore({
-        document: GAME_MESSAGES_SUBSCRIPTION,
-        variables: { gameId },
-        updateQuery: (prev, { subscriptionData }) => {
-          if (!subscriptionData.data) return prev;
-          const newFeedItem = subscriptionData.data.messageSent;
-          setNewMessage(newFeedItem)
+            console.log('SUB DATA...', subscriptionData);
 
-          //This part is broken.
-          //This really should be done in cache.
-            return Object.assign({}, prev, {
-              convos: {...prev.rows, ...newFeedItem}
-            });
-          }
-      });
+            if (!subscriptionData.data) return prev;
+            const newFeedItem = subscriptionData.data.messageSent;
+            setNewMessage(newFeedItem)
 
+            //This part is broken.
+            //This really should be done in cache.
+              return Object.assign({}, prev, {
+                convos: {...prev.rows, ...newFeedItem}
+              });
+            }
+        });
+      }
+
+      console.log('SPEC DATA', spectatorData);
+
+      if (spectatorData !== undefined) {
         spectatorSubscribe({
         document: SPECTATOR_MESSAGES_SUBSCRIPTION,
         variables: { gameId },
@@ -216,6 +219,7 @@ function GameMessages(props) {
             });
           }
       });
+    }
 
     },[data, spectatorData]);
 
@@ -296,6 +300,9 @@ const spectatorFetchAndOffset = () => {
     // loader={<h4>Loading...</h4>}
     scrollableTarget="scrollableDivGameChat"
   >
+
+    {/* this is blank */}
+    {console.log('SORTED: ', sortedConvos)}
     {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
             message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message}
             userId={userId} gameId={gameId} gameData={gameData}/>)}

@@ -375,7 +375,10 @@ const GET_GAME_CONVOS = gql`
             spectatorChat
             createdAt
             deleted
-            metaGameMessageTypeId
+            MetaGameMessageType {
+                id
+                metaGameMessageType
+            }
        }
     }
 }
@@ -972,7 +975,10 @@ subscription OnMessageSent($gameId: ID, $conversationId: ID) {
             spectatorChat
             createdAt
             deleted
-
+            MetaGameMessageType {
+                id
+                metaGameMessageType
+            }
        }
     }
   }

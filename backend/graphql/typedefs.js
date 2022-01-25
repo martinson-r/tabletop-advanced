@@ -386,7 +386,7 @@ const typeDefs = gql`
     login(userName: String!, password: String!): AuthPayload!
   }
   type Subscription {
-    messageSent(gameId: ID, conversationId: ID): CountAll,
+    messageSent(gameId: ID, conversationId: ID): CountAll
     spectatorMessageSent(gameId: ID, conversationId: ID): CountAll
   }
   schema {

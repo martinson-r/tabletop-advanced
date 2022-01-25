@@ -120,7 +120,7 @@ const resolvers = {
 
         convos: async (obj, args, context, info) => {
             return Message.findAndCountAll({ where: {[Op.and]: [{ gameId: args.gameId, spectatorChat: false }]}, include: [
-                {model: MetaGameMessageType},,
+                {model: MetaGameMessageType},
                 {model: User, as: "sender",
                 include: {model: Character, where: {
                     [Op.and]:
@@ -287,8 +287,12 @@ const resolvers = {
         sendMessageToGame: async(root,args,context) => {
 
         const { gameId, messageText, userId, offset, spectatorChat } = args;
-            if (!context.user) return null;
+            console.log('CONTEXT GAME', context);
+
+        //if (!context.user) return null;
             const user = context.user.id;
+
+            console.log(context.user.id)
 
             //Check to see if this is a dice roll.
             //Fun with regex
@@ -303,7 +307,7 @@ const resolvers = {
 
                 await Message.create({gameId, messageText, senderId: user, spectatorChat, metaGameMessageTypeId: 2});
 
-                const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
+                const returnRoll = await Message.findAndCountAll({ where: { gameId: args.gameId }, include: [{model: User, as: "sender"}, {model: MetaGameMessageType}], order: [['createdAt', 'DESC']], limit:20});
 
                 pubsub.publish('NEW_MESSAGE', {messageSent: returnRoll});
             } else if (numbers === null) {
@@ -315,9 +319,11 @@ const resolvers = {
             //backup in case this breaks
             //const senderId = userId;
             const senderId = context.user.id
-            await Message.create({gameId,messageText,senderId,spectatorChat});
+            await Message.create({gameId,messageText,senderId,spectatorChat,metaGameMessageTypeId:4});
 
-            const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
+            const conversation = await Message.findAndCountAll({ where: { gameId }, include: [{model: User, as: "sender"}, {model: MetaGameMessageType}], order: [['createdAt', 'DESC']], limit:20});
+
+            console.log(conversation.rows[0]);
 
             if (spectatorChat === false) {
                 pubsub.publish('NEW_MESSAGE', {messageSent: conversation});
@@ -1025,7 +1031,6 @@ const resolvers = {
                 //If it has a gameId at all, it's a game.
                 if (variables.gameId !== null && variables.gameId !== undefined) {
                     //Yes, you have to cast it to a string...
-                    console.log(payload);
                     return payload.spectatorMessageSent.rows[0].gameId.toString() === variables.gameId}
             }),
     },
@@ -1036,14 +1041,28 @@ const resolvers = {
                     //Structure is the same for both games and non-games; no need for a second subscription.
                     //We'll see if this is a game or conversation, first.
                     //If it has a gameId at all, it's a game.
+
+                    console.log('VARS...',variables);
+                    console.log('PAYLOAD', payload)
+
                     if (variables.gameId !== null && variables.gameId !== undefined) {
                         //Yes, you have to cast it to a string...
-                        console.log(payload);
-                        return payload.messageSent.rows[0].gameId.toString() === variables.gameId;
+
+                         //return payload.messageSent.rows[0].gameId.toString() === variables.gameId;
+                         return payload.messageSent.rows[0]
                     }
-                        return payload.messageSent.rows[0].conversationId.toString() === variables.conversationId;
-                }),
+                         return payload.messageSent.rows[0].conversationId.toString() === variables.conversationId;
+                    }),
             },
+
+            // messageSent: {
+            //     subscribe: (_, __, { pubsub }) => pubsub.asyncIterator(NEW_MESSAGE),
+            //      resolve: (payload) => {
+            //          console.log('PAYLOAD', payload);
+            //            //return payload;
+            //      }
+        //}
+
 
     },
 }
