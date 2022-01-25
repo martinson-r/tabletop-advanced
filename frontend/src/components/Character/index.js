@@ -128,7 +128,8 @@ if (form.classList.contains("edit-form-hidden")) {
 
                 <p>{name}, played by {data.characterById.User.userName} in {data.characterById.Game.title}</p>
             <p>{bio}</p>
-            <p><Link to={`/charactersheets/${data.characterById.characterSheetId}`}>Character Sheet</Link></p>
+            {data.characterById.characterSheetId !== null && (<p><Link to={`/charactersheets/${data.characterById.characterSheetId}`}>Character Sheet</Link></p>)}
+            {data.characterById.characterSheetId === null && (<p><Link to="/charactersheets/new">Create a character sheet</Link></p>)}
            {/* TODO: Retire Character */}
            {userId === parseInt(data.characterById.User.id) && (<div>
            <button onClick={showRetireForm}>Retire This Character</button>
