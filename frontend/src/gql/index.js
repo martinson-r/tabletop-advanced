@@ -421,6 +421,7 @@ query GetNonGameConvos($userId: ID!) {
         recipient {
             id
             recipient {
+                id
                 userName
             }
         }
@@ -444,6 +445,16 @@ query GetNonGameNonSpecConvos($conversationId: ID, $offset: Int) {
             createdAt
             deleted
        }
+    }
+}
+`;
+
+//Find out if user has any unread messages
+const FIND_UNREAD_MESSAGES = gql`
+query FindUnreadMessages {
+    findUnreadMessages {
+        id
+        conversationId
     }
 }
 `;
@@ -1093,6 +1104,7 @@ export { GET_ACCOUNTS,
         ADD_RECIPIENT,
         EDIT_MESSAGE,
         DELETE_MESSAGE,
+        FIND_UNREAD_MESSAGES,
         GET_NON_GAME_NON_SPEC_MESSAGES,
         GET_USER_NON_GAME_CONVOS,
         SEND_NON_GAME_NON_SPEC_MESSAGES,

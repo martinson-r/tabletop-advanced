@@ -5,7 +5,7 @@ import {
     useQuery, useLazyQuery, useMutation
   } from "@apollo/client";
 import { GET_GAMES, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITING_LIST_GAMES,
-    GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES, GET_FOLLOWED_GAMES, GET_FOLLOWED_PLAYERS } from "../../gql"
+    GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES, GET_FOLLOWED_GAMES, GET_FOLLOWED_PLAYERS, FIND_UNREAD_MESSAGES } from "../../gql"
 
 import "./dashboard.css";
 import { v4 as uuidv4 } from 'uuid';
@@ -25,9 +25,12 @@ function Home() {
     const appIdSpanRef = useRef(null);
     const [acceptDecline, setAcceptDecline] = useState(null);
 
+
     //grab all games
     //TODO: Replace with query to grab games only relating to the user
     const { loading, error, data } = useQuery(GET_GAMES);
+
+
     const [getHosting, { loading: loadingHosted, error: errorHosted, data: dataHosted}] = useLazyQuery(GET_HOSTED_GAMES, {
         fetchPolicy: 'network-only'
       });
@@ -80,6 +83,7 @@ function Home() {
             getGamesPlayingIn({ variables: { userId }});
         }
     },[userId, history]);
+
 
     useEffect(() => {
         getGamesPlayingIn({ variables: { userId }});
@@ -156,9 +160,9 @@ function Home() {
                 </div>
                 <div className="following">
                     <p>Games I'm Following:</p>
-                        {followedGameData && followedGameData.getFollowedGames.followedgame.map(game => <div><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link></div>)}
+                        {followedGameData.getFollowedGames !== undefined && followedGameData.getFollowedGames !== null && followedGameData.getFollowedGames.followedgame.map(game => <div><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link></div>)}
                     <div>Followed Players:</div>
-                        {followedPlayerData && followedPlayerData.getFollowedPlayers.followedplayer.map(player => <div><Link to={`/${player.id}/bio`}>{player.userName}</Link></div>)}
+                        {followedPlayerData !== null && followedPlayerData !== undefined && followedPlayerData.getFollowedPlayers && followedPlayerData.getFollowedPlayers.followedplayer.map(player => <div><Link to={`/${player.id}/bio`}>{player.userName}</Link></div>)}
                     </div>
                 </div>
             </div>

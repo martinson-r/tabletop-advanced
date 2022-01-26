@@ -32,6 +32,17 @@
     padding: 0;
   }
 
+  #circle2 {
+    width: 10px;
+    height: 10px;
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+    border-radius: 100%;
+    background: red;
+    padding: 0;
+    margin-left: -60px;
+  }
+
   .lefthand-nav {
     padding-left: 10px;
     display: flex;

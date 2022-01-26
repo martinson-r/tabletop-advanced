@@ -35,6 +35,7 @@ const typeDefs = gql`
     user: User
     allUsers: [User!]!
     me: User
+    findUnreadMessages: [Recipient]
   }
   type AuthPayload {
     token: String!
@@ -203,6 +204,7 @@ const typeDefs = gql`
     messageId: ID,
     Message: [Message]
     recipient: User
+    seen: Boolean
   }
   type AboutMe {
     id: ID,

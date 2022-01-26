@@ -183,10 +183,17 @@ const resolvers = {
             return User.findAll ({where: {id: userId}, include: {model: Conversation, as: "recipient", include: {model: User, as: "recipient"}}})
 
         },
+
         //TODO: GetSingleNonGameConversation
         getNonGameMessages: (obj, args, context, info) => {
             const { conversationId, offset } = args;
             return Message.findAndCountAll({where: {conversationId}, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit: 20, offset: offset,});
+        },
+
+        findUnreadMessages: (obj, args, context, info) => {
+            if (!context.user) return null;
+            const userId = context.user.id;
+            return Recipient.findAll({ where: { userId, seen: false } })
         },
 
         getGamesHosting: (obj, args, context, info) => {

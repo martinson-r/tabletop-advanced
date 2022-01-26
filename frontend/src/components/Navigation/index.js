@@ -11,7 +11,7 @@ import {
   useLazyQuery, useMutation, useQuery
 } from "@apollo/client";
 import Cookies from 'js-cookie';
-import { GET_USER, GET_FOLLOWED_GAMES, GET_FOLLOWED_VISITED_TIME } from "../../gql";
+import { FIND_UNREAD_MESSAGES, GET_USER, GET_FOLLOWED_GAMES, GET_FOLLOWED_VISITED_TIME } from "../../gql";
 
 function Navigation({ isLoaded }){
   const sessionUser = useSelector(state => state.session.user);
@@ -21,9 +21,12 @@ function Navigation({ isLoaded }){
   const [matchedDates, setMatchedDates] = useState([]);
   const [playerId, setPlayerId] = useState(null);
   const [newGames, setNewGames] = useState(false);
+  const [newMessages, setNewMessages] = useState(false);
+  const [messageStatus, setMessageStatus] = useState('none');
 
   const { data: gameData, loading: gameLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId } });
     const { data: visitedDate } = useQuery(GET_FOLLOWED_VISITED_TIME, { variables: { playerId } });
+    const { data: unreadData } = useQuery(FIND_UNREAD_MESSAGES);
 
   const logout = (e) => {
     e.preventDefault();
@@ -35,6 +38,16 @@ function Navigation({ isLoaded }){
   };
 
   useEffect(() => {
+    if (unreadData !== undefined && unreadData !== null) {
+      console.log('UNREAD', unreadData);
+      if (unreadData.findUnreadMessages.length > 0) {
+        setNewMessages(true);
+        setMessageStatus('new');
+      }
+    }
+},[unreadData])
+
+  useEffect(() => {
     if (sessionUser !== null && sessionUser !== undefined ) {
       setUserId(sessionUser.id);
       setPlayerId(sessionUser.id);
@@ -42,29 +55,22 @@ function Navigation({ isLoaded }){
   },[sessionUser]);
 
   let matchUpDates = () => {
-    if (gameData !== undefined && visitedDate !== undefined) {
+    if (gameData !== undefined && gameData !== null && visitedDate !== undefined) {
         //these are both arrays...
-        let followedGamesArray = gameData.getFollowedGames.followedgame;
+
+        console.log('followed......', gameData.getFollowedGames)
+
+        if (gameData.getFollowedGames !== null && gameData.getFollowedGames !== undefined){
+          let followedGamesArray = gameData.getFollowedGames.followedgame;
         let visitedArray = visitedDate.getFollowedTimeStamps;
 
         for (let game of followedGamesArray) {
-            console.log('ARRAY', followedGamesArray);
-            console.log(game.id);
-        }
-
-        for (let visitDate of visitedArray) {
-            console.log(visitDate);
-        }
-
-        for (let game of followedGamesArray) {
-            console.log('GAMID', game.id)
             for (let visitDate of visitedArray) {
-                console.log('game', game.id);
-                console.log('visitdate', visitDate.gameId)
                 if (game.id === visitDate.gameId) {
                     setMatchedDates(matchedDates => [{game, visitDate}, ...matchedDates]);
                 }
             }
+        }
         }
     }
 }
@@ -108,7 +114,8 @@ useEffect(() => {
         <div><NavLink to="/dashboard">My Games</NavLink></div>{
           newGames == true && (<div id="circle"></div>)}
         <div><NavLink to={`/${userId}/bio`}>My Bio</NavLink></div>
-        <div><NavLink to={`/conversations`}><i className="far fa-envelope"></i></NavLink></div>
+        <div><NavLink to={`/conversations`}><i className={`far fa-envelope messages-${messageStatus}`}></i></NavLink>
+        </div>{newMessages === true && (<div id="circle2"></div>)}
         <div onClick={logout}>Log Out</div>
         {/* <ProfileButton user={sessionUser} />
         <SearchModal /> */}
