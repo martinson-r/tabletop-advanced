@@ -139,7 +139,7 @@ function Home() {
                         <h2 className="game-filters-heading">Games by Ruleset:</h2>
                     {/* TODO: fetch all rulesets from database and map containers */}
                     <div className="game-cards-container">
-                       {ruleSetsData !==undefined && (ruleSetsData.map((ruleset) =>  <Link to={`/rulesets/${ruleset.id}`}><div key={uuidv4()} className="game-card">
+                       {ruleSetsData !==undefined && (ruleSetsData.map((ruleset) =>  <Link key={uuidv4()} to={`/rulesets/${ruleset.id}`}><div key={uuidv4()} className="game-card">
                        <p>{ruleset.ruleset}</p>
                         </div></Link>))}
                     </div>

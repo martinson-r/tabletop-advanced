@@ -110,7 +110,7 @@ function ConversationList() {
     {convoHighlighted !== undefined && convoHighlighted.map(recipients =>
         (<p key={uuidv4()} className={`private-convo ${recipients.highlighted}`}
         onClick={() => history.push(`/conversation/${recipients.conversationId}`)}>
-        {recipients.recipients.map(recipient =><span>{recipient.userName}, </span> )}
+        {recipients.recipients.map(recipient =><span key={uuidv4()}>{recipient.userName}, </span> )}
         </p>))}
 
 

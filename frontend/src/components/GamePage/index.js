@@ -16,10 +16,14 @@ import RemovePlayer from "../RemovePlayer";
 
 function GamePage() {
 
+  //TODO: remove game from list of unvisited ids when page visited
+
     const sessionUser = useSelector((state) => state.session.user);
     const [userId, setUserId] = useState(null);
     // Grab our game ID
     const { gameId } = useParams();
+
+
     const [displayIgnored, setDisplayIgnored] = useState(false);
     const [displayAccepted, setDisplayAccepted] = useState(true);
     const [details, setDetails] = useState("");
@@ -77,6 +81,7 @@ const removePlayerFromGame = () => {
 
     useEffect(() => {
       if (gameId !== undefined) {
+        console.log('game id', gameId);
         newVisit(gameId);
       }
 
@@ -84,7 +89,7 @@ const removePlayerFromGame = () => {
 
     useEffect(() => {
       if (visitedData !== undefined ) {
-        console.log('VISITED DATA', visitedData.newVisit);
+        console.log('visited dispatched', visitedData);
         dispatch(setVisited(visitedData.newVisit));
       }
     },[visitedData])
@@ -283,7 +288,7 @@ return (
           {/* End Campaign (ends game series) */}
           {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && active &&(<button onClick={toggleActive}>End Campaign</button>)}{hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && !active &&(<button onClick={toggleActive}>Restart Campaign</button>)}
         {/* Delete Game (hides from search and everyone, including players) */}
-        {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && !deleted &&(<button class="delete" onClick={toggleDeleted}>DELETE Campaign</button>)}{hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && deleted &&(<button class="delete" onClick={toggleDeleted}>Undelete Campaign</button>)}
+        {hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && !deleted &&(<button className="delete" onClick={toggleDeleted}>DELETE Campaign</button>)}{hostId !== null && userId !== undefined && userId !== null && userId.toString() === hostId && deleted &&(<button className="delete" onClick={toggleDeleted}>Undelete Campaign</button>)}
         </div>
         )}
       </div>

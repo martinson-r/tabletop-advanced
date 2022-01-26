@@ -71,7 +71,7 @@ function NewCharacterSheet() {
         <div className="gray-backdrop">
             <div className="container">
                 <form onSubmit={handleSubmit}>
-                    <div class="formflex">
+                    <div className="formflex">
                         <div>
                             <label>Name</label>
                             <input type="text"

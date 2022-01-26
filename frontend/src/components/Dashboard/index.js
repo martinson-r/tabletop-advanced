@@ -14,6 +14,7 @@ function Home() {
 
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
+    const whichGamesNotChecked = useSelector(state => state.message.uncheckedGameIds);
     const [userId, setUserId] = useState(null);
     const [playerId, setPlayerId] = useState(null);
     const [applicationId, setApplicationId] = useState(null);
@@ -50,15 +51,56 @@ function Home() {
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
     const [openApps, setOpenApps] = useState([]);
+    const [gamesWithNewContent, setGamesWithNewContent] = useState([]);
+    const [gamesWithoutNewContent, setGamesWithoutNewContent] = useState([]);
 
     const [acceptOffer] = useMutation(ACCEPT_OFFER, { variables: { applicationId, userId, gameId }});
 
     const [declineOffer] = useMutation(DECLINE_OFFER, { variables: { applicationId }});
 
-    // const getchar = (userId, gameId) => {
-    //     const char = character({ variables: { userId, gameId }});
-    //     return char;
-    // }
+      useEffect(() => {
+        console.log('FOLLOWED GAME DATA', followedGameData)
+
+        if (followedGameData !== null && followedGameData !== undefined) {
+
+            if (followedGameData.getFollowedGames !== null) {
+                let checkedGames = {};
+            let notCheckedGames = {};
+
+            let checkedArray = [];
+            let notCheckedArray = [];
+
+            followedGameData.getFollowedGames.followedgame.map((game) => {
+                console.log('not checked', whichGamesNotChecked);
+
+                if (!Object.values(whichGamesNotChecked).includes(game.id) && !Object.values(checkedGames).includes(game.id)) {
+                    notCheckedGames[game.id] = game;
+                }
+                if (Object.values(whichGamesNotChecked).includes(game.id) && !Object.values(whichGamesNotChecked).includes(game.id))
+                checkedGames[game.id] = game;
+            });
+
+            for (let [key, value] of Object.entries(notCheckedGames)) {
+                console.log('VALUE', value);
+                notCheckedArray.push({value});
+            };
+
+            setGamesWithNewContent(notCheckedArray)
+
+            for (let [key, value] of Object.entries(checkedGames)) {
+                checkedArray.push({value});
+            };
+
+            setGamesWithoutNewContent(checkedArray)
+
+            console.log('not checked array', notCheckedArray)
+
+
+
+            }
+
+        }
+      },[followedGameData, whichGamesNotChecked])
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -116,6 +158,8 @@ function Home() {
         //Just turning data.games into something easier to work with
         const gameData = data.games;
 
+        {console.log('unchecked, dashboard', whichGamesNotChecked)}
+
         return (
             // TODO: check Visited in games list against last updated for that game
             <div className="gray-backdrop">
@@ -159,10 +203,14 @@ function Home() {
                 )}
                 </div>
                 <div className="following">
+                    {console.log('not checked',whichGamesNotChecked)}
                     <p>Games I'm Following:</p>
-                        {followedGameData !== undefined && followedGameData.getFollowedGames !== undefined && followedGameData.getFollowedGames !== null && followedGameData.getFollowedGames.followedgame.map(game => <div><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link></div>)}
+
+                        {gamesWithNewContent !== undefined && gamesWithNewContent.map(game => <div><Link to={`/game/${game.value.id}/gameroom`} className="highlight"><b>{game.value.title}</b></Link></div>)}
+                        {gamesWithoutNewContent !== undefined && gamesWithoutNewContent.map(game => <div><Link to={`/game/${game.value.id}/gameroom`}>{game.value.title}</Link></div>)}
+
                     <div>Followed Players:</div>
-                        {followedPlayerData !== null && followedPlayerData !== undefined && followedPlayerData.getFollowedPlayers && followedPlayerData.getFollowedPlayers.followedplayer.map(player => <div><Link to={`/${player.id}/bio`}>{player.userName}</Link></div>)}
+                        {followedPlayerData !== null && followedPlayerData !== undefined && followedPlayerData.getFollowedPlayers && followedPlayerData.getFollowedPlayers.followedplayer.map(player => <div className="noHighlight"><Link to={`/${player.id}/bio`}>{player.userName}</Link></div>)}
                     </div>
                 </div>
             </div>

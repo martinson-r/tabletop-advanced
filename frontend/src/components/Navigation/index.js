@@ -11,12 +11,13 @@ import {
   useLazyQuery, useMutation, useQuery
 } from "@apollo/client";
 import Cookies from 'js-cookie';
-import { FIND_UNREAD_MESSAGES, GET_USER, GET_FOLLOWED_GAMES, GET_FOLLOWED_VISITED_TIME } from "../../gql";
-import { setVisited} from '../../store/message';
+import { FIND_UNREAD_MESSAGES, GET_GAME_CONVOS, GET_USER, GET_FOLLOWED_GAMES, GET_FOLLOWED_VISITED_TIME } from "../../gql";
+import { setUnchecked, setVisited, setNewGamesNotification } from '../../store/message';
 import { DateTime } from "../../utils/luxon";
 
 function Navigation({ isLoaded }){
   const sessionUser = useSelector(state => state.session.user);
+  const areNewGames = useSelector(state => state.newGames)
   const [userId, setUserId] = useState(null);
   const dispatch = useDispatch();
   const history = useHistory();
@@ -26,14 +27,17 @@ function Navigation({ isLoaded }){
   const [newMessages, setNewMessages] = useState(false);
   const [messageStatus, setMessageStatus] = useState('none');
   const [newGameStatus, setNewGameStatus] = useState('none');
-  const messagesReadStatus = useSelector((state) => state.message.messages);
+  const messagesReadStatus = useSelector((state) => state.message);
   const gamesCheckedStatus = useSelector((state) => state.message.games)
   const [areThereMessages, setAreThereMessages] = useState(false);
   const [newActivity, setNewActivity] = useState({});
   const [justVisited, setJustVisited] = useState(null);
+  const [uncheckedMessages, setUncheckedMessages] = useState([]);
   const { data: gameData, loading: gameLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId } });
   const { data: visitedDate } = useQuery(GET_FOLLOWED_VISITED_TIME, { variables: { playerId } });
   const { data: unreadData } = useQuery(FIND_UNREAD_MESSAGES);
+
+  console.log('unreadData', unreadData);
 
   const logout = (e) => {
     e.preventDefault();
@@ -100,74 +104,116 @@ useEffect(() => {
 }
 
 useEffect(() => {
-  if (unreadData && messagesReadStatus){
-    checkReduxStoreForUnreadMessages();
+
+  if (areNewGames !== undefined) {
+    setNewGames(areNewGames.newGames)
+  }
+},[areNewGames]);
+
+useEffect(() => {
+  if (unreadData !== undefined && messagesReadStatus !== undefined){
+    console.log('messagesReadStatus', messagesReadStatus)
+    //checkReduxStoreForUnreadMessages();
+    if (unreadData.length === 0) {
+      console.log('setting false 1')
+      setNewMessages(false);
+      return;
+    }
+
+    if (messagesReadStatus !== null
+      && messagesReadStatus !== undefined
+      && unreadData !== null
+      && unreadData !== undefined) {
+
+        if (unreadData.findUnreadMessages.length === 0 && messagesReadStatus.messages.length === 0) {
+          console.log('setting false 2')
+          setNewMessages(false);
+        }
+
+        if (unreadData.findUnreadMessages.length > messagesReadStatus.messages.length) {
+          console.log('setting true')
+          setNewMessages(true);
+        }
+      }
   }
 
-}, [unreadData, messagesReadStatus])
+}, [messagesReadStatus, unreadData])
 
 let checkReduxStoreForUnreadMessages = () => {
-  if (unreadData !== undefined && messagesReadStatus !== undefined) {
+  if (unreadData.findUnreadMessages !== null && unreadData !== undefined && messagesReadStatus !== undefined) {
 
     if (unreadData.length === 0) {
       setNewMessages(false);
       return;
     }
 
-    console.log('UNREAD DATA', unreadData)
-    console.log('MESSAGESREADSTATUS', messagesReadStatus)
-    let messagesRead = [];
-    let unreadMessages = [];
-    if (messagesReadStatus !== null) {
+    if (messagesReadStatus !== null
+      && messagesReadStatus !== undefined
+      && unreadData !== null
+      && unreadData !== undefined) {
 
-      console.log('messages read', messagesReadStatus)
-
-        for (let readMessage of messagesReadStatus) {
-          console.log('readMessage', readMessage)
-        messagesRead.push(readMessage.conversationId);
+        if (unreadData.findUnreadMessages.length === 0 && messagesReadStatus.messages.length === 0) {
+          setNewMessages(false);
         }
 
-      console.log('read messages', messagesRead);
-
-      for (let unreadMessage of unreadData.findUnreadMessages) {
-        console.log('unread message:', unreadMessage);
-        if (messagesRead.indexOf(unreadMessage.conversationId) === -1) {
-          console.log('unread message found.');
+        if (unreadData.findUnreadMessages.length > messagesReadStatus.messages.length) {
           setNewMessages(true);
-          setMessageStatus('new');
-          return;
         }
-      }
-      setNewMessages(false);
-    }
 
-     if (messagesReadStatus === null && unreadData !== undefined && unreadData !== null) {
-      console.log('UNREAD', unreadData);
-      if (unreadData.findUnreadMessages !== undefined && unreadData.findUnreadMessages !== null) {
-        if (unreadData.findUnreadMessages.length > 0) {
-          setNewMessages(true);
-          setMessageStatus('new');
-          return;
-        }
-        setNewMessages(false);
-      }
-    }
+//         for (let readMessage of messagesReadStatus) {
+//           console.log(
+//             'readMessage', readMessage
+//           )
+//         messagesRead.push(readMessage.conversationId);
+//         }
 
-  console.log('Checked store.');
-}
+//         console.log('messagesRead', messagesRead);
+
+//       for (let unreadMessage of unreadData.findUnreadMessages) {
+//         console.log('unreadMessage', unreadMessage)
+//         console.log('all read messages', messagesRead);
+
+//         if (messagesRead.indexOf(unreadMessage.conversationId) === -1) {
+
+//           setNewMessages(true);
+//           setMessageStatus('new');
+//           console.log('there are new messages')
+//           return;
+//         }
+//       }
+//       setNewMessages(false);
+//     }
+
+//      if (messagesReadStatus === null && unreadData !== undefined && unreadData !== null) {
+
+//       if (unreadData.findUnreadMessages !== undefined && unreadData.findUnreadMessages !== null) {
+//         if (unreadData.findUnreadMessages.length > 0) {
+//           setNewMessages(true);
+//           setMessageStatus('new');
+//           console.log('there are new messages')
+//           return;
+//         }
+//         setNewMessages(false);
+//         console.log('no new messages')
+//       }
+     }
+ }
 }
 
 
 useEffect(() => {
   let newActivity = matchedDates.filter(game => game.game.Messages[game.game.Messages.length-1] !== undefined && game.game.Messages[game.game.Messages.length-1].updatedAt > game.visitDate.visited);
-
+     console.log('new activity useEffect', newActivity)
     if (newActivity.length > 0) {
+    dispatch(setNewGamesNotification({newGames: true}));
     setNewGames(true);
     setNewGameStatus('new');
     setNewActivity(newActivity);
+    newActivity.map(game => dispatch(setUnchecked(game)));
   }
 
-  console.log('NewActivity', newActivity)
+  console.log('NewActivity', newActivity);
+
 }, [matchedDates]);
 
 //check visited games for newActivity
@@ -209,12 +255,22 @@ console.log('ACTIVITY....', gameActivity, gamesChecked)
       console.log('new games');
       console.log(gameActivity, gamesChecked, game)
       setNewGames(true);
+      setNewGamesNotification({newGames: true})
     } else {
       console.log('no new games');
       setNewGames(false);
+      setNewGamesNotification({newGames: false})
     }
-
 }
+
+
+let filteredGames = gameActivity.filter((game) => {
+  return gamesChecked.indexOf(game) === -1
+});
+
+console.log('filtered games', filteredGames);
+
+
 },[gamesCheckedStatus])
 
 
@@ -235,16 +291,19 @@ useEffect(() => {
         <div><i className="fas fa-dice-d20 logo"></i></div>
         <div><NavLink exact to="/">Tabletop Advanced</NavLink></div>
         {/* <div><p>Hello, {sessionUser.userName}!</p></div> */}
+        {console.log('unchecked', uncheckedMessages)}
       </div>
 
-      <div className="righthand-nav">
+      <div className={`righthand-nav`}>
         <SimpleSearch />
         <div><NavLink to="/account">Account</NavLink></div>
-        <div><NavLink to="/dashboard">My Games</NavLink></div>{console.log('new games', newGames)}{
-          newGames == true && (<div id="circle"></div>)}
+        <div><NavLink to="/dashboard">My Games</NavLink></div>
+
+        {newGames == true && (<div id="circle"></div>)}
         <div><NavLink to={`/${userId}/bio`}>My Bio</NavLink></div>
         <div><NavLink to={`/conversations`}>{console.log('matched dates', matchedDates)}<i className={`far fa-envelope messages-${messageStatus}`}></i></NavLink>
-        </div>{newMessages === true && (<div id="circle2"></div>)}
+        </div>
+        {unreadData !== undefined && unreadData.findUnreadMessages.length > messagesReadStatus.messages && (<div id="circle2" ></div>)}
         <div onClick={logout}>Log Out</div>
         {/* <ProfileButton user={sessionUser} />
         <SearchModal /> */}

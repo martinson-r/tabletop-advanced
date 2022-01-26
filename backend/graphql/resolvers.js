@@ -361,6 +361,14 @@ const resolvers = {
         const senderId = context.user.id;
             await Message.create({conversationId,messageText,senderId});
 
+            console.log('convo id:', conversationId)
+
+            //set Seen back to false for recipients in this conversation, except the sender
+            await Recipient.update({seen: false}, { where: { conversationId, [Op.not]: { userId: senderId } }});
+
+
+            //console.log(recipient);
+
             const conversation = await Message.findAndCountAll({ where: { conversationId }, include: [{model: User, as: "sender"}], order: [['createdAt', 'DESC']], limit:20});
 
             pubsub.publish('NEW_MESSAGE', {messageSent: conversation});

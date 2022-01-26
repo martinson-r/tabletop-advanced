@@ -333,7 +333,7 @@ const spectatorFetchAndOffset = () => {
 {/* Events are limited to GM */}
           {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === true || gameData.game.host.id === userId.toString()) &&
           (<div>
-            <div class="actionBox">
+            <div className="actionBox">
 
               {console.log('GAME DATA...', gameData)}
 
