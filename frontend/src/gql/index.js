@@ -964,6 +964,15 @@ mutation AddRecipient($recipientName: String, $conversationId: ID) {
 }
 `
 
+const MARK_MESSAGES_SEEN = gql`
+mutation MarkMessagesSeen($conversationId: ID) {
+    markMessagesSeen(conversationId: $conversationId) {
+        id
+        conversationId
+    }
+}
+`
+
 const LOGIN = gql`
 mutation Login($userName: String!, $password: String!) {
     login(userName: $userName, password: $password) {
@@ -1087,6 +1096,7 @@ export { GET_ACCOUNTS,
         RETIRE_CHARACTER,
         UNFOLLOW_PLAYER,
         GET_FOLLOWED_VISITED_TIME,
+        MARK_MESSAGES_SEEN,
         CHECK_FOLLOW_PLAYER,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,

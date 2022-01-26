@@ -368,6 +368,17 @@ const resolvers = {
 
     },
 
+    markMessagesSeen: (root,args, context) => {
+        if (!context.user) return null;
+        const userId = context.user.id;
+
+        const { conversationId } = args;
+
+        // let conversationsToMarkSeen = await Recipient.findAll({ where: { conversationId, userId, seen: false }});
+        Recipient.update({seen: true}, { where: { conversationId, userId, seen: false }});
+        return Recipient.findAll({ where: { conversationId, userId }});
+    },
+
     startNewNonGameConversation: async(root,args, context) => {
 
         const { currentUserId, recipients, messageText } = args;

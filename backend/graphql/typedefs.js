@@ -391,6 +391,7 @@ const typeDefs = gql`
     retireCharacter(characterId: ID, userId: ID, retireNote: String): Character
     registerUser(userName: String, email: String!, password: String!, confirmPassword: String!): AuthPayload!
     login(userName: String!, password: String!): AuthPayload!
+    markMessagesSeen(conversationId: ID): [Recipient]
   }
   type Subscription {
     messageSent(gameId: ID, conversationId: ID): CountAll

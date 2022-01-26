@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import MessageBox from "../MessageBox";
@@ -6,12 +7,12 @@ import SendChatBox from "../SendChatBox";
 import { v4 as uuidv4 } from 'uuid';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import './conversation.css';
-
+import { setRead } from '../../store/message'
 
 import {
     useQuery, useMutation
   } from "@apollo/client";
-import { ADD_RECIPIENT, SEND_MESSAGE_TO_GAME, GET_NON_GAME_NON_SPEC_MESSAGES, GAME_MESSAGES_SUBSCRIPTION, SEND_NON_GAME_NON_SPEC_MESSAGES } from "../../gql"
+import { ADD_RECIPIENT, SEND_MESSAGE_TO_GAME, GET_NON_GAME_NON_SPEC_MESSAGES, GAME_MESSAGES_SUBSCRIPTION, SEND_NON_GAME_NON_SPEC_MESSAGES, MARK_MESSAGES_SEEN } from "../../gql"
 
 function Conversation() {
     const sessionUser = useSelector((state) => state.session.user);
@@ -27,12 +28,15 @@ function Conversation() {
     const [isScrolling, setIsScrolling] = useState(false);
     const [messageText, setMessage] = useState('');
     const [errors, setErrors] = useState([]);
-    // const [recipients, setRecipients] = useState([]);
-    // const [recipient, setRecipient] = useState("");
 
-    // const [updateMessages] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat } } );
+
+
+    const dispatch = useDispatch();
+
+    //TODO: mark conversations as Seen upon visiting the conversation
+
     const [sendNonGameMessage, {error}] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText }, errorPolicy: 'all' } );
-
+    const [markMessagesSeen, {error: messageSeenError, data: messageSeenData}] = useMutation(MARK_MESSAGES_SEEN, { variables: { conversationId }, errorPolicy: 'all' } );
     //Submit messages when user presses Enter
     const handleKeyDown = (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
@@ -55,6 +59,23 @@ function Conversation() {
 
       }
 
+      useEffect(() => {
+        if (conversationId !== undefined && conversationId !== null) {
+          console.log('CONVO ID.....', conversationId)
+          markMessagesSeen({ conversationId });
+          //console.log('SEEN DATA', messageSeenData)
+
+
+        }
+      },[conversationId])
+
+      useEffect(() => {
+        if (messageSeenData !== undefined ) {
+          console.log('SEEN', messageSeenData);
+        dispatch(setRead(messageSeenData.markMessagesSeen));
+        }
+      },[messageSeenData])
+
 
     let { subscribeToMore, fetchMore, loading, data } = useQuery(
       //add offset
@@ -63,7 +84,7 @@ function Conversation() {
     );
 
     useEffect(() => {
-        if (sessionUser !== undefined) {
+        if (sessionUser !== undefined && sessionUser !== null) {
             setUserId(sessionUser.id);
         }
     }, [sessionUser, conversationId]);

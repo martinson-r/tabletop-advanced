@@ -83,7 +83,7 @@ function MessageBox(props) {
       },[messageToDelete]);
 
       useEffect(() => {
-        if (message.MetaGameMessageType !== null) {
+        if (message.MetaGameMessageType !== null && message.MetaGameMessageType !== undefined) {
           setMetaGameType(message.MetaGameMessageType.metaGameMessageType)
         } else {
           setMetaGameType('');
