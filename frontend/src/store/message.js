@@ -44,8 +44,7 @@ function messageReducer(state = initialState, action) {
     newState = {...state, messages: [...state.messages, ...action.payload]};
       return newState;
     case HIGHLIGHT_CONVO:
-    newState = {...state, conversations: [action.payload] };
-    console.log('new state', newState)
+    newState = {...state, conversations: [...action.payload] };
         return newState;
     default:
       return state;

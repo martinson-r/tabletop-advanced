@@ -26,9 +26,6 @@ function Navigation({ isLoaded }){
   const messagesReadStatus = useSelector((state) => state.message.messages);
   const [areThereMessages, setAreThereMessages] = useState(false);
 
-
-
-
   const { data: gameData, loading: gameLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId } });
     const { data: visitedDate } = useQuery(GET_FOLLOWED_VISITED_TIME, { variables: { playerId } });
     const { data: unreadData } = useQuery(FIND_UNREAD_MESSAGES);

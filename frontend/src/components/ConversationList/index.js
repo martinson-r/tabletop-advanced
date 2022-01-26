@@ -34,6 +34,7 @@ function ConversationList() {
     const [errorData, setError] = useState([]);
     const [data, setData] = useState([]);
     const convoHighlighted = useSelector(state => state.message.conversations)
+    const readMessages = useSelector(state => state.message.messages);
     const [conversations, setConversations] = useState()
 
     //match unreadData to conversations
@@ -41,6 +42,8 @@ function ConversationList() {
         if (nonGameData !== undefined && unreadData !== undefined) {
         let arrayOfConversations = [];
         let arrayOfUnreadIds = [];
+        let arrayOfReadConversations = [];
+
         let collectionOfConversations = [];
         nonGameData.getNonGameConvos[0].recipient.forEach(recipient => {
             arrayOfConversations.push(recipient);
@@ -50,11 +53,17 @@ function ConversationList() {
             arrayOfUnreadIds.push(unreadMessage.conversationId);
         });
 
+        readMessages.forEach(readMessage => {
+            arrayOfReadConversations.push(readMessage.conversationId);
+        })
+
         console.log('unread ids', arrayOfUnreadIds);
+        console.log('read convos array', arrayOfReadConversations);
 
         for (let conversation of arrayOfConversations) {
             // if index > -1 then it exists
-            if (arrayOfUnreadIds.indexOf(conversation.id) > -1) {
+            if (arrayOfUnreadIds.indexOf(conversation.id) > -1 && arrayOfReadConversations.indexOf(conversation.id) === -1) {
+
                 console.log('found one');
                 collectionOfConversations.push({ ['conversationId']: conversation.id,
                       ['recipients']: [...conversation.recipient], ['highlighted']: 'highlight' })
@@ -63,6 +72,7 @@ function ConversationList() {
                       ['recipients']: [...conversation.recipient], ['highlighted']: 'noHighlight' })
                 }
             }
+            console.log('collection', collectionOfConversations)
         dispatch(highlightConvo(collectionOfConversations));
         }
     }
@@ -97,14 +107,11 @@ function ConversationList() {
     <p>Private Conversations:</p>
     <p><Link to={'/newmessage'}>Start new conversation</Link></p>
     {console.log('hl', convoHighlighted)}
-    {convoHighlighted !== undefined && convoHighlighted.map(conversation =>
-     <div> {conversation.map(recipients =>
+    {convoHighlighted !== undefined && convoHighlighted.map(recipients =>
         (<p key={uuidv4()} className={`private-convo ${recipients.highlighted}`}
         onClick={() => history.push(`/conversation/${recipients.conversationId}`)}>
         {recipients.recipients.map(recipient =><span>{recipient.userName}, </span> )}
-        </p>)
-        )}
-        </div>)}
+        </p>))}
 
 
     {/* TODO: Add multiple users to private convos */}
