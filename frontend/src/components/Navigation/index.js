@@ -299,7 +299,7 @@ useEffect(() => {
         <div><NavLink to="/account">Account</NavLink></div>
         <div><NavLink to="/dashboard">My Games</NavLink></div>
 
-        {newGames == true && (<div id="circle"></div>)}
+        {newGames !== undefined && newGames !== null && newGames == true && (<div id="circle"></div>)}
         <div><NavLink to={`/${userId}/bio`}>My Bio</NavLink></div>
         <div><NavLink to={`/conversations`}>{console.log('matched dates', matchedDates)}<i className={`far fa-envelope messages-${messageStatus}`}></i></NavLink>
         </div>

@@ -66,6 +66,7 @@ function messageReducer(state = initialState, action) {
     case SET_NEW_GAMES:
         console.log('set new games dispatched')
         newState = {...state, newGames: {...state.newGames, ...action.payload}};
+        console.log('new games', newState)
             return newState;
     case REMOVE_FROM_UNCHECKED:
         let arrayCopy = state.uncheckedGameIds;
