@@ -529,6 +529,16 @@ query GetFollowedVisitedTime($playerId: ID) {
 }
 `
 
+const NEW_VISIT = gql`
+mutation NewVisit($gameId: ID) {
+    newVisit(gameId: $gameId) {
+        id
+        gameId
+        visited
+    }
+}
+`
+
 //MUTATIONS
 const ADD_BLOCKED_USER = gql`
   mutation AddBlockedUser($email: String) {
@@ -1101,6 +1111,7 @@ export { GET_ACCOUNTS,
         GET_PLAYING_WAITING_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,
+        NEW_VISIT,
         LOGIN,
         SIGNUP,
         GET_APPLICATION,

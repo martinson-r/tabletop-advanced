@@ -4,9 +4,10 @@ import { useParams, Link } from "react-router-dom";
 import { PubSub } from 'graphql-subscriptions';
 import { v4 as uuidv4 } from 'uuid';
 import GameMessages from "../GameMessages";
+import { setVisited } from '../../store/message'
 import './game-page.css';
 
-import { GAME_MESSAGES_SUBSCRIPTION, REMOVE_PLAYER, GET_FOLLOWED_GAMES, FOLLOW_GAME, UNFOLLOW_GAME, GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
+import { GAME_MESSAGES_SUBSCRIPTION, NEW_VISIT, REMOVE_PLAYER, GET_FOLLOWED_GAMES, FOLLOW_GAME, UNFOLLOW_GAME, GET_GAME, GET_WAITLIST_APPLIED, UPDATE_GAME } from "../../gql";
 import {
     useQuery, useMutation, useSubscription
   } from "@apollo/client";
@@ -34,13 +35,14 @@ function GamePage() {
     const [retireNote, setRetireNote] = useState('');
     const [playerId, setPlayerId] = useState(null);
 
+    const dispatch = useDispatch();
+
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
         setUserId(sessionUser.id);
       }
 
-    },[sessionUser])
-
+    },[sessionUser]);
 
     const changeDisplayIgnored = () => {
       setDisplayIgnored(!displayIgnored)
@@ -61,6 +63,7 @@ const removePlayerFromGame = () => {
     const [followGame] = useMutation(FOLLOW_GAME, { variables: { userId, gameId }, refetchQueries: ["GetSingleGame"] } );
     const [unFollowGame] = useMutation(UNFOLLOW_GAME, { variables: { userId, gameId }, refetchQueries: ["GetSingleGame"] } );
     const [removePlayer] = useMutation(REMOVE_PLAYER, { variables: { playerId, gameId, retireNote }} );
+    const [newVisit, {data: visitedData}] = useMutation(NEW_VISIT, { variables: { gameId }, errorPolicy: 'all'});
 
     useEffect(() => {
       if (data) {
@@ -71,6 +74,20 @@ const removePlayerFromGame = () => {
 
       }
     },[data]);
+
+    useEffect(() => {
+      if (gameId !== undefined) {
+        newVisit(gameId);
+      }
+
+    },[gameId])
+
+    useEffect(() => {
+      if (visitedData !== undefined ) {
+        console.log('VISITED DATA', visitedData.newVisit);
+        dispatch(setVisited(visitedData.newVisit));
+      }
+    },[visitedData])
 
     const toggleWaitlist = async () => {
       const togglePromise = new Promise((resolve, reject) => resolve(doToggleWaitlist()));
@@ -187,7 +204,7 @@ return (
         <div id="edit-details" className="game-content-block">
             <h2>More About This Game</h2>
             {data !== undefined && (<span>{data.game.description}</span>)}
-            {/* TODO: Follow Game */}
+
             {isGameFollowed === false && (<button onClick={followThisGame}>Follow Game</button>)}
             {isGameFollowed === true && (<button onClick={unFollowThisGame}>Unfollow Game</button>)}
         </div>
@@ -195,7 +212,7 @@ return (
         <div className="game-content-block">
         <h2>Playing In This Game</h2>
             {/* This feels a little backwards, but we're grabbing the player associated with the character */}
-            {/* TODO: GMs can remove characters from game */}
+
             {data !== undefined && data.game.Characters.map((character) =>
 
             {

@@ -63,9 +63,6 @@ function Conversation() {
         if (conversationId !== undefined && conversationId !== null) {
           console.log('CONVO ID.....', conversationId)
           markMessagesSeen({ conversationId });
-          //console.log('SEEN DATA', messageSeenData)
-
-
         }
       },[conversationId])
 

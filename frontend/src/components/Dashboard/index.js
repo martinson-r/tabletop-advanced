@@ -160,7 +160,7 @@ function Home() {
                 </div>
                 <div className="following">
                     <p>Games I'm Following:</p>
-                        {followedGameData.getFollowedGames !== undefined && followedGameData.getFollowedGames !== null && followedGameData.getFollowedGames.followedgame.map(game => <div><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link></div>)}
+                        {followedGameData !== undefined && followedGameData.getFollowedGames !== undefined && followedGameData.getFollowedGames !== null && followedGameData.getFollowedGames.followedgame.map(game => <div><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link></div>)}
                     <div>Followed Players:</div>
                         {followedPlayerData !== null && followedPlayerData !== undefined && followedPlayerData.getFollowedPlayers && followedPlayerData.getFollowedPlayers.followedplayer.map(player => <div><Link to={`/${player.id}/bio`}>{player.userName}</Link></div>)}
                     </div>

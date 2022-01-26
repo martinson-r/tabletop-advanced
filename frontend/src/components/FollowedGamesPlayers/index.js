@@ -84,7 +84,7 @@ function FollowedGamesPlayers() {
         {/* TODO: indicate if updated */}
         {/* game updatedAt is greater than followedgame visited */}
         <div>Followed Players:</div>
-        {data && data.getFollowedPlayers.followedplayer.map(player => <div><Link to={`/${player.id}/bio`}>{player.userName}</Link></div>)}
+        {data && data.getFollowedPlayers !== undefined && data.getFollowedPlayers.followedplayer.map(player => <div><Link to={`/${player.id}/bio`}>{player.userName}</Link></div>)}
      </div>
 
  )

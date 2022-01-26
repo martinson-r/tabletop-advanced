@@ -297,6 +297,7 @@ const resolvers = {
             return FollowedPlayer.findOne({where: {[Op.and]:
                 [{userId: currentUserId}, {playerId: userId}]}});
         }
+
     },
     Mutation: {
         sendMessageToGame: async(root,args,context) => {
@@ -730,6 +731,14 @@ const resolvers = {
                 throw new UserInputError('Bad User Input', { errors: err });
             }
 
+        },
+
+        newVisit: async(root, args, context) => {
+            const {gameId} = args;
+            if (!context.user) return null;
+            const userId = context.user.id;
+            FollowedGame.update({visited: new Date()},{where: {userId, gameId}});
+            return FollowedGame.findOne({where: {userId, gameId}});
         },
 
 
