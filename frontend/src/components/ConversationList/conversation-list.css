@@ -1,3 +1,7 @@
 .gray-backdrop p {
-    color: black;
+    color: rgb(170, 32, 182);
+}
+
+.highlight {
+    font-weight: bold;
 }

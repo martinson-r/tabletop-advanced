@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import {
     useQuery, useLazyQuery, useMutation
@@ -8,6 +8,7 @@ import { GET_GAMES, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITI
     GET_USER_NON_GAME_CONVOS, GET_HOSTED_GAMES, FIND_UNREAD_MESSAGES } from "../../gql"
 import { v4 as uuidv4 } from 'uuid';
 import './conversation-list.css';
+import { highlightConvo } from '../../store/message'
 
 function ConversationList() {
     //must set fetch policy to network-only so we get the latest data on the convo list
@@ -15,9 +16,15 @@ function ConversationList() {
         fetchPolicy: "network-only"
       });
     const { data: unreadData } = useQuery(FIND_UNREAD_MESSAGES);
+    const dispatch = useDispatch();
 
     console.log('CONVOS', nonGameData);
     console.log('UNREAD', unreadData);
+
+    //TODO:
+    //create an object to put in redux store that has:
+    //conversation id, recipient names, and read status (bolded or not bolded)
+    //set css class to read status, more flexible that way
 
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
@@ -26,10 +33,45 @@ function ConversationList() {
     const [loadingData, setLoading] = useState([]);
     const [errorData, setError] = useState([]);
     const [data, setData] = useState([]);
+    const convoHighlighted = useSelector(state => state.message.conversations)
+    const [conversations, setConversations] = useState()
 
     //match unreadData to conversations
     const matchAndFilterConvos = () => {
+        if (nonGameData !== undefined && unreadData !== undefined) {
+        let arrayOfConversations = [];
+        let arrayOfUnreadIds = [];
+        let collectionOfConversations = [];
+        nonGameData.getNonGameConvos[0].recipient.forEach(recipient => {
+            arrayOfConversations.push(recipient);
+        });
+
+        unreadData.findUnreadMessages.forEach(unreadMessage => {
+            arrayOfUnreadIds.push(unreadMessage.conversationId);
+        });
+
+        console.log('unread ids', arrayOfUnreadIds);
+
+        for (let conversation of arrayOfConversations) {
+            // if index > -1 then it exists
+            if (arrayOfUnreadIds.indexOf(conversation.id) > -1) {
+                console.log('found one');
+                collectionOfConversations.push({ ['conversationId']: conversation.id,
+                      ['recipients']: [...conversation.recipient], ['highlighted']: 'highlight' })
+                } else {
+                    collectionOfConversations.push({ ['conversationId']: conversation.id,
+                      ['recipients']: [...conversation.recipient], ['highlighted']: 'noHighlight' })
+                }
+            }
+        dispatch(highlightConvo(collectionOfConversations));
+        }
     }
+
+    useEffect(() =>  {
+            if (nonGameData !== undefined && unreadData !== undefined) {
+                matchAndFilterConvos();
+        }
+    },[nonGameData, unreadData])
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -48,21 +90,41 @@ function ConversationList() {
         return null;
     }
 
+
+
     return (
-        <div className="gray-backdrop">
+    <div className="gray-backdrop">
     <p>Private Conversations:</p>
     <p><Link to={'/newmessage'}>Start new conversation</Link></p>
+    {console.log('hl', convoHighlighted)}
+    {convoHighlighted !== undefined && convoHighlighted.map(conversation =>
+     <div> {conversation.map(recipients =>
+        (<p key={uuidv4()} className={`private-convo ${recipients.highlighted}`}
+        onClick={() => history.push(`/conversation/${recipients.conversationId}`)}>
+        {recipients.recipients.map(recipient =><span>{recipient.userName}, </span> )}
+        </p>)
+        )}
+        </div>)}
+
+
     {/* TODO: Add multiple users to private convos */}
     {/* We need unique keys for mapped elements so React can keep track of what is what */}
-    {nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversations => <div key={uuidv4()} className="convos-box" >{conversations.recipient.map(conversation => (<p key={uuidv4()} className="private-convo" onClick={() => history.push(`/conversation/${conversation.id}`)}>
-    {console.log(unreadData.findUnreadMessages.filter(message => message.conversationId === conversation.id).length > 0)}
-    {unreadData.findUnreadMessages.filter(message => message.conversationId === conversation.id).length > 0 && (
-        <b>{conversation.recipient.map(recipient => recipient.userName + ", ")}</b>
-    )}
-    {unreadData.findUnreadMessages.filter(message => message.conversationId === conversation.id).length === 0 && (
-        <>{conversation.recipient.map(recipient => recipient.userName + ", ")}</>
-    )}
-    </p>))}</div>))}
+    {/* {nonGameData !== undefined && (nonGameData.getNonGameConvos.map(conversations =>
+            <div key={uuidv4()} className="convos-box" >
+            {conversations.recipient.map(conversation =>
+            (<p key={uuidv4()} className="private-convo"
+            onClick={() => history.push(`/conversation/${conversation.id}`)}> */}
+
+
+
+
+
+
+            {/* {unreadData.findUnreadMessages.filter(message => message.conversationId === conversation.id).length === 0 && (
+            <>{conversation.recipient.map(recipient => recipient.userName + ", ")}</> */}
+        {/* )} */}
+    {/* </p>))} */}
+    {/* </div>))} */}
     </div>
     )
 

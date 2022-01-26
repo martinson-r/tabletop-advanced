@@ -4,15 +4,17 @@
 import Cookies from 'js-cookie';
 
 const SET_READ = 'message/setRead';
+const HIGHLIGHT_CONVO = 'message/highlightConvo'
 
 export const setRead = (message) => ({
   type: SET_READ,
   payload: message
 });
 
-// const removeUser = () => ({
-//   type: REMOVE_USER
-// });
+export const highlightConvo = (conversation) => ({
+  type: HIGHLIGHT_CONVO,
+  payload: conversation
+});
 
 // export const loginUser = (data) => async (dispatch) => {
 
@@ -32,15 +34,19 @@ export const setRead = (message) => ({
 //   dispatch(removeUser());
 // };
 
-const initialState = [ { message: null } ];
+const initialState = { messages: [], conversations: [] };
 
 function messageReducer(state = initialState, action) {
   let newState;
   switch (action.type) {
     case SET_READ:
-    //   newState = Object.assign({}, state, { message: action.payload });
-    newState = [...action.payload];
+    // newState = {...state, messages: [action.payload]};
+    newState = {...state, messages: [...state.messages, ...action.payload]};
       return newState;
+    case HIGHLIGHT_CONVO:
+    newState = {...state, conversations: [action.payload] };
+    console.log('new state', newState)
+        return newState;
     default:
       return state;
   }

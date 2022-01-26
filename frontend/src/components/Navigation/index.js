@@ -23,7 +23,7 @@ function Navigation({ isLoaded }){
   const [newGames, setNewGames] = useState(false);
   const [newMessages, setNewMessages] = useState(false);
   const [messageStatus, setMessageStatus] = useState('none');
-  const messagesReadStatus = useSelector((state) => state.message);
+  const messagesReadStatus = useSelector((state) => state.message.messages);
   const [areThereMessages, setAreThereMessages] = useState(false);
 
 
@@ -69,9 +69,6 @@ useEffect(() => {
 
   let matchUpDates = () => {
     if (gameData !== undefined && gameData !== null && visitedDate !== undefined) {
-        //these are both arrays...
-
-        console.log('followed......', gameData.getFollowedGames)
 
         if (gameData.getFollowedGames !== null && gameData.getFollowedGames !== undefined){
           let followedGamesArray = gameData.getFollowedGames.followedgame;
@@ -98,25 +95,39 @@ useEffect(() => {
 let checkReduxStoreForUnreadMessages = () => {
   if (unreadData !== undefined && messagesReadStatus !== undefined) {
 
+    if (unreadData.length === 0) {
+      setNewMessages(false);
+      return;
+    }
+
     console.log('UNREAD DATA', unreadData)
+    console.log('MESSAGESREADSTATUS', messagesReadStatus)
     let messagesRead = [];
     let unreadMessages = [];
     if (messagesReadStatus !== null) {
-      for (let readMessage of messagesReadStatus) {
+
+      console.log('messages read', messagesReadStatus)
+
+        for (let readMessage of messagesReadStatus) {
+          console.log('readMessage', readMessage)
         messagesRead.push(readMessage.conversationId);
-      }
+        }
+
+      console.log('read messages', messagesRead);
+
       for (let unreadMessage of unreadData.findUnreadMessages) {
+        console.log('unread message:', unreadMessage);
         if (messagesRead.indexOf(unreadMessage.conversationId) === -1) {
           console.log('unread message found.');
           setNewMessages(true);
           setMessageStatus('new');
           return;
         }
-        setNewMessages(false);
       }
+      setNewMessages(false);
     }
 
-     if (messagesReadStatus.message === null && unreadData !== undefined && unreadData !== null) {
+     if (messagesReadStatus === null && unreadData !== undefined && unreadData !== null) {
       console.log('UNREAD', unreadData);
       if (unreadData.findUnreadMessages !== undefined && unreadData.findUnreadMessages !== null) {
         if (unreadData.findUnreadMessages.length > 0) {
