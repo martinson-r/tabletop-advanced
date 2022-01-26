@@ -418,6 +418,7 @@ const GET_SPECTATOR_CONVOS = gql`
 const GET_USER_NON_GAME_CONVOS = gql`
 query GetNonGameConvos($userId: ID!) {
     getNonGameConvos(userId: $userId){
+        id
         recipient {
             id
             recipient {
