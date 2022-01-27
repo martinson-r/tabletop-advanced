@@ -13,6 +13,7 @@ import {
   } from "@apollo/client";
   import { DateTime } from "../../utils/luxon";
 import RemovePlayer from "../RemovePlayer";
+import { setNewGameActivity, removeFromGames, removeFromUnchecked } from '../../store/message';
 
 function GamePage() {
 
@@ -23,7 +24,9 @@ function GamePage() {
     // Grab our game ID
     const { gameId } = useParams();
 
+    const gamesCheckedStatus = useSelector((state) => state.message.games);
 
+    const newActivity = useSelector(state => state.message.gameActivity);
     const [displayIgnored, setDisplayIgnored] = useState(false);
     const [displayAccepted, setDisplayAccepted] = useState(true);
     const [details, setDetails] = useState("");
@@ -40,6 +43,11 @@ function GamePage() {
     const [playerId, setPlayerId] = useState(null);
 
     const dispatch = useDispatch();
+
+    // useEffect(() => {
+    //   dispatch(removeFromGames(gameId));
+    //   console.log('remove dispatched');
+    // },[gameId])
 
     useEffect(() => {
       if (sessionUser !== null && sessionUser !== undefined ) {
@@ -59,6 +67,7 @@ function GamePage() {
 const removePlayerFromGame = () => {
   removePlayer({ variables: { playerId, gameId, retireNote}})
 }
+
 
     const { loading, error, data } = useQuery(GET_GAME, { variables: { gameId }});
     const { data: followData, loading: followLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId: userId } });
@@ -81,15 +90,17 @@ const removePlayerFromGame = () => {
 
     useEffect(() => {
       if (gameId !== undefined) {
-        console.log('game id', gameId);
+
         newVisit(gameId);
+        console.log('removed');
+        dispatch(removeFromUnchecked(gameId));
       }
 
     },[gameId])
 
     useEffect(() => {
-      if (visitedData !== undefined ) {
-        console.log('visited dispatched', visitedData);
+      if (visitedData) {
+        //add to messages.games (visited games list)
         dispatch(setVisited(visitedData.newVisit));
       }
     },[visitedData])

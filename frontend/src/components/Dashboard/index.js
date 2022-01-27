@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import {
     useQuery, useLazyQuery, useMutation
@@ -9,12 +9,14 @@ import { GET_GAMES, GET_GAMES_PLAYING_IN, ACCEPT_OFFER, DECLINE_OFFER, GET_WAITI
 
 import "./dashboard.css";
 import { v4 as uuidv4 } from 'uuid';
+import { setNewGameActivity, setNewGamesNotification } from '../../store/message';
 
 function Home() {
 
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
     const whichGamesNotChecked = useSelector(state => state.message.uncheckedGameIds);
+
     const [userId, setUserId] = useState(null);
     const [playerId, setPlayerId] = useState(null);
     const [applicationId, setApplicationId] = useState(null);
@@ -25,6 +27,8 @@ function Home() {
     const gameIdRef = useRef(null);
     const appIdSpanRef = useRef(null);
     const [acceptDecline, setAcceptDecline] = useState(null);
+
+    const dispatch = useDispatch();
 
 
     //grab all games
@@ -58,49 +62,76 @@ function Home() {
 
     const [declineOffer] = useMutation(DECLINE_OFFER, { variables: { applicationId }});
 
-      useEffect(() => {
-        console.log('FOLLOWED GAME DATA', followedGameData)
+    //filter into checked games (no new content)
+    //and not checked games (new content)
+    let setGameList = () => {
+        if (!followedGameLoading
+            && followedGameData.getFollowedGames !== null
+            && whichGamesNotChecked) {
+            console.log('followed', followedGameData)
+            console.log('not checked', whichGamesNotChecked)
 
-        if (followedGameData !== null && followedGameData !== undefined) {
+            if (whichGamesNotChecked.length === 0) {
 
-            if (followedGameData.getFollowedGames !== null) {
-                let checkedGames = {};
+                setGamesWithNewContent([...whichGamesNotChecked]);
+
+                //TODO: filter out followed games that have been visited
+
+                setGamesWithoutNewContent([...gamesWithoutNewContent, ...followedGameData.getFollowedGames.followedgame])
+
+                dispatch(setNewGamesNotification(false));
+                console.log('dispatching notification');
+                return;
+            } else {
+
+            let checkedGames = {};
             let notCheckedGames = {};
 
             let checkedArray = [];
             let notCheckedArray = [];
+            let notCheckedIds = [];
 
-            followedGameData.getFollowedGames.followedgame.map((game) => {
-                console.log('not checked', whichGamesNotChecked);
+            whichGamesNotChecked.forEach(game => {
 
-                if (!Object.values(whichGamesNotChecked).includes(game.id) && !Object.values(checkedGames).includes(game.id)) {
-                    notCheckedGames[game.id] = game;
-                }
-                if (Object.values(whichGamesNotChecked).includes(game.id) && !Object.values(whichGamesNotChecked).includes(game.id))
-                checkedGames[game.id] = game;
+                notCheckedIds.push(game.game.id);
             });
 
-            for (let [key, value] of Object.entries(notCheckedGames)) {
-                console.log('VALUE', value);
-                notCheckedArray.push({value});
-            };
 
-            setGamesWithNewContent(notCheckedArray)
+
+            let noNewContent = followedGameData.getFollowedGames.followedgame.filter((game) => {
+                return notCheckedIds.indexOf(game.id) === -1;
+            });
+
+            let newContent = followedGameData.getFollowedGames.followedgame.filter((game) => {
+                return notCheckedIds.indexOf(game.id) !== -1;
+            });
+
+
+            setGamesWithNewContent([...newContent])
+            console.log('set it');
 
             for (let [key, value] of Object.entries(checkedGames)) {
                 checkedArray.push({value});
             };
 
-            setGamesWithoutNewContent(checkedArray)
-
-            console.log('not checked array', notCheckedArray)
-
-
+            setGamesWithoutNewContent([...noNewContent])
 
             }
-
         }
-      },[followedGameData, whichGamesNotChecked])
+    }
+
+      useEffect(() => {
+
+
+        setGameList();
+    //   },[followedGameData, playerId, whichGamesNotChecked])
+},[whichGamesNotChecked]);
+
+console.log('not checked 2', whichGamesNotChecked)
+
+useEffect(() => {
+setGameList()
+},[whichGamesNotChecked, followedGameData])
 
     useEffect(() => {
         //Make sure we have ALL of our data
@@ -143,7 +174,7 @@ function Home() {
   },[dataHosted]);
 
   const [getCurrentNonGameConvos, { loading: nonGameLoading, error: nonGameError, data: nonGameData }] = useLazyQuery(GET_USER_NON_GAME_CONVOS);
-  if (loading) return <p>Loading...</p>;
+  if (loading || followedGameLoading) return <p>Loading...</p>;
   if (error) return <p>Error :( </p>;
 
     if (!data) {
@@ -158,7 +189,6 @@ function Home() {
         //Just turning data.games into something easier to work with
         const gameData = data.games;
 
-        {console.log('unchecked, dashboard', whichGamesNotChecked)}
 
         return (
             // TODO: check Visited in games list against last updated for that game
@@ -172,7 +202,7 @@ function Home() {
                     {/* REFACTOR. Rework how you pull this data. This is not maintainable. */}
                     {/* Just do 2 separate queries. One for Waiting List (excluding offerAccepted apps), one for games the user is a player in. */}
                 <p>Games I'm Playing In:</p>
-                {console.log('retired ', playingInData)}
+
 
                 {/* TODO: filter for unretired characters */}
 
@@ -203,11 +233,15 @@ function Home() {
                 )}
                 </div>
                 <div className="following">
-                    {console.log('not checked',whichGamesNotChecked)}
+
                     <p>Games I'm Following:</p>
 
-                        {gamesWithNewContent !== undefined && gamesWithNewContent.map(game => <div><Link to={`/game/${game.value.id}/gameroom`} className="highlight"><b>{game.value.title}</b></Link></div>)}
-                        {gamesWithoutNewContent !== undefined && gamesWithoutNewContent.map(game => <div><Link to={`/game/${game.value.id}/gameroom`}>{game.value.title}</Link></div>)}
+                    {console.log('new', gamesWithNewContent)}
+                    {console.log('not new', gamesWithoutNewContent)}
+
+                        {gamesWithNewContent !== undefined && gamesWithNewContent.map(game => <div><Link to={`/game/${game.id}/gameroom`} className="highlight"><b>{game.title}</b></Link></div>)}
+
+                        {gamesWithoutNewContent !== undefined && gamesWithoutNewContent.map(game => <div><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link></div>)}
 
                     <div>Followed Players:</div>
                         {followedPlayerData !== null && followedPlayerData !== undefined && followedPlayerData.getFollowedPlayers && followedPlayerData.getFollowedPlayers.followedplayer.map(player => <div className="noHighlight"><Link to={`/${player.id}/bio`}>{player.userName}</Link></div>)}

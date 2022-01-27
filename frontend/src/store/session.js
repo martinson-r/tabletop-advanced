@@ -42,7 +42,9 @@ function reducer(state = initialState, action) {
       newState = Object.assign({}, state, { user: action.payload });
       return newState;
     case REMOVE_USER:
-      newState = Object.assign({}, state, { user: null });
+      console.log('removeUser fired')
+      newState = { user: null };
+      console.log('new state:', newState);
       return newState;
     default:
       return state;

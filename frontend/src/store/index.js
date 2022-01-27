@@ -8,6 +8,23 @@ const rootReducer = combineReducers({
     message
 });
 
+// const appReducer = combineReducers({
+//   session,
+//   message
+// })
+
+// const rootReducer = (state, action) => {
+//   console.log('action type', action.type)
+//   if (action.type == "session/removeUser") {
+//     console.log('user removed')
+//     return appReducer(undefined, action)
+//   }
+
+//   return appReducer(state, action)
+// }
+
+
+
 let enhancer;
 
 if (process.env.NODE_ENV === 'production') {

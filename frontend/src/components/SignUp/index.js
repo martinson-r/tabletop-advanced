@@ -21,7 +21,6 @@ function SignUp() {
 
     const [registerUser, { data, loading, error }] = useMutation(SIGNUP, { variables: { userName, password, confirmPassword, email }} );
 
-    console.log(data);
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -32,7 +31,7 @@ function SignUp() {
         if (res.data.errors) {
                 setErrors(res.data.errors)
               } else {
-                console.log(res.data.registerUser)
+
                 dispatch(sessionActions.loginUser(res.data.registerUser));
                 history.push('/')
               }

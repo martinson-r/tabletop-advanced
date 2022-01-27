@@ -23,7 +23,7 @@ function SendChatBox(props){
     const [updateMessages, {error: gameMessageError}] = useMutation(SEND_MESSAGE_TO_GAME, { variables: { gameId, userId, messageText, spectatorChat, metaGameMessageTypeId }, errorPolicy: 'all' } );
     const [sendNonGameMessage, {error}] = useMutation(SEND_NON_GAME_NON_SPEC_MESSAGES, { variables: { conversationId, userId, messageText, metaGameMessageTypeId }, errorPolicy: 'all' } );
 
-    console.log('PROPS', props);
+
 
     useEffect(() => {
 
@@ -62,7 +62,7 @@ function SendChatBox(props){
 
           //Offset is fine at this point. No need to do anything with it.
           if (gameId !== undefined) {
-          console.log('METAGAME ID: ', metaGameMessageTypeId);
+
           updateMessages(gameId, userId, messageText, spectatorChat, metaGameMessageTypeId);
           setSubmittedMessage(true);
           setMessage('');
@@ -80,7 +80,7 @@ function SendChatBox(props){
      <>
 
      {(<form onSubmit={handleSpectatorSubmit}>
-      {console.log('META TYPE', metaGameMessageTypeId)}
+
       {gameMessageError && gameMessageError !== undefined && (
       <span>{gameMessageError.toString()}</span>)}
       {error && error !== undefined && (

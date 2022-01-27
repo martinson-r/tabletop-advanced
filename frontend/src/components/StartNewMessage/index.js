@@ -33,8 +33,7 @@ function StartNewMessage() {
 
     const sendNewMessage = () => {
         //TODO: Refactor for multiple recipients in an array
-        console.log(recipients);
-        console.log(currentUserId);
+
         startNewNonGameConversation({recipients, currentUserId});
         }
 

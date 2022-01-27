@@ -109,7 +109,7 @@ const resolvers = {
         }]});
         },
 
-        getFollowedTimeStamps: async (obj, args, context, info) => {
+        getFollowedTimeStamps: (obj, args, context, info) => {
             const { playerId } = args;
             return FollowedGame.findAll({where: {userId: playerId} });
         },

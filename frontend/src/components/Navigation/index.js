@@ -12,32 +12,34 @@ import {
 } from "@apollo/client";
 import Cookies from 'js-cookie';
 import { FIND_UNREAD_MESSAGES, GET_GAME_CONVOS, GET_USER, GET_FOLLOWED_GAMES, GET_FOLLOWED_VISITED_TIME } from "../../gql";
-import { setUnchecked, setVisited, setNewGamesNotification } from '../../store/message';
+import { setUnchecked, setVisited, setNewGamesNotification, setNewGameActivity, setRead } from '../../store/message';
 import { DateTime } from "../../utils/luxon";
 
 function Navigation({ isLoaded }){
-  const sessionUser = useSelector(state => state.session.user);
-  const areNewGames = useSelector(state => state.newGames)
-  const [userId, setUserId] = useState(null);
   const dispatch = useDispatch();
+
+  const sessionUser = useSelector(state => state.session.user);
+  const areNewGames = useSelector(state => state.newGames);
+  const isNewGamesNotification = useSelector(state => state.message.newGames.newGames);
+  const messagesReadStatus = useSelector((state) => state.message);
+  const gamesCheckedStatus = useSelector((state) => state.message.games);
+
+  const [userId, setUserId] = useState(null);
   const history = useHistory();
   const [matchedDates, setMatchedDates] = useState([]);
   const [playerId, setPlayerId] = useState(null);
   const [newGames, setNewGames] = useState(false);
   const [newMessages, setNewMessages] = useState(false);
   const [messageStatus, setMessageStatus] = useState('none');
-  const [newGameStatus, setNewGameStatus] = useState('none');
-  const messagesReadStatus = useSelector((state) => state.message);
-  const gamesCheckedStatus = useSelector((state) => state.message.games)
-  const [areThereMessages, setAreThereMessages] = useState(false);
+  const [newGameStatus, setNewGameStatus] = useState([]);
+
   const [newActivity, setNewActivity] = useState({});
   const [justVisited, setJustVisited] = useState(null);
-  const [uncheckedMessages, setUncheckedMessages] = useState([]);
   const { data: gameData, loading: gameLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId } });
-  const { data: visitedDate } = useQuery(GET_FOLLOWED_VISITED_TIME, { variables: { playerId } });
-  const { data: unreadData } = useQuery(FIND_UNREAD_MESSAGES);
+  const { data: visitedDate, loading: visitedLoading } = useQuery(GET_FOLLOWED_VISITED_TIME, { variables: { playerId } });
+  const { data: unreadData, loading: unreadLoading } = useQuery(FIND_UNREAD_MESSAGES);
 
-  console.log('unreadData', unreadData);
+
 
   const logout = (e) => {
     e.preventDefault();
@@ -48,35 +50,55 @@ function Navigation({ isLoaded }){
     history.push('/login');
   };
 
-//   useEffect(() => {
-//     if (gamesCheckedStatus !== undefined) {
+  useEffect(() => {
+    console.log('notify', isNewGamesNotification)
+    if (isNewGamesNotification.newGames === false) {
+      setNewGames(false)
+      console.log('set false')
+    };
+    if (isNewGamesNotification. newGames === true) {
+      setNewGames(true);
+      console.log('set true')
+    }
+  },[isNewGamesNotification])
 
-//       //TODO: compare visitedDate with game's last update
-//       //and update Redux store
-//       console.log('GAMEDATA', gameData);
-//       console.log('visited date', visitedDate);
-//   let uncheckedGames = [];
+  useEffect(() => {
+    if (gamesCheckedStatus !== undefined
+      && gameData !== undefined
+      &&  visitedDate !== undefined) {
 
-//   visitedDate.getFollowedTimeStamps.forEach((timeStamp) => {
-//     gameData.getFollowedGames.followedgame.forEach((game) => {
-//       if (timeStamp.gameId === game.gameId) {
-//         if (timeStamp.visited < game.Messages[game.Messages.length - 1].updatedAt) {
-//           uncheckedGames.push(timeStamp.gameId);
-//         }
-//       }
-//     })
-//   })
+  let uncheckedGames = [];
 
-//   console.log('unchecked games', uncheckedGames);
+    visitedDate.getFollowedTimeStamps?.forEach((timeStamp) => {
 
-//     }
-// },[gamesCheckedStatus]);
+      gameData.getFollowedGames.followedgame?.forEach((game) => {
 
-useEffect(() => {
- if (messagesReadStatus !== undefined) {
-   console.log('READ STATUS', messagesReadStatus)
- }
-}, [messagesReadStatus])
+
+        if (timeStamp.gameId === game.id) {
+
+
+          if (timeStamp.visited < game.Messages[game.Messages?.length - 1].updatedAt) {
+            uncheckedGames.push(game);
+          }
+        }
+
+      })
+    })
+
+    setNewGameStatus([...newGameStatus, ...uncheckedGames]);
+
+    if (uncheckedGames.length > 0) {
+      (console.log('new notification set 1'))
+      dispatch(setNewGamesNotification(true));
+    }
+    if (uncheckedGames.length === 0) {
+      (console.log('new notification set 2'))
+      dispatch(setNewGamesNotification(false));
+    }
+
+    }
+},[gamesCheckedStatus, gameData, visitedDate]);
+
 
   useEffect(() => {
     if (sessionUser !== null && sessionUser !== undefined ) {
@@ -86,21 +108,29 @@ useEffect(() => {
   },[sessionUser]);
 
   let matchUpDates = () => {
-    if (gameData !== undefined && gameData !== null && visitedDate !== undefined) {
+    if (!gameLoading && !visitedLoading) {
 
         if (gameData.getFollowedGames !== null && gameData.getFollowedGames !== undefined){
           let followedGamesArray = gameData.getFollowedGames.followedgame;
         let visitedArray = visitedDate.getFollowedTimeStamps;
 
+        console.log(console.log('followed games', followedGamesArray));
+
+        let storeMatchedDates = [];
+
         for (let game of followedGamesArray) {
             for (let visitDate of visitedArray) {
                 if (game.id === visitDate.gameId) {
-                    setMatchedDates(matchedDates => [{game, visitDate}, ...matchedDates]);
+                  console.log('match!');
+                    storeMatchedDates.push({game, visitDate})
                 }
             }
+          }
+          setMatchedDates(storeMatchedDates);
         }
-        }
+
     }
+    console.log('matched', matchedDates);
 }
 
 useEffect(() => {
@@ -111,27 +141,28 @@ useEffect(() => {
 },[areNewGames]);
 
 useEffect(() => {
-  if (unreadData !== undefined && messagesReadStatus !== undefined){
-    console.log('messagesReadStatus', messagesReadStatus)
+  if (!unreadLoading && messagesReadStatus !== undefined){
+
     //checkReduxStoreForUnreadMessages();
     if (unreadData.length === 0) {
-      console.log('setting false 1')
       setNewMessages(false);
       return;
     }
 
     if (messagesReadStatus !== null
       && messagesReadStatus !== undefined
-      && unreadData !== null
-      && unreadData !== undefined) {
+      // && unreadData.findUnreadMessages !== null
+      // && unreadData.findUnreadMessages !== undefined
+      ) {
 
-        if (unreadData.findUnreadMessages.length === 0 && messagesReadStatus.messages.length === 0) {
-          console.log('setting false 2')
+        if (unreadData.findUnreadMessages?.length === 0 && messagesReadStatus.messages?.length === 0) {
+
           setNewMessages(false);
+
         }
 
-        if (unreadData.findUnreadMessages.length > messagesReadStatus.messages.length) {
-          console.log('setting true')
+        if (unreadData.findUnreadMessages?.length > messagesReadStatus.messages?.length) {
+
           setNewMessages(true);
         }
       }
@@ -202,18 +233,20 @@ let checkReduxStoreForUnreadMessages = () => {
 
 
 useEffect(() => {
+console.log('notification fired');
+},[isNewGamesNotification])
+
+useEffect(() => {
   let newActivity = matchedDates.filter(game => game.game.Messages[game.game.Messages.length-1] !== undefined && game.game.Messages[game.game.Messages.length-1].updatedAt > game.visitDate.visited);
-     console.log('new activity useEffect', newActivity)
+  console.log('matched', matchedDates)
+  console.log('new activity', newActivity);
     if (newActivity.length > 0) {
     dispatch(setNewGamesNotification({newGames: true}));
     setNewGames(true);
-    setNewGameStatus('new');
-    setNewActivity(newActivity);
-    newActivity.map(game => dispatch(setUnchecked(game)));
+    dispatch(setNewGameActivity(newActivity));
+    console.log('new activity, dispatching', newActivity)
+    newActivity.map(newActivity => dispatch(setUnchecked(newActivity)));
   }
-
-  console.log('NewActivity', newActivity);
-
 }, [matchedDates]);
 
 //check visited games for newActivity
@@ -228,38 +261,41 @@ useEffect(() => {
   //   return;
   // }
 
+
+
   if (newActivity[0] !== undefined) {
     for (let activity of newActivity) {
       gameActivity.push(activity.visitDate.gameId);
       for (let game of gamesCheckedStatus) {
-
-      console.log('ids', game.gameId === activity.visitDate.gameId)
-      console.log('times', game.visited > activity.game.Messages[newActivity[0].game.Messages.length - 1].updatedAt)
-
       if (game.gameId === activity.visitDate.gameId) {
-      console.log('TIME', activity.game.Messages[activity.game.Messages.length - 1].updatedAt)
-        console.log('GAME VISITED', game.visited);
-
       if (game.visited > activity.game.Messages[activity.game.Messages.length - 1].updatedAt) {
           setJustVisited(game);
-           console.log('push gameId ', game.gameId)
+
           gamesChecked.push(game.gameId);
       }
     }
   }
 }
 }
-console.log('ACTIVITY....', gameActivity, gamesChecked)
+
+if (gameActivity.length === 0){
+      setNewGames(false);
+      console.log('set notification to false');
+      dispatch(setNewGamesNotification(false));
+      return;
+}
+
   for (let game of gameActivity) {
     if (gamesChecked.indexOf(game) === -1) {
-      console.log('new games');
-      console.log(gameActivity, gamesChecked, game)
+
       setNewGames(true);
-      setNewGamesNotification({newGames: true})
+      console.log('set notification to true')
+      dispatch(setNewGamesNotification(true));
     } else {
-      console.log('no new games');
+
       setNewGames(false);
-      setNewGamesNotification({newGames: false})
+      console.log('set notification to false')
+      dispatch(setNewGamesNotification(false));
     }
 }
 
@@ -268,7 +304,6 @@ let filteredGames = gameActivity.filter((game) => {
   return gamesChecked.indexOf(game) === -1
 });
 
-console.log('filtered games', filteredGames);
 
 
 },[gamesCheckedStatus])
@@ -291,7 +326,7 @@ useEffect(() => {
         <div><i className="fas fa-dice-d20 logo"></i></div>
         <div><NavLink exact to="/">Tabletop Advanced</NavLink></div>
         {/* <div><p>Hello, {sessionUser.userName}!</p></div> */}
-        {console.log('unchecked', uncheckedMessages)}
+
       </div>
 
       <div className={`righthand-nav`}>
@@ -299,11 +334,16 @@ useEffect(() => {
         <div><NavLink to="/account">Account</NavLink></div>
         <div><NavLink to="/dashboard">My Games</NavLink></div>
 
-        {newGames !== undefined && newGames !== null && newGames == true && (<div id="circle"></div>)}
+
+        {console.log('notification', isNewGamesNotification, newGames)}
+        {newGames && (<div id="circle">{console.log('newGames inside div', newGames)}</div>)}
         <div><NavLink to={`/${userId}/bio`}>My Bio</NavLink></div>
-        <div><NavLink to={`/conversations`}>{console.log('matched dates', matchedDates)}<i className={`far fa-envelope messages-${messageStatus}`}></i></NavLink>
+        <div><NavLink to={`/conversations`}><i className={`far fa-envelope messages-${messageStatus}`}></i></NavLink>
         </div>
-        {unreadData !== undefined && unreadData.findUnreadMessages.length > messagesReadStatus.messages && (<div id="circle2" ></div>)}
+        {messagesReadStatus.messages !== undefined && unreadData !== undefined
+        && unreadData.findUnreadMessages !== null && unreadData.findUnreadMessages !== undefined
+        && unreadData.findUnreadMessages.length > messagesReadStatus.messages?.length
+        && (<div id="circle2" ></div>)}
         <div onClick={logout}>Log Out</div>
         {/* <ProfileButton user={sessionUser} />
         <SearchModal /> */}

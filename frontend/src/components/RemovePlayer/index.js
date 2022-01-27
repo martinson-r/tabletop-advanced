@@ -12,7 +12,6 @@ function RemovePlayer(props) {
 
     const { character, hostId, gameId, userId } = props;
 
-    console.log(character);
     const [retireNote, setRetireNote] = useState('');
     const [playerId, setPlayerId] = useState(character.User.id);
     const [characterName, setCharacterName] = useState(character.name);
@@ -26,14 +25,12 @@ function RemovePlayer(props) {
       }
 
     const openRemoveMenu = () => {
-        console.log('playerId ', playerId);
-        console.log('character name ', characterName)
+
         let noteDiv = document.getElementsByClassName(characterName)[0];
         if (noteDiv) {
           if (noteDiv.classList.contains('noDisplay')) {
             noteDiv.classList.remove('noDisplay');
-            console.log('playerId after display ', playerId);
-            console.log('character name after display ', characterName)
+
           } else {
             noteDiv.classList.add('noDisplay');
             setRetireNote('');

@@ -13,7 +13,7 @@ function FollowedGamesPlayers() {
     const [userId, setUserId] = useState(null);
     const [matchedDates, setMatchedDates] = useState([]);
 
-    console.log(playerId);
+
     const { data, loading } = useQuery(GET_FOLLOWED_PLAYERS, { variables: { playerId } });
     const { data: gameData, loading: gameLoading } = useQuery(GET_FOLLOWED_GAMES, { variables: { playerId } });
     const { data: visitedDate } = useQuery(GET_FOLLOWED_VISITED_TIME, { variables: { playerId } });
@@ -25,19 +25,17 @@ function FollowedGamesPlayers() {
             let visitedArray = visitedDate.getFollowedTimeStamps;
 
             for (let game of followedGamesArray) {
-                console.log('ARRAY', followedGamesArray);
-                console.log(game.id);
+
             }
 
             for (let visitDate of visitedArray) {
-                console.log(visitDate);
+
             }
 
             for (let game of followedGamesArray) {
-                console.log('GAMID', game.id)
+
                 for (let visitDate of visitedArray) {
-                    console.log('game', game.id);
-                    console.log('visitdate', visitDate.gameId)
+
                     if (game.id === visitDate.gameId) {
                         setMatchedDates(matchedDates => [{game, visitDate}, ...matchedDates]);
                     }
@@ -48,12 +46,12 @@ function FollowedGamesPlayers() {
 
     useEffect(() => {
         matchUpDates();
-        console.log('DATA => ', gameData)
+
     },[visitedDate, gameData]);
 
     useEffect(() => {
 
-        console.log('user', sessionUser);
+
         if (sessionUser !== null && sessionUser !== undefined) {
             setUserId(sessionUser.id);
         }

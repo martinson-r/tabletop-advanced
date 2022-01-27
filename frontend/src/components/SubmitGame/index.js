@@ -49,8 +49,6 @@ function SubmitGame() {
     const handleSubmit = (e) => {
       e.preventDefault();
       submitGame(userId, title, description, gameLanguageId, gameRulesetId, gameTypeId)
-      // .catch((error) => {
-      //   console.log("Error: " + error)})
     };
 
     useEffect(() => {

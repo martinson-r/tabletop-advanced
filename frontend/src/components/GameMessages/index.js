@@ -204,7 +204,7 @@ function GameMessages(props) {
           variables: { gameId },
           updateQuery: (prev, { subscriptionData }) => {
 
-            console.log('SUB DATA...', subscriptionData);
+
 
             if (!subscriptionData.data) return prev;
             const newFeedItem = subscriptionData.data.messageSent;
@@ -219,7 +219,7 @@ function GameMessages(props) {
         });
       }
 
-      console.log('SPEC DATA', spectatorData);
+
 
       if (spectatorData !== undefined) {
         spectatorSubscribe({
@@ -267,7 +267,7 @@ const fetchAndOffset = () => {
 const spectatorFetchAndOffset = () => {
   setOffset(offset + 20);
 
-  console.log('spec offset', offset);
+
 
   spectatorFetchMore({
     variables: {
@@ -293,7 +293,7 @@ const spectatorFetchAndOffset = () => {
 
       <div className="messagesContainer">
       <div className="messageListing"  data-status={hideSpectatorChat}>
-      {console.log('GAME DATA ', gameData, 'IS PLAYER ', isPlayer, 'SESSION USER ', sessionUser)}
+
       {sessionUser !== undefined && userId !== null && gameData !== undefined && (isPlayer === false && gameData.game.host.id !== userId.toString()) && (
           <div className="notification spectator">You are a spectator</div>)}
       <div
@@ -320,7 +320,7 @@ const spectatorFetchAndOffset = () => {
   >
 
     {/* this is blank */}
-    {console.log('SORTED: ', sortedConvos)}
+
     {sortedConvos && sortedConvos.length !== 0 && sortedConvos.map(message =>
             message.spectatorChat !== true && <MessageBox key={uuidv4()} message={message}
             userId={userId} gameId={gameId} gameData={gameData}/>)}
@@ -335,7 +335,7 @@ const spectatorFetchAndOffset = () => {
           (<div>
             <div className="actionBox">
 
-              {console.log('GAME DATA...', gameData)}
+
 
             { userId === gameData.game.host.id && (<div><input
               name="event"
@@ -353,7 +353,7 @@ const spectatorFetchAndOffset = () => {
               </div>
             </div>
             <div className="sendChatBox">
-              {console.log('GM Chat?', isGmChat)}
+
           <SendChatBox gameId={gameId} userId={userId} spectatorChat={false} isAction={isAction} isEvent={isEvent} isGmChat={isGmChat} />
           </div>
 

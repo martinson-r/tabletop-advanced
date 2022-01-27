@@ -13,7 +13,7 @@ function RuleSetPage() {
 
     const { rulesetid } = useParams();
 
-    console.log(rulesetid);
+
     const { loading, error, data } = useQuery(GET_GAMES_WITH_RULESET, { variables: { rulesetid }});
 
     //TODO: Query to get all games with ruleset matching ID from params
