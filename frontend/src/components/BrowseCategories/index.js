@@ -43,15 +43,22 @@ function BrowseCategories() {
     },[offset]);
 
     let loadMoreGames = () => {
-        setOffset(offset => offset+2);
+        setOffset(offset => offset+20);
+    }
+
+    let loadPrevGames = () => {
+        if (offset >= 20) {
+            setOffset(offset => offset-20);
+        } else {
+            setOffset(0)
+        }
     }
 
     return (
         <div>
 
-            {browsingData && browsingData.paginatedGames.rows?.map(game => <div>{game.title} presented by {game.host.userName}</div>
-            )}
-            <button onClick={loadMoreGames}>Load more</button>
+            {browsingData && browsingData.paginatedGames.rows?.map(game => <div>{game.title} presented by {game.host.userName}</div>)}
+            <button onClick={loadPrevGames}>Prev</button><button onClick={loadMoreGames}>Next</button>
         </div>
     )
 
