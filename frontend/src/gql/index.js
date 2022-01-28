@@ -51,6 +51,7 @@ const GET_GAMES = gql`
     }
 `;
 
+//rulesets will eventually be paginated by default
 const GET_RULESETS = gql`
     query GetAllRulesets {
        rulesets {
@@ -208,6 +209,21 @@ query GetCharacter($userId: ID, $gameId: ID) {
         imageUrl
     }
 }
+`
+
+const GET_PAGINATED_GAMES = gql`
+query GetPaginatedGames($offset: Int) {
+        paginatedGames(offset: $offset) {
+          rows{
+            id
+            title
+            host{
+              userName
+            }
+          }
+
+        }
+    }
 `
 
 const GET_CHARACTER_BY_ID = gql`
@@ -1109,6 +1125,7 @@ export { GET_ACCOUNTS,
         MARK_MESSAGES_SEEN,
         CHECK_FOLLOW_PLAYER,
         GET_PLAYING_WAITING_GAMES,
+        GET_PAGINATED_GAMES,
         GET_GAMES_PLAYING_IN,
         GET_WAITING_LIST_GAMES,
         NEW_VISIT,

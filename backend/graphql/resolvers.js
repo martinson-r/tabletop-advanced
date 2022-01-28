@@ -60,31 +60,30 @@ const resolvers = {
             id = context.user.id;
             return User.findByPk(id);
         },
-        games: async (obj, args, context, info) => {
-            // if (!context.user) return null;
-            //console.log('context', context.user);
-            //userid is context.user.id
 
-            //will need to replace with FindAndCountAll
-            //for pagination?
-            //will require an Offset
-            //add [Op.or] for ruleset and genre
-            //and make them optional
-            //returning all games if they are not specified
+        games: (obj, args, context, info) => {
+            return Game.findAll({
+                include: [ {model: User, as: "host"}]});
+        },
 
-            //getting the newest is easy, most popular is trickier...
+        paginatedGames: (obj, args, context, info) => {
+
+            const { offset } = args;
+
+            console.log('offset args', offset);
+
+            return Game.findAndCountAll({
+                include: [ {model: User, as: "host"}],
+                offset: offset,
+                limit: 2
+            });
+        },
+
+        mostPopularGames: async (obj, args, context, info) => {
+
+            //This returns the 20 most popular games
 
             //1. find all games with most followers
-
-            //ex:
-            //Game.findAll({
-            //include: [{model: User,
-            //           as: "follower",
-            //           include: [sequelize.fn('COUNT', sequelize.col('follower.id')), 'count']}]
-            //     limit: 20 ,
-            //     group: ['User.id'],
-            //order: [['count', 'DESC']]
-            // })
 
             //2. find all games most recently updated
 
@@ -118,9 +117,7 @@ const resolvers = {
         })
 
         //this will get the most recent messages
-        //need to figure out how to limit the number of messages,
-        //while the game is unique
-        //fn DISTINCT does not work
+        //where the game id is unique
         let messages = await Message.findAll({
 
             where: { gameId: { [Op.or]: [...arrayOfGameIds]} },
@@ -140,8 +137,6 @@ const resolvers = {
             "Message.id",
             "Game->host.id",
             "Game->host.userName"
-            //"host.id",
-            //"Game.hostId"
         ]})
 
         //Weight games:
@@ -161,12 +156,12 @@ const resolvers = {
         console.log('combined now minus msgs ....', combined)
 
         //we'll take the first place each one appears in the
-        //merged array (games with more messages will always show up
+        //merged array (games with more recent messages will always show up
         //first) and get rid of the next one
 
-        deduped = combined.filter((game,index,array)=>array.findIndex(otherGame=>(otherGame.id===game.id))===index)
-
-            console.log('dedupes in order 5:06', deduped);
+        deduped = combined.filter((game,index,array) =>
+        array.findIndex(otherGame =>
+            (otherGame.id === game.id)) === index)
 
             return deduped;
 

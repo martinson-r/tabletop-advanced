@@ -25,6 +25,7 @@ import CharacterSheetList from "./components/CharacterSheetList";
 import CharacterSheet from "./components/CharacterSheet";
 import NewCharacterSheet from "./components/NewCharacterSheet";
 import FollowedGamesPlayers from "./components/FollowedGamesPlayers";
+import BrowseCategories from "./components/BrowseCategories";
 
 import { GET_USER } from "./gql";
 import {
@@ -70,6 +71,7 @@ function App() {
         <Route path="/charactersheets/list/:playerId" component={CharacterSheetList}></Route>
         <Route path="/charactersheets/:characterSheetId" component={CharacterSheet}></Route>
         <Route path="/:playerId/followed" component={FollowedGamesPlayers}></Route>
+        <Route path="/browse" component={BrowseCategories}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
     </div>

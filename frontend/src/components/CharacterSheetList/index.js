@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams, Link, useHistory } from "react-router-dom";
 import {
-    useLazyQuery, useMutation, useQuery
+    useQuery
   } from "@apollo/client";
 import { GET_CHARACTERSHEET_LIST_BY_PLAYER } from "../../gql"
 import { v4 as uuidv4 } from 'uuid';

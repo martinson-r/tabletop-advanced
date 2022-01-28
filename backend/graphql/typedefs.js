@@ -11,6 +11,8 @@ const typeDefs = gql`
     rulesets: [Ruleset]
     game(gameId: ID!): Game
     messages: [Message]
+    mostPopularGames: [Game]
+    paginatedGames(offset: Int): CountAllGames
     convos(gameId: ID, offset: Int): CountAll
     spectatorConvos(gameId: ID, offset: Int): CountAll
     getNonGameConvos(userId: ID!): [User]
@@ -231,6 +233,10 @@ const typeDefs = gql`
   }
   type CountAll {
     rows: [Message]
+    count: Int
+  }
+  type CountAllGames {
+    rows: [Game]
     count: Int
   }
   type GameTime {
