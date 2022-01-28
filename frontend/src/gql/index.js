@@ -51,12 +51,20 @@ const GET_GAMES = gql`
     }
 `;
 
-//rulesets will eventually be paginated by default
 const GET_RULESETS = gql`
     query GetAllRulesets {
        rulesets {
             id,
             ruleset
+       }
+    }
+`;
+
+const GET_GENRES = gql`
+    query GetAllGenres {
+       genres {
+            id,
+            name
        }
     }
 `;
@@ -212,8 +220,8 @@ query GetCharacter($userId: ID, $gameId: ID) {
 `
 
 const GET_PAGINATED_GAMES = gql`
-query GetPaginatedGames($offset: Int) {
-        paginatedGames(offset: $offset) {
+query GetPaginatedGames($offset: Int, $ruleSetId: ID, $genreId: ID) {
+        paginatedGames(offset: $offset, ruleSetId: $ruleSetId, genreId: $genreId) {
           rows{
             id
             title
@@ -1104,6 +1112,7 @@ export { GET_ACCOUNTS,
         GET_GAMES,
         GET_GAMES_WITH_RULESET,
         GET_RULESETS,
+        GET_GENRES,
         GET_GAME,
         GET_CHARACTER,
         GET_CHARACTER_BY_ID,

@@ -9,10 +9,11 @@ const typeDefs = gql`
     gamesWithRuleset(rulesetid: ID): [Game]
     character(userId: ID, gameId: ID): Character
     rulesets: [Ruleset]
+    genres: [Genre]
     game(gameId: ID!): Game
     messages: [Message]
     mostPopularGames: [Game]
-    paginatedGames(offset: Int): CountAllGames
+    paginatedGames(offset: Int, ruleSetId: ID, genreId: ID): CountAllGames
     convos(gameId: ID, offset: Int): CountAll
     spectatorConvos(gameId: ID, offset: Int): CountAll
     getNonGameConvos(userId: ID!): [User]
@@ -193,6 +194,10 @@ const typeDefs = gql`
   type Ruleset {
     id: ID,
     ruleset: String
+  }
+  type Genre {
+    id: ID,
+    name: String
   }
   type Conversation {
     id: ID

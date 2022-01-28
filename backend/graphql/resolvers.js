@@ -1,4 +1,4 @@
-const { Message, Recipient, FollowedGame, FollowedPlayer, MetaGameMessageType, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist, CharacterSheet } = require('../db/models');
+const { Message, Genre, Recipient, FollowedGame, FollowedPlayer, MetaGameMessageType, PlayerJoin, Conversation, Character, User, Game, Application, Language, Ruleset, GameType, AboutMe, Waitlist, CharacterSheet } = require('../db/models');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const { Op } = require('sequelize');
 const { UserInputError } = require('apollo-server-express');
@@ -68,15 +68,42 @@ const resolvers = {
 
         paginatedGames: (obj, args, context, info) => {
 
-            const { offset } = args;
+            const { offset, genreId, ruleSetId } = args;
 
-            console.log('offset args', offset);
+            if (!genreId && !ruleSetId) {
+                return Game.findAndCountAll({
+                    include: [{model: User, as: "host" }],
+                    offset: offset,
+                    limit: 20
+                });
+            }
+            if (genreId && !ruleSetId) {
+                return Game.findAndCountAll({
+                    include: [{model: User, as: "host" }],
+                    where: { genreId },
+                    offset: offset,
+                    limit: 20
+                });
+            }
+            if (ruleSetId && !genreId) {
+                console.log('rule set id', ruleSetId);
 
-            return Game.findAndCountAll({
-                include: [ {model: User, as: "host"}],
-                offset: offset,
-                limit: 2
-            });
+                return Game.findAndCountAll({
+                    include: [{model: User, as: "host" }],
+                    where: { ruleSetId },
+                    offset: offset,
+                    limit: 20
+                });
+
+            }
+            if (ruleSetId && genreId) {
+                return Game.findAndCountAll({
+                    include: [{model: User, as: "host" }],
+                    where: { [Op.and]: [{ genreId }, {ruleSetId }] },
+                    offset: offset,
+                    limit: 20
+                });
+            }
         },
 
         mostPopularGames: async (obj, args, context, info) => {
@@ -107,8 +134,6 @@ const resolvers = {
             limit: 20,
             order: [['count', 'DESC']]
         });
-
-        console.log(games);
 
         let arrayOfGameIds = [];
 
@@ -153,8 +178,6 @@ const resolvers = {
         //combined, with duplication
         let combined = [...gamesFromMessages, ...games];
 
-        console.log('combined now minus msgs ....', combined)
-
         //we'll take the first place each one appears in the
         //merged array (games with more recent messages will always show up
         //first) and get rid of the next one
@@ -166,6 +189,7 @@ const resolvers = {
             return deduped;
 
         },
+
         gamesWithRuleset: (obj, args, context, info) => {
             console.log(args);
             const {rulesetid} = args
@@ -174,10 +198,17 @@ const resolvers = {
                 include: [{model: User, as: "host"}]
             });
         },
+
         rulesets: (obj, args, context, info) => {
 
             return Ruleset.findAll();
         },
+
+        genres: (obj, args, context, info) => {
+
+            return Genre.findAll();
+        },
+
         game:(obj, args, context, info) => {
            const {gameId} = args;
         //    return Game.findByPk(gameId, {include: [{model: User, as: "host"}, {model: User, as: "player"}, {model: Application, include: [{model: User, as: "applicationOwner"}]}]});
