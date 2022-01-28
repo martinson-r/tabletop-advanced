@@ -144,7 +144,7 @@ useEffect(() => {
   if (!unreadLoading && messagesReadStatus !== undefined){
 
     //checkReduxStoreForUnreadMessages();
-    if (unreadData.length === 0) {
+    if (unreadData?.length === 0) {
       setNewMessages(false);
       return;
     }

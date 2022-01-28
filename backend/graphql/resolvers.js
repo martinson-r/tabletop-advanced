@@ -5,7 +5,8 @@ const { UserInputError } = require('apollo-server-express');
 const bcrypt = require('bcryptjs');
 const user = require('../db/models/user');
 const game = require('../db/models/game');
-const jsonwebtoken = require('jsonwebtoken')
+const jsonwebtoken = require('jsonwebtoken');
+const sequelize = require("sequelize");
 
 const pubsub = new PubSub();
 
@@ -59,13 +60,116 @@ const resolvers = {
             id = context.user.id;
             return User.findByPk(id);
         },
-        games: (obj, args, context, info) => {
+        games: async (obj, args, context, info) => {
             // if (!context.user) return null;
             //console.log('context', context.user);
             //userid is context.user.id
-            return Game.findAll({
-                include: [{model: User, as: "host"}]
-            });
+
+            //will need to replace with FindAndCountAll
+            //for pagination?
+            //will require an Offset
+            //add [Op.or] for ruleset and genre
+            //and make them optional
+            //returning all games if they are not specified
+
+            //getting the newest is easy, most popular is trickier...
+
+            //1. find all games with most followers
+
+            //ex:
+            //Game.findAll({
+            //include: [{model: User,
+            //           as: "follower",
+            //           include: [sequelize.fn('COUNT', sequelize.col('follower.id')), 'count']}]
+            //     limit: 20 ,
+            //     group: ['User.id'],
+            //order: [['count', 'DESC']]
+            // })
+
+            //2. find all games most recently updated
+
+            //3. function to sort them
+
+            let games = await Game.findAll({
+            include: [ {model: User, as: "host"}, {
+              model: User,
+              as: "followinguser",
+              attributes: ['id', [sequelize.fn('COUNT', sequelize.col('followinguser.id')), 'count']],
+              duplicating: false,
+              required: false,
+            }],
+            group: ['Game.id',
+            'followinguser->FollowedGames.createdAt',
+            'followinguser->FollowedGames.updatedAt',
+            'followinguser->FollowedGames.gameId',
+            'followinguser->FollowedGames.userId',
+            'followinguser.id',
+            'host.id'],
+            limit: 20,
+            order: [['count', 'DESC']]
+        });
+
+        console.log(games);
+
+        let arrayOfGameIds = [];
+
+        games.forEach((game) => {
+            arrayOfGameIds.push(game.id);
+        })
+
+        //this will get the most recent messages
+        //need to figure out how to limit the number of messages,
+        //while the game is unique
+        //fn DISTINCT does not work
+        let messages = await Message.findAll({
+
+            where: { gameId: { [Op.or]: [...arrayOfGameIds]} },
+            attributes:[[(sequelize.fn('DISTINCT'), sequelize.col('gameId')), "gameId"]],
+            include: { model: Game,
+                //missing FROM-clause entry for table \"host\"
+                include: [{
+                    model: User,
+                    as: "host",
+                    attributes: ["id", "userName"]}]
+                },
+            limit: 1,
+            order: [['createdAt', 'DESC']],
+            group: ['Game.id',
+            "Message.gameId",
+            "Message.createdAt",
+            "Message.id",
+            "Game->host.id",
+            "Game->host.userName"
+            //"host.id",
+            //"Game.hostId"
+        ]})
+
+        //Weight games:
+
+        //order by most recent, then by followers.
+        messages.sort(function(firstMessage, secondMessage) {
+            return firstMessage.createdAt - secondMessage.createdAt
+        });
+
+        let gamesFromMessages = [];
+
+        messages.forEach(message => gamesFromMessages.push(message.Game));
+
+        //combined, with duplication
+        let combined = [...gamesFromMessages, ...games];
+
+        console.log('combined now minus msgs ....', combined)
+
+        //we'll take the first place each one appears in the
+        //merged array (games with more messages will always show up
+        //first) and get rid of the next one
+
+        deduped = combined.filter((game,index,array)=>array.findIndex(otherGame=>(otherGame.id===game.id))===index)
+
+            console.log('dedupes in order 5:06', deduped);
+
+            return deduped;
+
         },
         gamesWithRuleset: (obj, args, context, info) => {
             console.log(args);
@@ -110,8 +214,9 @@ const resolvers = {
         },
 
         getFollowedTimeStamps: (obj, args, context, info) => {
-            const { playerId } = args;
-            return FollowedGame.findAll({where: {userId: playerId} });
+            if (!context.user) return null;
+            let userId = context.user.id;
+            return FollowedGame.findAll({where: {userId} });
         },
 
         getFollowedPlayers:(obj, args, context, info) => {

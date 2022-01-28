@@ -59,14 +59,6 @@ export const setVisited = (game) => ({
       payload: gameActivity
   })
 
-  // export const setUnchecked = (data) => async (dispatch) => {
-
-  //   console.log('unchecked data', data)
-  //   dispatch(settingUnchecked(data));
-
-  // };
-
-
   export const logoutUser = (data) => async (dispatch) => {
     dispatch(loggingOutUser()) ;
   }
@@ -103,6 +95,7 @@ function messageReducer(state = initialState, action) {
         let gamesArrayCopy = [...state.games];
 
         let filteredArray = gamesArrayCopy.filter(game => game.gameId !== action.payload);
+
         //figure out which object has the gameId in it and remove it
         newState = {games: [...filteredArray]};
             return newState;
@@ -111,9 +104,9 @@ function messageReducer(state = initialState, action) {
       console.log('state 1', state.uncheckedGameIds)
       let arrayCopy = [...state.uncheckedGameIds];
 
+      //figure out which object has the gameId in it and remove it
       arrayCopy.splice(arrayCopy.indexOf(action.payload), 1);
       newState = {...state, uncheckedGameIds: [...arrayCopy]};
-      console.log('state 2', newState)
           return newState;
 
     default:

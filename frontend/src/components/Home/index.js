@@ -12,6 +12,8 @@ import GameMessages from "../GameMessages";
 
 function Home() {
 
+
+
     //Grab our session user
     const sessionUser = useSelector(state => state.session.user);
     const [userId, setUserId] = useState("");
@@ -71,10 +73,14 @@ function Home() {
         )
     }
 
+    {console.log('gameData', data)}
+
     if (data && !loading) {
 
         //Just turning data.games into something easier to work with
         const gameData = data.games;
+
+
 
         //make copy of ruleSetsData so that we are able to sort it
 
@@ -94,7 +100,10 @@ function Home() {
 
      return (
 
+
+
         <div className="main-container">
+
             <div className="newest-games-container">
                 {/* TODO: grid this, align everything to bottom */}
                 <div><b className="newest-title">Newest Games</b>
@@ -110,12 +119,20 @@ function Home() {
             <div className="top-game-display-container">
                 <div className="recent-games-list">
 
-                    {/* <p>Active Games:</p> */}
+                    {/* Top Games: */}
+                    {/* TODO: display "top" 20-50 games
+                    (for now... games with most followers, in order by
+                    followers and then by updatedAt).
+                    Button 'see more' directs to a dedicated page
+                    with pagination (next and prev buttons) */}
                     {gameData && (gameData.map((game) =>
                     (game.active === true && (<div key={uuidv4()} className="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, presented by {game.host.userName}<br /><span className="premise"><i>{game.blurb}</i></span></p></div>))
                     ))}
+                    {/* See More - links to GamesList */}
 
                     {/* Show inactive games conditionally */}
+                    {/* TODO: this may be irrelevant & can be removeFromUnchecked
+                    from the home page */}
                     {displayInactive === true && (<span><p>Inactive Games:</p>
                     {gameData.map((game) =>
                     (game.active === false && game.deleted === false && (<div key={uuidv4()} className="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}<br />Premise: {game.blurb}</p></div>))
@@ -128,6 +145,9 @@ function Home() {
                     )}</span>)} */}
 
                 </div>
+
+                {/* TODO: remove from Home. Demo button can just go to
+                a random popular game. */}
                 <div className="popular-game-preview">
                     <GameMessages gameId={gameId} />
                 </div>
@@ -139,13 +159,14 @@ function Home() {
                         <h2 className="game-filters-heading">Games by Ruleset:</h2>
                     {/* TODO: fetch all rulesets from database and map containers */}
                     <div className="game-cards-container">
+                        {/* This will be replaced by data fed into GamesList */}
                        {ruleSetsData !==undefined && (ruleSetsData.map((ruleset) =>  <Link key={uuidv4()} to={`/rulesets/${ruleset.id}`}><div key={uuidv4()} className="game-card">
                        <p>{ruleset.ruleset}</p>
                         </div></Link>))}
                     </div>
                 </div>
                 <div>
-                    {/* TODO: add Genres to database */}
+                    {/* TODO: add Genres to database & queries */}
                     {/* <div>
                         <p>Games by Genre:</p>
                     </div>

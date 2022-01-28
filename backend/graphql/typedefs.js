@@ -298,6 +298,7 @@ const typeDefs = gql`
     hostId: ID
     updatedAt: String
     Messages: [Message]
+    followinguser: [User]
   }
   type Application {
     id: ID
