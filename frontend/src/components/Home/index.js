@@ -104,20 +104,34 @@ function Home() {
 
         <div className="main-container">
 
-            <div className="newest-games-container">
-                {/* TODO: grid this, align everything to bottom */}
+            <h3>Tabletop Advanced</h3>
+            <p>Play games online with your friends</p>
+            <Link to="/signup">Start Playing</Link>
+            {/* TODO: search users */}
+            <Link to="#">Find Friends</Link>
+
+            <p>Keep up with the community and follow along with popular games</p>
+            {/* <p>Cause mayhem, comment, and play along in DM-approved in-game events and community-choice polls</p> */}
+            <p>Join in the adventure and play in a campaign or host one yourself</p>
+
+            {/* TODO: randomize from top 20 games */}
+            <p>Still on the fence? <Link to={`/game/1/gameroom`}>See a demo</Link></p>
+            <Link to="/signup">Start your adventure now</Link>
+
+            {/* <div className="newest-games-container">
+
+
                 <div><b className="newest-title">Newest Games</b>
                 <input type="checkbox"  checked={displayInactive} onChange={changeDisplayInactive}/>
                 <label>Show inactive games</label></div>
 
-                {/* <label>Show waitlist closed</label>
-                <input type="checkbox" checked={displayClosedWaitlist} onChange={changeDisplayClosedWaitlist}/> */}
-                <Link className="create-game-button" to="/start-game">Create a Game</Link>
-            </div>
 
-                {/* TODO: position and style */}
-            <div className="top-game-display-container">
-                <div className="recent-games-list">
+                <Link className="create-game-button" to="/start-game">Create a Game</Link>
+            </div> */}
+
+
+            {/* <div className="top-game-display-container">
+                <div className="recent-games-list"> */}
 
                     {/* Top Games: */}
                     {/* TODO: display "top" 20-50 games
@@ -125,18 +139,18 @@ function Home() {
                     followers and then by updatedAt).
                     Button 'see more' directs to a dedicated page
                     with pagination (next and prev buttons) */}
-                    {gameData && (gameData.map((game) =>
+                    {/* {gameData && (gameData.map((game) =>
                     (game.active === true && (<div key={uuidv4()} className="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, presented by {game.host.userName}<br /><span className="premise"><i>{game.blurb}</i></span></p></div>))
-                    ))}
+                    ))} */}
                     {/* See More - links to GamesList */}
 
                     {/* Show inactive games conditionally */}
                     {/* TODO: this may be irrelevant & can be removeFromUnchecked
                     from the home page */}
-                    {displayInactive === true && (<span><p>Inactive Games:</p>
+                    {/* {displayInactive === true && (<span><p>Inactive Games:</p>
                     {gameData.map((game) =>
                     (game.active === false && game.deleted === false && (<div key={uuidv4()} className="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}/gameroom`}>{game.title}</Link>, hosted by {game.host.userName}<br />Premise: {game.blurb}</p></div>))
-                    )}</span>)}
+                    )}</span>)} */}
 
                     {/* Show closed waitlist games conditionally */}
                     {/* {displayClosedWaitlist === true && (<span><p>Games With Closed Waitlists:</p>
@@ -144,53 +158,32 @@ function Home() {
                     (game.waitListOpen === false && (<div class="gameBox"><p key={uuidv4()}><Link to={`/game/${game.id}`}>{game.title}</Link>, hosted by {game.host.userName}</p></div>))
                     )}</span>)} */}
 
-                </div>
+                {/* </div> */}
 
                 {/* TODO: remove from Home. Demo button can just go to
                 a random popular game. */}
-                <div className="popular-game-preview">
+                {/* <div className="popular-game-preview">
                     <GameMessages gameId={gameId} />
-                </div>
-        </div>
-        <div className="bottom-game-display-container">
+                </div> */}
+        {/* </div> */}
+        {/* <div className="bottom-game-display-container">
             <div className="game-filters">
-                 {/* TODO: a component that fetches/displays by category fed in */}
+
                 <div>
                         <h2 className="game-filters-heading">Games by Ruleset:</h2>
-                    {/* TODO: fetch all rulesets from database and map containers */}
+
                     <div className="game-cards-container">
-                        {/* This will be replaced by data fed into GamesList */}
+
                        {ruleSetsData !==undefined && (ruleSetsData.map((ruleset) =>  <Link key={uuidv4()} to={`/rulesets/${ruleset.id}`}><div key={uuidv4()} className="game-card">
                        <p>{ruleset.ruleset}</p>
                         </div></Link>))}
                     </div>
                 </div>
                 <div>
-                    {/* TODO: add Genres to database & queries */}
-                    {/* <div>
-                        <p>Games by Genre:</p>
-                    </div>
-                    <div className="game-cards-container">
-                        <div className="game-card">
-
-                        </div>
-                        <div className="game-card">
-
-                        </div>
-                        <div className="game-card">
-
-                        </div>
-                        <div className="game-card">
-
-                        </div>
-                        <div className="game-card">
-
-                        </div>
-                    </div> */}
 
                 </div>
             </div>
-        </div>
+        </div> */}
     </div>
      )
      }

@@ -26,6 +26,8 @@ import CharacterSheet from "./components/CharacterSheet";
 import NewCharacterSheet from "./components/NewCharacterSheet";
 import FollowedGamesPlayers from "./components/FollowedGamesPlayers";
 import BrowseCategories from "./components/BrowseCategories";
+import GenresPage from "./components/GenresPage";
+import Footer from "./components/Footer";
 
 import { GET_USER } from "./gql";
 import {
@@ -36,8 +38,6 @@ function App() {
   const dispatch = useDispatch();
   const { data, loading, error } = useQuery(GET_USER);
   const [isLoaded, setIsLoaded] = useState(false);
-
-  console.log('DATA APP', data);
 
   useEffect(() => {
       dispatch(sessionActions.restoreUser(data)).then(() => setIsLoaded(true));
@@ -67,6 +67,7 @@ function App() {
         <Route path="/search/:text" component={SearchResults} exact={true}></Route>
         <Route path="/conversations" component={ConversationList}></Route>
         <Route path="/rulesets/:rulesetid" component={RuleSetPage}></Route>
+        <Route path="/genres/:genreId" component={GenresPage}></Route>
         <Route path="/charactersheets/new" component={NewCharacterSheet}></Route>
         <Route path="/charactersheets/list/:playerId" component={CharacterSheetList}></Route>
         <Route path="/charactersheets/:characterSheetId" component={CharacterSheet}></Route>
@@ -74,6 +75,7 @@ function App() {
         <Route path="/browse" component={BrowseCategories}></Route>
         <Route path="/" component={Home}></Route>
       </Switch>)}
+      <Footer></Footer>
     </div>
   );
 }

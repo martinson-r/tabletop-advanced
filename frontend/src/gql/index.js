@@ -225,6 +225,7 @@ query GetPaginatedGames($offset: Int, $ruleSetId: ID, $genreId: ID) {
           rows{
             id
             title
+            blurb
             host{
               userName
             }

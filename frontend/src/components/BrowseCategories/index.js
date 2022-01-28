@@ -128,36 +128,30 @@ function BrowseCategories() {
         <div>
             <div>
                 <div>
-                    <h3>Browse All Games</h3>
-                    <p onClick={() => {
+                    <h3><Link to="/browse/all">Browse All Games</Link></h3>
+                    {/* <p onClick={() => {
                     setRuleSetId(null);
                     setGenreId(null);
-                    }}>Browse All</p>
+                    }}>Browse All</p> */}
                 </div>
 
                 <div>
-                    <h3 onClick={showRulesets}>Filter by Ruleset</h3>
-                    <div id="rulesets" className="hidden">
+                    <h3>Rulesets</h3>
+                    <div id="rulesets" className="game-cards-container">
                     {rulesetsData?.rulesets?.map((ruleset) =>
-                        <div onClick={() => {
-                            setGenreId(null);
-                            setRuleSetId(ruleset.id);
-                        }}>
-                    {ruleset.ruleset}
-                    </div>)}
+                    <Link to={`rulesets/${ruleset.id}`}><div id="rulesets" className="game-card">
+
+                        {ruleset.ruleset}</div></Link>)}
                     </div>
                 </div>
-
                 <div>
-                    <h3 onClick={showGenres}>Filter by Genre</h3>
-                    <div id="genres" className="hidden">
+                    <h3>Genres</h3>
+                    <div id="genres" className="game-cards-container">
                     {genresData?.genres?.map((genre) =>
-                        <div onClick={() => {
-                            setRuleSetId(null);
-                            setGenreId(genre.id);
-                        }}>
-                    {genre.name}
-                    </div>)}
+                        <Link to={`/genres/${genre.id}`}><div className="game-card">
+
+                            {genre.name}
+                    </div></Link>)}
                     </div>
                 </div>
             </div>
